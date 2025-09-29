@@ -1,5 +1,5 @@
 {
-  "name": "server",
+  "name": "catfecito-backend",
   "version": "1.0.0",
   "main": "src/index.js",
   "scripts": {
@@ -7,10 +7,16 @@
     "dev": "nodemon src/index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": [],
+  "keywords": [
+    "ecommerce",
+    "PERN",
+    "express",
+    "postgresql",
+    "jwt"
+  ],
   "author": "",
   "license": "ISC",
-  "description": "",
+  "description": "Backend para e-commerce Catfecito usando PERN Stack",
   "dependencies": {
     "bcrypt": "^6.0.0",
     "cors": "^2.8.5",
