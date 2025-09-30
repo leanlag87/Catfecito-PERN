@@ -17,4 +17,10 @@ pool.on("error", (err) => {
   console.error("Error en la conexión a la base de datos", err);
 });
 
+// Test de conexión a la base de datos
+export async function testDB() {
+  await pool.query("SELECT 1");
+  console.log("Base de datos conectada correctamente desde la funcion testDB");
+}
+
 export default pool;
