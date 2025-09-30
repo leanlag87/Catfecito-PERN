@@ -187,6 +187,7 @@
 
 import express from "express";
 import morgan from "morgan";
+import authRoutes from "./router/auth.routes.js";
 
 const app = express();
 
@@ -199,6 +200,8 @@ app.use(express.urlencoded({ extended: false }));
 app.get("/", (req, res) =>
   res.json({ message: "Bienvenidos a la API de Catfecito" })
 );
+
+app.use("/api", authRoutes);
 
 // Middleware para manejar errores
 app.use((err, req, res, next) => {

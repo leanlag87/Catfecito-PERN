@@ -33,9 +33,6 @@ export async function register(req, res) {
     const user = result.rows[0];
     const token = await signAccessToken({ id: user.id, role: user.role });
 
-    // Si prefieres cookie en lugar de devolver el token en el body:
-    // res.cookie("token", token, { httpOnly: true, sameSite: "lax", maxAge: 24*60*60*1000 });
-
     return res.status(201).json({ user, token });
   } catch (err) {
     if (err.code === "23505") {
