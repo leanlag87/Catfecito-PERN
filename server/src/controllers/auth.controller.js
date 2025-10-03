@@ -34,11 +34,11 @@ export async function register(req, res) {
     const token = await signAccessToken({ id: user.id, role: user.role });
 
     return res.status(201).json({ user, token });
-  } catch (err) {
-    if (err.code === "23505") {
+  } catch (error) {
+    if (error.code === "23505") {
       return res.status(409).json({ message: "El email ya está registrado" });
     }
-    console.error(err);
+    console.error(error);
     return res.status(500).json({ message: "Error interno del servidor" });
   }
 }
@@ -122,8 +122,8 @@ export async function login(req, res) {
         canManageOrders: user.role === "admin",
       },
     });
-  } catch (err) {
-    console.error("Error en login:", err);
+  } catch (error) {
+    console.error("Error en login:", error);
     return res.status(500).json({
       message: "Error interno del servidor",
     });
