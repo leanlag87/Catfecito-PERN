@@ -3,6 +3,7 @@ import cors from "cors";
 import morgan from "morgan";
 import authRoutes from "./router/auth.routes.js";
 import userRoutes from "./router/user.routes.js";
+import categoryRoutes from "./router/category.routes.js";
 
 const app = express();
 
@@ -20,6 +21,7 @@ app.get("/", (req, res) =>
 
 app.use("/api", authRoutes);
 app.use("/api", userRoutes);
+app.use("/api", categoryRoutes);
 
 // Middleware para manejar errores
 app.use((err, req, res, next) => {
