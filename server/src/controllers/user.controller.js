@@ -234,6 +234,13 @@ export async function updateUserRole(req, res) {
 }
 
 // Desactivar/activar usuario (solo admin)
+/**
+ * si el usuario esta activo lo desactiva con una peticion PATCH
+ * Para activarlo de nuevo se hace la misma peticion PATCH, se invierte el valor
+ * No requiere body, solo el id en params
+ * Es decir que no hace falta poner en el body el estado en el que queremos dejar al usuario
+ *
+ */
 export async function toggleUserStatus(req, res) {
   const { id } = req.params;
 
