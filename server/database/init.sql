@@ -39,3 +39,26 @@ DROP TRIGGER IF EXISTS trg_set_updated_at_users ON users;
 CREATE TRIGGER trg_set_updated_at_usuarios
 BEFORE UPDATE ON users
 FOR EACH ROW EXECUTE FUNCTION set_updated_at();
+
+-- Tabla de categorías
+CREATE TABLE IF NOT EXISTS categories (
+  id SERIAL PRIMARY KEY,
+  name VARCHAR(100) NOT NULL UNIQUE,
+  description TEXT,
+  image_url VARCHAR(255),
+  is_active BOOLEAN DEFAULT TRUE,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Índice para búsquedas
+CREATE INDEX idx_categories_name ON categories(name);
+CREATE INDEX idx_categories_is_active ON categories(is_active);
+
+-- Insertar categorías de ejemplo
+INSERT INTO categories (name, description) VALUES
+  ('Café en Grano', 'Café en grano de alta calidad'),
+  ('Café Molido', 'Café molido listo para preparar'),
+  ('Accesorios', 'Accesorios para preparación de café'),
+  ('Merchandising', 'Productos de marca Catfecito')
+ON CONFLICT (name) DO NOTHING;
