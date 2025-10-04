@@ -3,6 +3,7 @@ import { verifyToken, verifyAdmin } from "../middlewares/auth.middleware.js";
 import {
   getProfile,
   updateProfile,
+  changePassword,
   getAllUsers,
   getUserById,
   updateUserRole,
@@ -15,6 +16,7 @@ const router = Router();
 // Usuario + Admin
 router.get("/profile", verifyToken, getProfile);
 router.put("/profile", verifyToken, updateProfile);
+router.put("/change-password", verifyToken, changePassword);
 
 // RUTAS ADMIN
 router.get("/", verifyToken, verifyAdmin, getAllUsers);
