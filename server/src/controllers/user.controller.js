@@ -1,3 +1,5 @@
+import { BCRYPT_ROUNDS } from "../config.js";
+import bcrypt from "bcrypt";
 import { pool } from "../db.js";
 
 // Obtener perfil del usuario autenticado
@@ -25,6 +27,8 @@ export async function getProfile(req, res) {
 }
 
 // Actualizar perfil del usuario autenticado
+// Nos permite actualizar los campos juntos o separados
+// Ej: nombre solo o correo solo
 export async function updateProfile(req, res) {
   const { name, email } = req.body;
   const userId = req.user.id;
@@ -60,6 +64,77 @@ export async function updateProfile(req, res) {
   } catch (error) {
     console.error("Error en updateProfile:", error);
     return res.status(500).json({ message: "Error al actualizar perfil" });
+  }
+}
+
+// Cambiar contraseña del usuario autenticado
+export async function changePassword(req, res) {
+  const { currentPassword, newPassword } = req.body;
+  const userId = req.user.id;
+
+  // Validaciones
+  if (!currentPassword || !newPassword) {
+    return res.status(400).json({
+      message: "Contraseña actual y nueva contraseña son requeridas",
+    });
+  }
+
+  if (newPassword.length < 8) {
+    return res.status(400).json({
+      message: "La nueva contraseña debe tener al menos 8 caracteres",
+    });
+  }
+
+  if (currentPassword === newPassword) {
+    return res.status(400).json({
+      message: "La nueva contraseña debe ser diferente a la actual",
+    });
+  }
+
+  try {
+    // Obtener contraseña actual del usuario
+    const userResult = await pool.query(
+      "SELECT password_hash FROM users WHERE id = $1",
+      [userId]
+    );
+
+    if (userResult.rowCount === 0) {
+      return res.status(404).json({ message: "Usuario no encontrado" });
+    }
+
+    // Verificar contraseña actual
+    const isValidPassword = await bcrypt.compare(
+      currentPassword,
+      userResult.rows[0].password_hash
+    );
+
+    if (!isValidPassword) {
+      return res.status(401).json({
+        message: "La contraseña actual es incorrecta",
+      });
+    }
+
+    // Hash de la nueva contraseña
+    const salt = await bcrypt.genSalt(BCRYPT_ROUNDS);
+    const newPasswordHash = await bcrypt.hash(newPassword, salt);
+
+    // Actualizar contraseña
+    await pool.query(
+      `UPDATE users 
+       SET password_hash = $1, updated_at = NOW() 
+       WHERE id = $2`,
+      [newPasswordHash, userId]
+    );
+
+    return res.status(200).json({
+      success: true,
+      message: "Contraseña actualizada exitosamente",
+    });
+  } catch (error) {
+    console.error("Error en changePassword:", error);
+    return res.status(500).json({
+      message: "Error al cambiar la contraseña",
+    });
   }
 }
 
