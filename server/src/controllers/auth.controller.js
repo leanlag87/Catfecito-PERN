@@ -1,4 +1,3 @@
-// server/src/controllers/auth.controller.js
 import { pool } from "../db.js";
 import bcrypt from "bcrypt";
 import { signAccessToken } from "../libs/jwt.js";
@@ -126,6 +125,27 @@ export async function login(req, res) {
     console.error("Error en login:", error);
     return res.status(500).json({
       message: "Error interno del servidor",
+    });
+  }
+}
+
+export async function logout(req, res) {
+  try {
+    // Opcional: Registrar la hora de logout
+    if (req.user?.id) {
+      await pool.query(`UPDATE users SET updated_at = NOW() WHERE id = $1`, [
+        req.user.id,
+      ]);
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Sesión cerrada exitosamente",
+    });
+  } catch (error) {
+    console.error("Error en logout:", error);
+    return res.status(500).json({
+      message: "Error al cerrar sesión",
     });
   }
 }
