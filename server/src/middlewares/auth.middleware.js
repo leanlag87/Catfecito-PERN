@@ -1,5 +1,5 @@
 import jwt from "jsonwebtoken";
-import { TOKEN_SECRET } from "../config.js";
+import { JWT_SECRET } from "../config.js";
 
 export const verifyToken = async (req, res, next) => {
   try {
@@ -22,7 +22,7 @@ export const verifyToken = async (req, res, next) => {
     }
 
     // Verificar y decodificar el token
-    const decoded = jwt.verify(token, TOKEN_SECRET);
+    const decoded = jwt.verify(token, JWT_SECRET);
 
     // Agregar datos del usuario al request
     req.user = {
