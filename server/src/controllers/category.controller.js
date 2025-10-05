@@ -155,18 +155,17 @@ export async function deleteCategory(req, res) {
   const { id } = req.params;
 
   try {
-    /// *** Descomentar cuando exista la tabla products *** ///
-    // Verificar si hay productos asociados
-    // const productsCount = await pool.query(
-    //   "SELECT COUNT(*) FROM products WHERE category_id = $1",
-    //   [id]
-    // );
+    //Verificar si hay productos asociados
+    const productsCount = await pool.query(
+      "SELECT COUNT(*) FROM products WHERE category_id = $1",
+      [id]
+    );
 
-    // if (parseInt(productsCount.rows[0].count) > 0) {
-    //   return res.status(400).json({
-    //     message: "No se puede eliminar una categoría con productos asociados",
-    //   });
-    // }
+    if (parseInt(productsCount.rows[0].count) > 0) {
+      return res.status(400).json({
+        message: "No se puede eliminar una categoría con productos asociados",
+      });
+    }
 
     const result = await pool.query(
       "DELETE FROM categories WHERE id = $1 RETURNING id, name",
