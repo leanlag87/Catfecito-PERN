@@ -155,7 +155,7 @@ export async function deleteCategory(req, res) {
   const { id } = req.params;
 
   try {
-    // Verificar si hay productos asociados
+    //Verificar si hay productos asociados
     const productsCount = await pool.query(
       "SELECT COUNT(*) FROM products WHERE category_id = $1",
       [id]

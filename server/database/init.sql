@@ -62,3 +62,31 @@ INSERT INTO categories (name, description) VALUES
   ('Accesorios', 'Accesorios para preparación de café'),
   ('Merchandising', 'Productos de marca Catfecito')
 ON CONFLICT (name) DO NOTHING;
+
+-- Tabla de productos
+
+CREATE TABLE IF NOT EXISTS products (
+  id SERIAL PRIMARY KEY,
+  name VARCHAR(255) NOT NULL,
+  description TEXT NOT NULL,
+  price DECIMAL(10, 2) NOT NULL CHECK (price >= 0),
+  stock INTEGER NOT NULL DEFAULT 0 CHECK (stock >= 0),
+  category_id INTEGER NOT NULL REFERENCES categories(id) ON DELETE RESTRICT,
+  image_url VARCHAR(500),
+  is_active BOOLEAN DEFAULT TRUE,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Índices
+CREATE INDEX idx_products_category_id ON products(category_id);
+CREATE INDEX idx_products_is_active ON products(is_active);
+CREATE INDEX idx_products_name ON products(name);
+
+-- Productos de ejemplo
+INSERT INTO products (name, description, price, stock, category_id) VALUES
+  ('Café Colombia Supremo', 'Café de origen colombiano de alta calidad', 15.99, 100, 1),
+  ('Café Arábica Etiopía', 'Café arábica con notas florales', 18.50, 50, 1),
+  ('Café Molido Espresso', 'Mezcla perfecta para espresso', 12.99, 80, 2),
+  ('Prensa Francesa', 'Cafetera de émbolo de vidrio', 25.00, 30, 3)
+ON CONFLICT DO NOTHING;
