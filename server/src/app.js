@@ -19,9 +19,9 @@ app.get("/", (req, res) =>
   res.json({ message: "Bienvenidos a la API de Catfecito" })
 );
 
-app.use("/api", authRoutes);
-app.use("/api", userRoutes);
-app.use("/api", categoryRoutes);
+app.use("/api/auth", authRoutes);
+app.use("/api/users", userRoutes);
+app.use("/api/categories", categoryRoutes);
 
 // Middleware para manejar errores
 app.use((err, req, res, next) => {
