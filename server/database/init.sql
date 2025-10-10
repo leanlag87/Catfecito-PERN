@@ -90,3 +90,19 @@ INSERT INTO products (name, description, price, stock, category_id) VALUES
   ('Café Molido Espresso', 'Mezcla perfecta para espresso', 12.99, 80, 2),
   ('Prensa Francesa', 'Cafetera de émbolo de vidrio', 25.00, 30, 3)
 ON CONFLICT DO NOTHING;
+
+-- Tabla de carrito de compras
+
+CREATE TABLE IF NOT EXISTS cart_items (
+  id SERIAL PRIMARY KEY,
+  user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  product_id INTEGER NOT NULL REFERENCES products(id) ON DELETE CASCADE,
+  quantity INTEGER NOT NULL DEFAULT 1 CHECK (quantity > 0),
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  UNIQUE(user_id, product_id) -- Un usuario no puede tener el mismo producto duplicado
+);
+
+-- Índices para mejorar rendimiento
+CREATE INDEX idx_cart_items_user_id ON cart_items(user_id);
+CREATE INDEX idx_cart_items_product_id ON cart_items(product_id);
