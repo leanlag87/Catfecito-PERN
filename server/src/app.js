@@ -7,6 +7,7 @@ import authRoutes from "./router/auth.routes.js";
 import userRoutes from "./router/user.routes.js";
 import categoryRoutes from "./router/category.routes.js";
 import productRoutes from "./router/product.routes.js";
+import cartRoutes from "./router/cart.routes.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -32,6 +33,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/categories", categoryRoutes);
 app.use("/api/products", productRoutes);
+app.use("/api/cart", cartRoutes);
 
 // Middleware para manejar errores
 app.use((err, req, res, next) => {
