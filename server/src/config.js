@@ -29,6 +29,9 @@ const config = {
   MP_ACCESS_TOKEN: process.env.MP_ACCESS_TOKEN,
   MP_PUBLIC_KEY: process.env.MP_PUBLIC_KEY,
   MP_WEBHOOK_SECRET: process.env.MP_WEBHOOK_SECRET,
+
+  // URL pública (ngrok)
+  BACKEND_URL: process.env.BACKEND_URL || "http://localhost:5000",
 };
 
 export default config;
@@ -48,4 +51,5 @@ export const {
   MP_ACCESS_TOKEN,
   MP_PUBLIC_KEY,
   MP_WEBHOOK_SECRET,
+  BACKEND_URL,
 } = config;
