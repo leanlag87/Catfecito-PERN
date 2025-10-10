@@ -9,6 +9,7 @@ import categoryRoutes from "./router/category.routes.js";
 import productRoutes from "./router/product.routes.js";
 import cartRoutes from "./router/cart.routes.js";
 import orderRoutes from "./router/order.routes.js";
+import paymentRoutes from "./router/payment.routes.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -36,6 +37,7 @@ app.use("/api/categories", categoryRoutes);
 app.use("/api/products", productRoutes);
 app.use("/api/cart", cartRoutes);
 app.use("/api/orders", orderRoutes);
+app.use("/api/payments", paymentRoutes);
 
 // Middleware para manejar errores
 app.use((err, req, res, next) => {
