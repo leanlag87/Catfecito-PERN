@@ -61,6 +61,10 @@ export async function createPreference(req, res) {
       currency_id: "ARS",
     }));
 
+    // Obtener URL base del backend (puede ser localhost o ngrok)
+    const backendUrl = process.env.BACKEND_URL || "http://localhost:5000";
+    //const frontendUrl = process.env.FRONTEND_URL || "http://localhost:3000";
+
     // Configurar preferencia de pago
     const preferenceData = {
       items: items,
@@ -68,22 +72,14 @@ export async function createPreference(req, res) {
         name: order.user_name,
         email: order.user_email,
       },
-      back_urls: {
-        success: `${
-          process.env.FRONTEND_URL || "http://localhost:3000"
-        }/payment/success`,
-        failure: `${
-          process.env.FRONTEND_URL || "http://localhost:3000"
-        }/payment/failure`,
-        pending: `${
-          process.env.FRONTEND_URL || "http://localhost:3000"
-        }/payment/pending`,
-      },
-      auto_return: "approved",
+      //   back_urls: {
+      //     success: `${frontendUrl}/payment/success?order_id=${order_id}`,
+      //     failure: `${frontendUrl}/payment/failure?order_id=${order_id}`,
+      //     pending: `${frontendUrl}/payment/pending?order_id=${order_id}`,
+      //   },
+      //auto_return: "approved",
       external_reference: order_id.toString(), // Importante para identificar la orden
-      notification_url: `${
-        process.env.BACKEND_URL || "http://localhost:5000"
-      }/api/payments/webhook`, // Webhook
+      notification_url: `${backendUrl}/api/payments/webhook`,
       statement_descriptor: "CATFECITO",
       metadata: {
         order_id: order_id,
