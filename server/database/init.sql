@@ -90,3 +90,51 @@ INSERT INTO products (name, description, price, stock, category_id) VALUES
   ('Café Molido Espresso', 'Mezcla perfecta para espresso', 12.99, 80, 2),
   ('Prensa Francesa', 'Cafetera de émbolo de vidrio', 25.00, 30, 3)
 ON CONFLICT DO NOTHING;
+
+-- Tabla de carrito de compras
+
+CREATE TABLE IF NOT EXISTS cart_items (
+  id SERIAL PRIMARY KEY,
+  user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  product_id INTEGER NOT NULL REFERENCES products(id) ON DELETE CASCADE,
+  quantity INTEGER NOT NULL DEFAULT 1 CHECK (quantity > 0),
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  UNIQUE(user_id, product_id) -- Un usuario no puede tener el mismo producto duplicado
+);
+
+-- Índices para mejorar rendimiento
+CREATE INDEX idx_cart_items_user_id ON cart_items(user_id);
+CREATE INDEX idx_cart_items_product_id ON cart_items(product_id);
+
+-- Tabla de ordenes
+CREATE TABLE IF NOT EXISTS orders (
+  id SERIAL PRIMARY KEY,
+  user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  total DECIMAL(10, 2) NOT NULL CHECK (total >= 0),
+  status VARCHAR(50) NOT NULL DEFAULT 'pending',
+  payment_id VARCHAR(255), -- ID de MercadoPago (cuando se implemente)
+  payment_status VARCHAR(50) DEFAULT 'pending',
+  shipping_address TEXT,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT valid_status CHECK (status IN ('pending', 'paid', 'processing', 'shipped', 'delivered', 'cancelled'))
+);
+
+-- Tabla de items de la orden
+CREATE TABLE IF NOT EXISTS order_items (
+  id SERIAL PRIMARY KEY,
+  order_id INTEGER NOT NULL REFERENCES orders(id) ON DELETE CASCADE,
+  product_id INTEGER NOT NULL REFERENCES products(id) ON DELETE RESTRICT,
+  quantity INTEGER NOT NULL CHECK (quantity > 0),
+  price DECIMAL(10, 2) NOT NULL CHECK (price >= 0), -- Precio al momento de la compra
+  subtotal DECIMAL(10, 2) NOT NULL CHECK (subtotal >= 0),
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Índices para mejorar rendimiento
+CREATE INDEX idx_orders_user_id ON orders(user_id);
+CREATE INDEX idx_orders_status ON orders(status);
+CREATE INDEX idx_orders_created_at ON orders(created_at);
+CREATE INDEX idx_order_items_order_id ON order_items(order_id);
+CREATE INDEX idx_order_items_product_id ON order_items(product_id);

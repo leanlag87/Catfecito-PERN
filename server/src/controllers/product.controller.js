@@ -165,6 +165,12 @@ export async function createProduct(req, res) {
 }
 
 // Actualizar producto (con imagen opcional)
+/**
+ *
+ * Se puede actualizar los productos desde insomnia, ya se de tipo json o form-data
+ * Para agregar o cambiar la imagen, usar form-data y el campo "image" de tipo file
+ * No es obligatorio la modificacion de todos los campos, se pueden modificar solo algunos
+ */
 export async function updateProduct(req, res) {
   const { id } = req.params;
   const { name, description, price, stock, category_id } = req.body;
