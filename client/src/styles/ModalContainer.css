@@ -1,0 +1,68 @@
+.cf-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  padding: 1rem;
+}
+
+.cf-modal {
+  background: #ffffff;
+  border-radius: 12px;
+  width: 100%;
+  height: fit-content;
+  max-width: 520px; /* reduced width */
+  box-shadow: 0 8px 24px rgba(0,0,0,0.20);
+  position: relative;
+  overflow: hidden;
+  animation: cf-modal-enter 160ms ease-out;
+}
+
+@keyframes cf-modal-enter {
+  from { transform: translateY(8px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.cf-modal-close {
+  position: absolute;
+  right: 12px;
+  top: 8px;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  border: none;
+  background: transparent;
+  font-size: 20px;
+  cursor: pointer;
+  color: #444;
+}
+
+.cf-modal-close:hover { background: rgba(0,0,0,0.04); }
+
+.cf-modal-content {
+  /* padding: 0.9rem 1.1rem; slimmer padding */
+  height: fit-content; /* leave more room for overlay */
+  overflow-y: auto;
+}
+
+/* Optional tighter variant if some screens need it */
+.cf-modal.tight { max-width: 420px; }
+
+/* Spinner animation for loading state */
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.spinner {
+  animation: spin 1s linear infinite;
+}
+
+/* Small responsive tweak */
+@media (max-width: 420px) {
+  .cf-modal { border-radius: 8px; }
+  .cf-modal-content { padding: 1rem; }
+}

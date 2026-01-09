@@ -1,0 +1,67 @@
+/* Layout para la página de productos */
+.products-container {
+  display: flex;
+  gap: 20px;
+  max-width: auto;
+  
+  padding: 0 10%;
+}
+
+.filters-section {
+  flex: 0 0 320px; /* Ancho fijo para los filtros */
+  position: sticky;
+  top: 25px;
+  height: fit-content;
+}
+
+.products-main {
+  flex: 1; /* El resto del espacio */
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+  min-width: 0; /* Evita overflow */
+}
+
+.sort-section {
+  width: 100%; /* Full width */
+  display: flex;
+  justify-content: flex-end; /* Alinear a la derecha */
+  padding: 12px 0;
+  border-bottom: 1px solid rgba(0,0,0,0.1);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .products-container {
+    flex-direction: column;
+    gap: 20px;
+  }
+  
+  .filters-section {
+    flex: none;
+    margin-right: 0;
+  }
+  
+  .sort-section {
+    justify-content: center;
+    padding: 0;
+  }
+  
+  .products-grid {
+    padding: 20px;
+  }
+}
+
+/* Responsive scaffold: media-query templates for this component */
+@media (max-width: 576px) {
+}
+@media (min-width: 577px) and (max-width: 767px) {
+}
+@media (min-width: 768px) and (max-width: 991px) {
+}
+@media (min-width: 992px) and (max-width: 1199px) {
+}
+@media (min-width: 1200px) and (max-width: 1399px) {
+}
+@media (min-width: 1400px) {
+}

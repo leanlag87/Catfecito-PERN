@@ -1,0 +1,91 @@
+/* Contenedor del botón de checkout */
+.checkout-button-container {
+  width: 100%;
+  margin-top: 20px;
+}
+
+.checkout-button-wrapper {
+  width: 100%;
+}
+
+.checkout-button-wrapper.hidden {
+  display: none;
+}
+
+/* Loading spinner */
+.checkout-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+  text-align: center;
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #5b3b2b;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 10px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.checkout-loading p {
+  margin: 0;
+  color: #666;
+  font-size: 14px;
+  font-family: 'Poppins', sans-serif;
+}
+
+/* Error state */
+.checkout-error {
+  text-align: center;
+  padding: 20px;
+  background: #fee;
+  border: 1px solid #fcc;
+  border-radius: 8px;
+  margin-top: 10px;
+}
+
+.checkout-error p {
+  margin: 0 0 10px 0;
+  color: #c33;
+  font-size: 14px;
+  font-family: 'Poppins', sans-serif;
+}
+
+.retry-button {
+  background: #5b3b2b;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-family: 'Poppins', sans-serif;
+  font-size: 12px;
+  transition: background-color 0.3s ease;
+}
+
+.retry-button:hover {
+  background: #4a2f1f;
+}
+
+/* Responsive scaffold: media-query templates for this component */
+@media (max-width: 576px) {
+}
+@media (min-width: 577px) and (max-width: 767px) {
+}
+@media (min-width: 768px) and (max-width: 991px) {
+}
+@media (min-width: 992px) and (max-width: 1199px) {
+}
+@media (min-width: 1200px) and (max-width: 1399px) {
+}
+@media (min-width: 1400px) {
+}

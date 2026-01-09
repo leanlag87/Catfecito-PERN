@@ -1,0 +1,77 @@
+/* Global breakpoints and small responsive utilities
+
+Breakpoints (mobile-first):
+ - 576px  → mobile (sm)
+ - 768px  → tablet  (md)
+ - 992px  → laptop  (lg)
+ - 1200px → desktop (xl)
+ - 1400px → large desktop (xxl)
+
+Usage:
+ - Use the media query blocks below to place component-specific overrides.
+ - Utility classes provided: .hide-mobile, .show-mobile, .container
+
+This file is imported by `index.css` so rules are available globally.
+*/
+
+:root{
+  /* container max widths (optional helpers) */
+  --container-sm: 540px;
+  --container-md: 720px;
+  --container-lg: 960px;
+  --container-xl: 1140px;
+  --container-xxl: 1320px;
+}
+
+/* Utility: basic responsive container centering */
+.container{
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 12px;
+  padding-right: 12px;
+}
+
+/* Utility: show/hide helpers */
+.hide-mobile{ display: none !important; }
+.show-mobile{ display: inline-block !important; }
+
+/* Default: mobile-first - hide mobile-only helpers by default on larger screens */
+@media (min-width: 577px){
+  .hide-mobile{ display: inline-block !important; }
+  .show-mobile{ display: none !important; }
+}
+
+/* Breakpoint helpers for components to copy/paste */
+/* Mobile (<=576px) - use without media query since this is base */
+
+/* Tablet */
+@media (min-width: 768px){
+  .container{ max-width: var(--container-md); }
+}
+
+/* Laptop */
+@media (min-width: 992px){
+  .container{ max-width: var(--container-lg); }
+}
+
+/* Desktop */
+@media (min-width: 1200px){
+  .container{ max-width: var(--container-xl); }
+}
+
+/* Large Desktop */
+@media (min-width: 1400px){
+  .container{ max-width: var(--container-xxl); }
+}
+
+/* Direct media query blocks you can copy into component CSS:
+
+@media (max-width: 576px) { /* mobile styles *-/ }
+@media (min-width: 577px) and (max-width: 767px) { /* small tablets *-/ }
+@media (min-width: 768px) and (max-width: 991px) { /* tablets *-/ }
+@media (min-width: 992px) and (max-width: 1199px) { /* laptops *-/ }
+@media (min-width: 1200px) and (max-width: 1399px) { /* desktops *-/ }
+@media (min-width: 1400px) { /* large desktops *-/ }
+
+*/

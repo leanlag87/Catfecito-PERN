@@ -1,0 +1,46 @@
+/* Components responsive scaffolding
+
+Copy these media-query blocks into component CSS files when you need to add responsive overrides.
+They follow the project's breakpoint system:
+ - 576px  → mobile
+ - 768px  → tablet
+ - 992px  → laptop
+ - 1200px → desktop
+ - 1400px → large desktop
+
+Example usage in a component file:
+  @media (max-width: 576px) { .my-class { ... } }
+  @media (min-width: 577px) and (max-width: 767px) { ... }
+
+This file is imported by `index.css` so it's available as reference and can be used for shared utilities.
+*/
+
+/* mobile: up to 576px (base styles typically apply here) */
+@media (max-width: 576px) {
+  /* mobile rules - override component styles here */
+}
+
+/* small tablets / phablets */
+@media (min-width: 577px) and (max-width: 767px) {
+  /* small tablet rules */
+}
+
+/* tablets */
+@media (min-width: 768px) and (max-width: 991px) {
+  /* tablet rules */
+}
+
+/* laptops */
+@media (min-width: 992px) and (max-width: 1199px) {
+  /* laptop rules */
+}
+
+/* desktop */
+@media (min-width: 1200px) and (max-width: 1399px) {
+  /* desktop rules */
+}
+
+/* large desktop */
+@media (min-width: 1400px) {
+  /* large desktop rules */
+}

@@ -1,0 +1,245 @@
+/* === ESTILOS DEL BANNER/SLIDER (Originales y nuevos) === */
+
+.hero-slider {
+  width: 100%;
+  height: 760px;
+  padding: 50px 300px;
+  box-sizing: border-box;
+}
+
+.slider-images {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  border-radius: 16px;
+}
+
+.slider-images img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  opacity: 0;
+  transition: opacity 0.5s ease-in-out;
+  z-index: 1;
+}
+
+.slider-images img.active {
+  opacity: 1;
+  z-index: 2;
+}
+
+/* === ESTILOS PARA EL CONTENIDO SUPERPUESTO (NUEVO) === */
+
+.slide-content {
+  /* Place the content in the top-left corner on all viewports by default.
+     This keeps the copy visible over busy images and matches the requested layout. */
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  transform: none;
+  z-index: 5; /* Asegura que esté por encima de la imagen */
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start; /* Alinea los elementos a la izquierda */
+  gap: 20px; /* Espacio entre logo, texto y botón */
+  max-width: 520px;
+  color: #fff;
+  padding: 18px;
+  /* no backdrop: content sits directly above the image */
+  border-radius: 8px;
+}
+
+
+.slide-content .logo {
+  width: 280px;
+  height: auto;
+  margin-bottom: 15px;
+  fill: #FFFFFF; /* <-- AÑADE ESTA LÍNEA para forzar el color de relleno */
+}
+
+.slide-content .text {
+  font-family: Arial, sans-serif;
+  font-size: 1.3rem;
+  line-height: 1.6;
+  color: #E0E0E0; /* Un color de texto claro para buen contraste */
+  /* Sombra sutil más definida para mejorar legibilidad sin backdrop */
+  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.65);
+}
+
+.slide-content .buy-button {
+  font-family: Arial, sans-serif;
+  font-size: 1rem;
+  font-weight: bold;
+  text-transform: uppercase;
+  padding: 14px 35px;
+  cursor: pointer;
+  border: 2px solid #FFFFFF; /* Borde del botón */
+  background-color: transparent;
+  color: #FFFFFF;
+  transition: background-color 0.3s, color 0.3s;
+  letter-spacing: 1.5px;
+  margin-top: 15px; /* Espacio extra arriba del botón */
+}
+
+.slide-content .buy-button:hover {
+  background-color: #FFFFFF;
+  color: #5b3b2b; /* Color oscuro para el texto al pasar el ratón */
+}
+
+
+/* === Controles del Slider (Originales) === */
+
+.slider-dots {
+  position: absolute;
+  left: 50%;
+  bottom: 20px;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 12px;
+  z-index: 10;
+}
+
+.slider-dots .dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #d2c5b7;
+  opacity: 0.7;
+  cursor: pointer;
+  transition: background 0.2s, opacity 0.2s;
+}
+
+.slider-dots .dot.active {
+  background: #5b3b2b;
+  opacity: 1;
+}
+
+.slider-images .prev,
+.slider-images .next {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  color: white;
+  background-color: rgba(0, 0, 0, 0.3);
+  border: none;
+  font-size: 18px;
+  padding: 12px;
+  cursor: pointer;
+  border-radius: 50%;
+  z-index: 10;
+  opacity: 0.7;
+  transition: opacity 0.3s, background-color 0.3s;
+}
+
+.slider-images .prev { left: 20px; }
+.slider-images .next { right: 20px; }
+
+.slider-images .prev:hover,
+.slider-images .next:hover {
+  opacity: 1;
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+
+/* === RESPONSIVE PARA EL BANNER === */
+
+@media (max-width: 1400px) {
+  .hero-slider {
+    padding-left: 100px;
+    padding-right: 100px;
+  }
+}
+
+@media (max-width: 983px) {
+  .hero-slider {
+    height: 500px;
+    padding: 20px;
+  }
+  .slide-content {
+    /* keep top-left placement but reduce width for medium screens */
+    top: 12px;
+    left: 12px;
+    max-width: 420px;
+    gap: 14px;
+  padding: 12px;
+  }
+  .slide-content .logo {
+    width: 200px;
+  }
+  .slide-content .text {
+    font-size: 1.1rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .hero-slider {
+    height: 400px;
+    padding: 10px;
+  }
+  /* Move the content to the top-left corner on smaller screens and reduce sizes
+     so the text doesn't get lost behind the image. Keep a soft padding and
+     semi-transparent backdrop for legibility. */
+  .slide-content {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    transform: none;
+    align-items: flex-start;
+    text-align: left;
+    width: calc(100% - 32px);
+    max-width: 360px;
+    gap: 10px;
+    padding: 10px 12px;
+    border-radius: 8px;
+    /* Mobile backdrop to ensure contrast on small screens */
+    background: rgba(0,0,0,0.25);
+  }
+  .slide-content .logo {
+    width: 150px;
+  }
+}
+
+@media (max-width: 576px) {
+  .hero-slider {
+    height: 320px;
+    padding: 8px;
+  }
+  .slide-content {
+    top: 10px;
+    left: 10px;
+    max-width: 320px;
+    padding: 8px 10px;
+    /* Slightly stronger backdrop on very small screens */
+    background: rgba(0,0,0,0.28);
+  }
+  .slide-content .logo {
+    width: 120px;
+  }
+  .slide-content .text {
+    font-size: 0.95rem;
+    line-height: 1.4;
+  }
+  .slide-content .buy-button {
+    padding: 10px 20px;
+    font-size: 0.9rem;
+  }
+}
+
+/* Responsive scaffold: media-query templates for this component */
+@media (max-width: 576px) {
+}
+@media (min-width: 577px) and (max-width: 767px) {
+}
+@media (min-width: 768px) and (max-width: 991px) {
+}
+@media (min-width: 992px) and (max-width: 1199px) {
+}
+@media (min-width: 1200px) and (max-width: 1399px) {
+}
+@media (min-width: 1400px) {
+}
