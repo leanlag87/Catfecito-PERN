@@ -1,0 +1,231 @@
+.filter-right-bar {
+  width: 100%;
+  padding-top: 8px;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  padding-bottom: 12px;
+  border-bottom: 2px solid rgba(0,0,0,0.06);
+}
+
+.facets-vertical-form {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 15px;
+  min-width: 250px;
+}
+
+.facets-vertical-form--anchored {
+  margin-left: auto; /* helper class if needed to force right anchoring */
+}
+
+.order-by {
+  margin: 0;
+  font-family: 'Poppins', sans-serif;
+  font-size: 14px;
+  color: #6b4a3e;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.order-by label {
+  cursor: pointer;
+}
+
+.select {
+  position: relative;
+  min-width: 200px;
+}
+
+.sort-by-category {
+  width: 100%;
+  padding: 8px 16px;
+  padding-right: 40px;
+  border: 1px solid rgba(0,0,0,0.15);
+  border-radius: 6px;
+  background-color: #ffffff;
+  font-family: 'Poppins', sans-serif;
+  font-size: 13px;
+  color: #2e1e18;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 16px;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.sort-by-category:focus {
+  outline: none;
+  border-color: #5b3b2b;
+  box-shadow: 0 0 0 3px rgba(91, 59, 43, 0.1);
+}
+
+.sort-by-category:hover {
+  border-color: rgba(0,0,0,0.2);
+}
+
+.sort-by-category option {
+  padding: 8px;
+  font-family: 'Poppins', sans-serif;
+  color: #2e1e18;
+}
+
+@media (max-width: 768px) {
+  .filter-right-bar {
+    padding: 20px;
+    justify-content: center;
+    border-top: 1px solid rgba(0,0,0,0.06);
+    margin-top: 20px;
+  }
+  
+  .facets-vertical-form {
+    width: 100%;
+    max-width: 300px;
+  }
+  
+  .sort-by-category {
+    font-size: 16px; /* Evita zoom en iOS */
+  }
+}
+
+/* Mid breakpoint: avoid overlap around ~835px by shrinking gaps and control widths */
+@media (max-width: 900px) and (min-width: 769px) {
+  .sortbar-row {
+    gap: 12px;
+  }
+
+  .search-tag-placeholder {
+    flex: 1 1 220px;
+  }
+
+  .search-tag-value {
+    max-width: 120px;
+  }
+
+  .facets-vertical-form {
+    min-width: 180px;
+    max-width: 260px;
+    gap: 10px;
+    margin-left: auto; /* ensure it stays on the right */
+  }
+
+  .select {
+    min-width: 150px;
+  }
+
+  .sort-by-category {
+    padding: 6px 12px;
+    font-size: 13px;
+  }
+}
+
+/* Layout row: tag a la izquierda, sort a la derecha */
+.sortbar-row {
+  display: flex;
+  align-items: center;
+  gap: 16px; /* avoid huge fixed gap that breaks on narrow screens */
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+/* Tag de búsqueda */
+.search-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: #fff;
+  border-radius: 8px;
+  padding: 8px 12px;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.06);
+  color: #3b2b20;
+  font-size: 14px;
+  /* allow the tag to shrink on small screens so the sort control can stay right */
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.search-tag-label {
+  color: #7a5b49;
+  margin-right: 6px;
+  font-weight: 600;
+}
+
+.search-tag-value {
+  color: #2b2b2b;
+  max-width: 260px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Botón para quitar el filtro */
+.search-tag-clear {
+  margin-left: 8px;
+  background: transparent;
+  border: none;
+  font-size: 16px;
+  line-height: 1;
+  cursor: pointer;
+  color: #7a5b49;
+  padding: 2px 6px;
+  border-radius: 6px;
+}
+.search-tag-clear:hover {
+  background: rgba(0,0,0,0.04);
+}
+
+/* placeholder para mantener spacing cuando no hay búsqueda */
+.search-tag-placeholder {
+  /* placeholder keeps spacing but is flexible */
+  flex: 1 1 320px; /* allows shrink while keeping approximate width on desktop */
+  min-width: 0;
+}
+
+/* Make the sort form take only the necessary space and stay aligned right */
+.facets-vertical-form {
+  flex: 0 0 auto;
+}
+
+/* Responsive adjustments: on tablet/mobile ensure the sort control stays at the right side */
+@media (max-width: 768px) {
+  .sortbar-row {
+    gap: 12px;
+    /* keep row layout but allow elements to wrap if necessary */
+    flex-wrap: nowrap;
+    align-items: center;
+  }
+
+  .facets-vertical-form {
+    max-width: 320px;
+    width: auto;
+    align-self: flex-end; /* ensure it stays visually on the right */
+  }
+
+  .search-tag, .search-tag-placeholder {
+    flex: 1 1 auto;
+  }
+
+  .search-tag-value {
+    max-width: 160px;
+  }
+}
+
+/* Responsive scaffold: media-query templates for this component */
+@media (max-width: 576px) {
+}
+@media (min-width: 577px) and (max-width: 767px) {
+}
+@media (min-width: 768px) and (max-width: 991px) {
+}
+@media (min-width: 992px) and (max-width: 1199px) {
+}
+@media (min-width: 1200px) and (max-width: 1399px) {
+}
+@media (min-width: 1400px) {
+}

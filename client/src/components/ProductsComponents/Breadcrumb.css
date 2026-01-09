@@ -1,0 +1,52 @@
+.section-template-products {
+  box-sizing: border-box;
+  display: block;
+  font-family: "Poppins", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-size: 14.4px;
+  font-style: normal;
+  font-weight: 400;
+  width: 100%;
+  letter-spacing: 0.3px;
+  line-height: 27.2px;
+  padding-bottom: 5px;
+  unicode-bidi: isolate;
+}
+
+.page-width {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.breadcrumb {
+  margin-bottom: 0px;
+  margin-top: 0px;
+  height: 24px;
+  box-sizing: border-box;
+  display: block;
+  padding-left: 180px;
+  font-family: "Poppins", sans-serif;
+  font-size: 14px;
+  color: #666;
+}
+
+.breadcrumb a {
+  color: #5b3b2b;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.breadcrumb a:hover {
+  color: #4a2f1f;
+  text-decoration: underline;
+}
+
+.breadcrumb span {
+  color: #666;
+}
+
+@media (max-width: 768px) {
+  .breadcrumb {
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+}

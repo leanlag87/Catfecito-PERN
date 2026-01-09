@@ -1,0 +1,252 @@
+/* Footer styles using project palette */
+:root{
+  --cf-bg: #fdf8ef;
+  --cf-surface: #f5f0e6;
+  --cf-accent: #4A2D1A;
+  --cf-muted: #7b6b60;
+  --cf-input-bg: #fff;
+}
+
+
+.cf-footer{
+  background: var(--cf-surface);
+  color: var(--cf-accent);
+  padding: 0px 40px;
+  padding-top: 36px;
+  padding-bottom: 12px;
+  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  margin-top: 10px;
+}
+
+.cf-footer-inner{
+  display: flex;
+  gap: 140px;
+  align-items: flex-start;
+  justify-content: space-between;
+  max-width: 1300px;
+  margin: 0 auto 18px;
+}
+
+.cf-footer-brand{
+  flex: 0 0 300px;
+}
+
+.cf-footer-logo{
+  width: 180px;
+  height: auto;
+  object-fit: contain;
+}
+
+.cf-footer-desc{
+  color: var(--cf-muted);
+  margin-top: 8px;
+  font-size: 14px;
+}
+
+/* Short version used for small screens */
+.cf-footer-desc-short{ display:none }
+
+.cf-footer-links{
+  display: flex;
+  flex-direction: row;
+  gap: 32px;
+  flex: 1 1 auto;
+}
+
+/* Enforce row-based layout for footer link sections across all breakpoints
+   so items remain inline and wrap when necessary instead of stacking into columns. */
+.cf-footer-inner {
+  flex-direction: row;
+  flex-wrap: wrap;
+}
+.cf-footer-links {
+  flex-direction: row;
+  flex-wrap: wrap;
+}
+.cf-footer-links ul {
+  flex-direction: row;
+}
+.cf-footer-links li {
+  display: inline-block;
+}
+
+.cf-footer-links h4{
+  margin: 0 0 8px 0;
+  font-size: 16px;
+}
+
+.cf-footer-links ul{
+  display: flex;
+  flex-direction: row;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  gap: 6px;
+}
+
+.cf-footer-links li{
+  margin: 8px 0; /* base spacing */
+  white-space: nowrap;    /* evita salto de línea dentro del item */
+  display: inline-block;  /* pone las palabras en una sola línea */
+  vertical-align: middle;
+}
+
+/* Increase spacing specifically for the lists inside the primary footer sections
+   (Explorar and Soporte) to improve readability */
+.cf-footer-links > div > ul > li{
+  margin-top: 5px;
+  margin-right: 5px; /* larger spacing for these specific lists */
+}
+
+.cf-footer-links a{
+  color: var(--cf-accent);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.cf-footer-news p{ color: var(--cf-muted); font-size: 14px }
+
+.cf-socials{
+  margin-top: 10px;
+  display:flex;
+  gap:10px;
+}
+
+.cf-socials a{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  width:36px; /* match soporte/explorar */
+  height:36px; /* match soporte/explorar */
+  border-radius:50%;
+  background: rgba(74,45,26,0.08);
+  color: var(--cf-accent);
+  text-decoration:none;
+  font-weight:700;
+}
+
+.cf-socials a img{
+  width: 20px; /* match soporte/explorar inner img */
+  height: 20px;
+  display: block;
+  object-fit: contain;
+}
+
+/* Support list specific styles */
+.cf-support-list{ display:flex; flex-direction:column; gap:6px; padding:0; margin:0; }
+.cf-support-item{ list-style:none; }
+.cf-support-item a{ display:flex; align-items:center; gap:8px; }
+.cf-support-text{ display:inline-block; }
+.cf-support-img{ display:none; width:20px; height:20px; object-fit:contain; }
+
+/* Explore list specific styles */
+.cf-explore-list{ display:flex; flex-direction:column; gap:6px; padding:0; margin:0; }
+.cf-explore-item{ list-style:none; }
+.cf-explore-item a{ display:flex; align-items:center; gap:8px; }
+.cf-explore-text{ display:inline-block; }
+.cf-explore-img{ display:none; width:20px; height:20px; object-fit:contain; }
+
+.cf-footer-bottom{
+  border-top: 1px solid rgba(0,0,0,0.05);
+  padding-top: 10px;
+  display:flex;
+  align-items:center;
+  justify-content:flex-end; /* align items to the right */
+  gap: 18px;
+  max-width: 1500px;
+  margin: 0 auto;
+  font-size: 10px;
+}
+
+
+/* Responsive rules using project's breakpoints */
+
+/* Mobile: <= 576px */
+@media (max-width: 576px) {
+  .cf-footer{
+    padding: 18px 12px;
+  }
+  /* Keep footer sections in a row on small screens but allow wrapping instead of forcing column */
+  .cf-footer-inner{
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: flex-start;
+    justify-content: center;
+  }
+  .cf-footer-brand{ flex: none; text-align: center }
+  .cf-footer-logo{ width: 140px }
+  /* Ensure description wraps and never overflows the viewport on small screens */
+  .cf-footer-desc{
+    text-align: center;
+    font-size: 13px;
+    max-width: 100%;
+    box-sizing: border-box;
+    padding: 0 8px; /* small horizontal padding so text doesn't touch edges */
+    white-space: normal; /* allow wrapping */
+    overflow-wrap: anywhere;
+    word-break: break-word;
+  }
+  /* On very small screens, hide the full description and show the short one */
+  .cf-footer-desc-full{ display:none }
+  .cf-footer-desc-short{ display:block }
+  /* For mobile: stack sections vertically, but keep each list's links in a row */
+  .cf-footer-links{ width: 100%; flex-direction: column; gap: 10px }
+  .cf-footer-links ul{ display:flex; flex-direction: row; gap: 6px; flex-wrap: wrap }
+  .cf-footer-links li{ display: inline-block; white-space: normal }
+  .cf-footer-bottom{ flex-direction: column; gap: 8px; align-items: center; justify-content: center }
+}
+
+/* Small tablets / phablets: 577 - 767px */
+@media (min-width: 577px) and (max-width: 767px) {
+  .cf-footer{ padding: 20px 16px }
+  /* keep row layout with wrapping on small tablets */
+  /* For small tablets: stack sections vertically, but lists' links remain inline */
+  .cf-footer-inner{ flex-direction: row; flex-wrap: wrap; gap: 14px }
+  .cf-footer-logo{ width: 150px }
+  .cf-footer-links{ flex-direction: column; gap: 10px }
+  .cf-footer-links ul{ display:flex; flex-direction: row; gap: 6px; flex-wrap: wrap }
+  .cf-footer-bottom{ align-items: center; justify-content: center }
+}
+
+/* Tablet: 768 - 991px */
+@media (min-width: 768px) and (max-width: 991px) {
+  .cf-footer{ padding: 26px 24px }
+  /* For tablets: stack sections vertically but keep each ul's links inline */
+  .cf-footer-inner{ flex-direction: row; gap: 48px }
+  .cf-footer-brand{ flex: 0 0 260px }
+  .cf-footer-logo{ width: 160px }
+  .cf-footer-links{ flex-direction: column; gap: 24px }
+  .cf-footer-links ul{ display:flex; flex-direction: row; gap: 8px; flex-wrap: wrap }
+  .cf-footer-bottom{ justify-content: flex-end }
+}
+
+/* Laptop and up: 992px+ keep the desktop layout but allow larger spacing */
+@media (min-width: 992px) and (max-width: 1199px) {
+  .cf-footer-inner{ gap: 80px }
+  .cf-footer-logo{ width: 170px }
+}
+
+/* Desktop: 1200 - 1399px */
+@media (min-width: 1200px) and (max-width: 1399px) {
+  .cf-footer-inner{ gap: 100px; max-width:1200px }
+  .cf-footer-logo{ width: 180px }
+}
+
+/* Large desktop: 1400px+ */
+@media (min-width: 1400px) {
+  .cf-footer-inner{ gap: 140px; max-width:1300px }
+  .cf-footer-logo{ width: 180px }
+}
+
+/* Show icons instead of text for soporte and explorar items across all sizes */
+.cf-support-text{ display:none; }
+.cf-support-img{ display:block; }
+.cf-support-item a{ width: 36px; height: 36px; display:inline-flex; align-items:center; justify-content:center; border-radius:50%; background: rgba(74,45,26,0.08); }
+.cf-support-item{ margin-bottom:6px; }
+.cf-support-item a{ padding: 8px 0; }
+.cf-explore-text{ display:none; }
+.cf-explore-img{ display:block; }
+.cf-explore-item a{ width: 36px; height: 36px; display:inline-flex; align-items:center; justify-content:center; border-radius:50%; background: rgba(74,45,26,0.08); }
+.cf-explore-item{ margin-bottom:6px; }
+.cf-explore-item a{ padding: 8px 0; }

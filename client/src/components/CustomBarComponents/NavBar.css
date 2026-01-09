@@ -1,0 +1,150 @@
+.navbar {
+  background-color: #f5f0e6;
+  box-sizing: border-box;
+  position: relative;
+  margin: 0 auto;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 2px 24px;            /* espacio lateral dentro del contenido */
+  min-height: 40px;   /* quitar bg interno (el fondo ya está en .header-container) */
+  border: none;               /* quitar borde interno */
+  border-radius: 0;
+  border-bottom: 1px solid rgba(209, 197, 197, 0.12);   /* línea fina más oscura */
+  box-shadow: 0 6px 18px -12px rgba(94, 87, 87, 0.4);
+}
+
+.navbar .button {
+  background: none;
+  border: none;
+  color: #5b3b2b;
+  font-size: 14px;
+  font-weight: 600;
+  padding: 8px 16px;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: background-color 0.3s ease;
+}
+
+.navbar .button:hover {
+  background-color: rgba(91, 59, 43, 0.1);
+  color: #5b3b2b;
+}
+
+/* Responsive adjustments for NavBar */
+@media (max-width: 576px) {
+  .navbar{ padding: 6px 8px; gap: 8px; overflow-x: auto; }
+  .navbar .button{ padding: 6px 10px; font-size: 13px; }
+}
+
+@media (min-width: 577px) and (max-width: 767px) {
+  .navbar{ padding: 8px 12px; gap: 12px }
+  .navbar .button{ padding: 8px 12px; font-size: 14px }
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  .navbar{ padding: 10px 18px; gap: 14px }
+  .navbar .button{ padding: 8px 14px }
+}
+
+@media (min-width: 992px) and (max-width: 1199px) {
+  .navbar{ padding: 12px 20px; gap: 16px }
+}
+
+@media (min-width: 1200px) {
+  .navbar{ padding: 14px 24px; gap: 18px }
+}
+
+/* Hide mobile menu and hamburger by default */
+.navbar-hamburger{ display:none; background:none; border:none; cursor:pointer; padding:8px; }
+.hamburger{ display:inline-block; width:20px; height:2px; background:#5b3b2b; position:relative; transition:all .25s ease; }
+.hamburger::before, .hamburger::after{ content:''; position:absolute; left:0; width:20px; height:2px; background:#5b3b2b; transition:all .25s ease; }
+.hamburger::before{ top:-6px }
+.hamburger::after{ top:6px }
+.hamburger.open{ background:transparent }
+.hamburger.open::before{ transform: rotate(45deg) translate(3px, 3px); }
+.hamburger.open::after{ transform: rotate(-45deg) translate(3px, -3px); }
+
+.navbar-mobile-menu{
+  /* hidden by default on desktop */
+  display: none;
+}
+.navbar-mobile-menu .mobile-button{
+  background:none;
+  border:none;
+  text-align:left;
+  padding:8px 12px;
+  width:100%;
+  color:#5b3b2b;
+  font-weight:600;
+  cursor:pointer;
+}
+.navbar-mobile-menu .mobile-button:hover{ background:rgba(91,59,43,0.04); }
+
+/* Responsive: show hamburger on small screens and hide the horizontal items */
+@media (max-width: 768px){
+  .navbar { padding: 6px 12px; }
+  .navbar-items{ display:none; }
+  .navbar-hamburger{ display:inline-flex; align-items:center; justify-content:center; }
+}
+
+/* Mobile: make the hamburger menu overlay full-width and avoid inner scroll */
+@media (max-width: 768px) {
+  /* Show a centered small panel (not full-screen) and animate open/close */
+  .navbar-mobile-menu{
+    position: fixed;
+    top: 56px;
+    left: 50%;
+    transform: translateX(-50%) scale(0.98);
+    width: min(92%, 380px);
+    max-height: 70vh;
+    background: #fff;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+    border-radius: 12px;
+    padding: 12px 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    align-items: stretch;
+    justify-content: flex-start;
+    overflow: auto;
+    opacity: 0;
+    pointer-events: none;
+    z-index: 2000; /* ensure mobile menu sits above other page elements (banner/header) */
+    transition: transform 220ms ease, opacity 180ms ease, max-height 220ms ease;
+  }
+  .navbar-mobile-menu.open{
+    transform: translateX(-50%) scale(1);
+    opacity: 1;
+    pointer-events: auto;
+  }
+  .navbar-mobile-menu.closed{
+    transform: translateX(-50%) scale(0.98) translateY(-6px);
+    opacity: 0;
+    pointer-events: none;
+  }
+  .navbar-mobile-menu .mobile-button{
+    padding: 12px 14px;
+    text-align: left;
+    font-size: 15px;
+    background: transparent;
+    border-radius: 8px;
+  }
+}
+
+/* Responsive scaffold: media-query templates for this component */
+@media (max-width: 576px) {
+}
+@media (min-width: 577px) and (max-width: 767px) {
+}
+@media (min-width: 768px) and (max-width: 991px) {
+}
+@media (min-width: 992px) and (max-width: 1199px) {
+}
+@media (min-width: 1200px) and (max-width: 1399px) {
+}
+@media (min-width: 1400px) {
+}
+
+

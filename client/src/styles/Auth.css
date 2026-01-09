@@ -1,0 +1,140 @@
+.auth-container {
+  min-height: calc(100vh - 390px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem 0.5rem; /* menos padding para caber en modal */
+  background: #f7f5f2; /* tono claro general */
+}
+
+.auth-container-register {
+  min-height: calc(100vh - 245px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem 0.5rem; /* menos padding para caber en modal */
+  background: #f7f5f2; /* tono claro general */
+}
+
+.auth-form {
+  width: 100%;
+  max-width: 420px;
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+  padding: 1rem 1.1rem; /* padding reducido */
+  border: 1px solid rgba(0,0,0,0.06);
+}
+
+.auth-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 0.4rem;
+}
+
+.auth-logo {
+  width: 68px;
+  height: 68px;
+  object-fit: contain;
+  border-radius: 8px;
+  box-shadow: 0 6px 18px -12px rgba(0,0,0,0.12);
+}
+
+.auth-form h2 {
+  margin: 0 0 1rem;
+  font-size: 1.6rem;
+  color: #222;
+}
+
+.auth-form label {
+  display: block;
+  margin: 0.5rem 0 0.25rem;
+  color: #444;
+  font-weight: 600;
+}
+
+.auth-form input[type="email"],
+.auth-form input[type="password"],
+.auth-form input[type="text"] {
+  width: 100%;
+  padding: 0.55rem 0.7rem; /* menos padding */
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  background: #fff;
+  color: #222;
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+.auth-form input:focus {
+  border-color: #b18253; /* tono café (match header links) */
+}
+
+.auth-form button[type="submit"] {
+  width: 100%;
+  margin-top: 0.9rem;
+  padding: 0.65rem 0.8rem; /* boton mas compacto */
+  border: none;
+  border-radius: 8px;
+  background: #b18253; /* color primario café */
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.auth-form button[type="submit"]:hover {
+  background: #925f3f;
+}
+
+.auth-form .secondary {
+  background: transparent;
+  border: 1px solid #e6d7c7;
+  color: #4a4a4a;
+}
+
+.auth-form p {
+  margin-top: 0.8rem;
+  color: #555;
+  text-align: center;
+  font-size: 0.95rem;
+}
+
+.auth-form a {
+  color: #b18253; /* café claro */
+  text-decoration: none;
+}
+
+.auth-form a:hover {
+  text-decoration: underline;
+}
+
+/* ---- Autofill (Chrome / Blink) ---- */
+input:-webkit-autofill,
+textarea:-webkit-autofill,
+select:-webkit-autofill {
+  -webkit-box-shadow: 0 0 0px 1000px #ffffff inset !important; /* fondo deseado */
+  box-shadow: 0 0 0px 1000px #ffffff inset !important;
+  -webkit-text-fill-color: #222222 !important;                /* color del texto */
+  caret-color: #222222 !important;
+  transition: background-color 5000s ease-in-out 0s;           /* evita parpadeo */
+}
+
+/* Mantener mismo look al recibir foco */
+input:-webkit-autofill:focus,
+textarea:-webkit-autofill:focus,
+select:-webkit-autofill:focus {
+  -webkit-box-shadow: 0 0 0px 1000px #ffffff inset !important;
+  box-shadow: 0 0 0px 1000px #ffffff inset !important;
+  -webkit-text-fill-color: #222222 !important;
+}
+
+/* ---- Firefox (experimental) ---- */
+input:-moz-autofill,
+textarea:-moz-autofill,
+select:-moz-autofill {
+  box-shadow: 0 0 0px 1000px #ffffff inset !important;
+  -moz-text-fill-color: #222222 !important;
+}

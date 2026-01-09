@@ -1,0 +1,52 @@
+.logout-modal-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1rem;
+  background-color: #fdf8ef;
+  border-radius: 12px;
+}
+
+.logout-modal-image {
+  max-width: 100%;
+  width: 220px;
+  height: auto;
+  margin-bottom: 1.5rem;
+  border-radius: 8px;
+}
+
+.logout-modal-title {
+  color: #5b3b2b;
+  font-size: 1.3rem;
+  font-weight: 600;
+  text-align: center;
+  margin: 0;
+  padding: 0;
+}
+
+@media (max-width: 600px) {
+  .logout-modal-container {
+    padding: 1.2rem 0.5rem;
+  }
+  .logout-modal-image {
+    width: 140px;
+  }
+  .logout-modal-title {
+    font-size: 1rem;
+  }
+}
+
+/* Responsive scaffold: media-query templates for this component */
+@media (max-width: 576px) {
+}
+@media (min-width: 577px) and (max-width: 767px) {
+}
+@media (min-width: 768px) and (max-width: 991px) {
+}
+@media (min-width: 992px) and (max-width: 1199px) {
+}
+@media (min-width: 1200px) and (max-width: 1399px) {
+}
+@media (min-width: 1400px) {
+}

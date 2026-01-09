@@ -1,0 +1,829 @@
+:root {
+  --profile-bg: #f5f5f5;
+  --card-bg: #ffffff;
+  --text: #222;
+  --muted: #666;
+  --border: #e8e8e8;
+  --primary: #111827;
+  --danger: #b00020;
+}
+
+.profile-page-admin {
+  background: var(--profile-bg);
+  min-height: 100vh;
+  background-color: #fffefd;
+}
+
+.profile-admin-container {
+  max-width: 960px;
+  margin: 24px auto;
+  padding: 0 16px;
+  color: #5b3b2b;
+}
+
+.profile-title-admin {
+  font-size: 28px;
+  font-weight: 700;
+  color: #5b3b2b;
+  margin: 8px 0 16px;
+}
+
+.profile-card-admin {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 16px;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+  color: black;
+}
+
+@media (max-width: 576px) {
+  .profile-admin-container {
+    margin: 12px auto;
+    padding: 0 12px;
+  }
+
+  .profile-title-admin {
+    font-size: 22px;
+    margin: 0 0 12px;
+  }
+
+  .profile-card-admin {
+    padding: 16px;
+    margin-bottom: 12px;
+    border-radius: 10px;
+  }
+
+  .profile-card-admin h3 {
+    font-size: 18px;
+    margin-top: 0;
+    margin-bottom: 12px;
+  }
+}
+
+.profile-card-admin select {
+  grid-column: span 2;
+  padding: 10px 12px;
+  border: 1px solid #b3b3b3;
+  border-radius: 8px;
+  outline: none;
+  background-color: #ffffff;
+  color: #5b3b2b;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 100%;
+}
+
+.profile-error-admin {
+  background: #fff7f7;
+  border: 1px solid #ffd6d6;
+  color: #8a1c1c;
+  border-radius: 8px;
+  padding: 10px 12px;
+  margin-bottom: 12px;
+}
+
+.profile-fields-admin {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+
+.field-admin {
+  display: flex;
+  flex-direction: column;
+}
+
+.field-label-admin {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+}
+
+.field-value-admin {
+  font-size: 15px;
+  color: var(--text);
+}
+
+.section-header-admin {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.section-title-admin {
+  font-size: 18px;
+  margin: 0;
+}
+
+.iud-products-admin {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px 16px;
+}
+
+.iud-products-admin > div {
+  grid-column: span 2;
+  box-sizing: border-box;
+}
+
+.iud-products-admin > div > div {
+  display: flex;
+  gap: 8px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.iud-products-admin > div > div select {
+  flex: 1;
+  padding: 10px 12px;
+  border: 1px solid #b3b3b3;
+  border-radius: 8px;
+  outline: none;
+  background-color: #ffffff;
+  color: #5b3b2b;
+  box-sizing: border-box;
+  min-width: 0;
+}
+
+.iud-products-admin > div > div .btn-secondary-admin {
+  flex-shrink: 0;
+  padding: 10px 14px;
+  white-space: nowrap;
+}
+
+.product-select-update {
+  grid-column: span 2;
+  box-sizing: border-box;
+}
+
+.product-select-update > div {
+  display: flex;
+  gap: 8px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.product-select-update select {
+  flex: 1;
+  padding: 10px 12px;
+  border: 1px solid #b3b3b3;
+  border-radius: 8px;
+  outline: none;
+  background-color: #ffffff;
+  color: #5b3b2b;
+  box-sizing: border-box;
+  min-width: 0;
+}
+
+.product-select-update .btn-secondary-admin {
+  flex-shrink: 0;
+  padding: 10px 14px;
+  white-space: nowrap;
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text);
+  border-radius: 8px;
+  cursor: pointer;
+  text-decoration: none;
+  font-size: 14px;
+  transition: all 0.2s;
+}
+
+.insert-product-image {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  box-sizing: border-box;
+  flex-wrap: wrap;
+}
+
+.insert-product-image input[type="file"] {
+  flex: 1;
+  grid-column: unset;
+  min-width: 150px;
+}
+
+.insert-product-image > div {
+  font-size: 14px;
+  color: #5b3b2b;
+  white-space: normal;
+  word-break: break-word;
+  flex: 0 1 auto;
+}
+
+.iud-products-admin label {
+  grid-column: span 2;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+}
+
+.iud-products-admin input,
+.iud-products-admin select,
+.iud-products-admin textarea {
+  grid-column: span 2;
+  padding: 10px 12px;
+  border: 1px solid #b3b3b3;
+  border-radius: 8px;
+  outline: none;
+  background-color: #ffffff;
+  color: #5b3b2b;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 100%;
+}
+
+.iud-products-admin ::-webkit-file-upload-button {
+  grid-column: span 2;
+  padding: 10px 12px;
+  border: 1px solid #b3b3b3;
+  border-radius: 8px;
+  outline: none;
+  background-color: #ffffff;
+  color: #5b3b2b;
+  box-sizing: border-box;
+  width: 20%;
+  max-width: 100%;
+}
+ 
+
+@media (max-width: 576px) {
+  .iud-products-admin {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .iud-products-admin > div {
+    grid-column: span 1;
+  }
+
+  .iud-products-admin > div > div {
+    flex-direction: column;
+  }
+
+  .iud-products-admin > div > div select {
+    width: 100%;
+  }
+
+  .iud-products-admin > div > div .btn-secondary-admin {
+    width: 100%;
+  }
+
+  .product-select-update {
+    grid-column: span 1;
+  }
+
+  .product-select-update > div {
+    flex-direction: column;
+  }
+
+  .product-select-update select {
+    width: 100%;
+  }
+
+  .product-select-update .btn-secondary-admin {
+    width: 100%;
+  }
+
+  .iud-products-admin label {
+    grid-column: span 1;
+  }
+
+  .iud-products-admin input,
+  .iud-products-admin select,
+  .iud-products-admin textarea,
+  .iud-products-admin ::-webkit-file-upload-button {
+    grid-column: span 1;
+    box-sizing: border-box;
+    width: 100%;
+    max-width: 100%;
+  }
+}
+
+.btn-primary-admin {
+  margin-top: 8px;
+  grid-column: span 2;
+  background: #5b3b2b;
+  color: #fff;
+  border: 1px solid #5b3b2b;
+  padding: 10px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.btn-secondary-admin {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 8px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  text-decoration: none;
+  font-size: 14px;
+  transition: all 0.2s;
+}
+
+.btn-secondary-admin:hover {
+  background: var(--profile-bg);
+}
+
+@media (max-width: 576px) {
+  .btn-primary-admin {
+    grid-column: span 1;
+    padding: 12px 10px;
+    font-size: 14px;
+  }
+
+  .btn-secondary-admin {
+    padding: 8px 12px;
+    font-size: 12px;
+    flex: 1;
+    min-width: 0;
+  }
+}
+
+
+
+
+
+.profile-success-admin {
+  background: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+  padding: 12px;
+  border-radius: 8px;
+  margin-bottom: 16px;
+}
+
+.section-title-admin {
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 16px;
+  color: var(--text);
+}
+
+.btn-danger-admin {
+  margin-top: 12px;
+  background: var(--danger);
+  color: #fff;
+  border: none;
+  padding: 10px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.link-button-admin {
+  background: transparent;
+  border: none;
+  color: var(--primary);
+  font-weight: 600;
+  cursor: not-allowed;
+}
+
+.empty-box-admin {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--muted);
+  background: #f8f8f8;
+  border: 1px dashed var(--border);
+  border-radius: 8px;
+  padding: 12px;
+}
+
+/* Admin Navigation */
+.profile-nav-admin {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+
+/* Responsive scaffold */
+@media (max-width: 576px) {
+  /* Mobile optimizations */
+  .profile-nav-admin {
+    gap: 6px;
+  }
+
+  .profile-nav-admin a,
+  .profile-nav-admin .btn-secondary-admin {
+    flex: 1 1 calc(50% - 3px);
+    padding: 8px 6px;
+    font-size: 12px;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .btn-danger-admin {
+    width: 100%;
+    padding: 12px;
+  }
+
+  .profile-card-admin select {
+    grid-column: span 1;
+  }
+
+  .section-header-admin {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .empty-box-admin {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+@media (max-width: 425px) {
+  .product-select-update {
+    grid-column: span 1;
+  }
+
+  .product-select-update > div {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .product-select-update select {
+    width: 100%;
+  }
+
+  .product-select-update .btn-secondary-admin {
+    width: 100%;
+  }
+
+  .insert-product-image {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .insert-product-image input[type="file"] {
+    width: 100%;
+    min-width: unset;
+  }
+
+  .insert-product-image > div {
+    font-size: 12px;
+  }
+
+  .iud-products-admin ::-webkit-file-upload-button {
+  width: 42%;
+  
+}
+}
+
+@media (max-width: 375px) {
+  .profile-admin-container {
+    margin: 8px auto;
+    padding: 0 8px;
+  }
+
+  .profile-title-admin {
+    font-size: 18px;
+    margin: 0 0 10px;
+  }
+
+  .profile-card-admin {
+    padding: 12px;
+    margin-bottom: 10px;
+    border-radius: 10px;
+  }
+
+  .profile-card-admin h3 {
+    font-size: 16px;
+    margin-bottom: 10px;
+  }
+
+  .profile-nav-admin {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-bottom: 8px;
+  }
+
+  .profile-nav-admin a,
+  .profile-nav-admin .btn-secondary-admin {
+    width: 100%;
+    padding: 10px 8px;
+    font-size: 12px;
+    text-align: center;
+    border-radius: 8px;
+    box-sizing: border-box;
+  }
+
+  .btn-primary-admin {
+    padding: 11px 8px;
+    font-size: 13px;
+    width: 100%;
+  }
+
+  .btn-danger-admin {
+    padding: 11px 8px;
+    font-size: 13px;
+    width: 100%;
+  }
+
+  .iud-products-admin {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .iud-products-admin > div {
+    grid-column: span 1;
+  }
+
+  .iud-products-admin > div > div {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .iud-products-admin > div > div select {
+    width: 100%;
+  }
+
+  .iud-products-admin > div > div .btn-secondary-admin {
+    width: 100%;
+  }
+
+  .product-select-update {
+    grid-column: span 1;
+  }
+
+  .product-select-update > div {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .product-select-update select {
+    width: 100%;
+    padding: 10px 10px;
+    font-size: 14px;
+  }
+
+  .product-select-update .btn-secondary-admin {
+    width: 100%;
+    padding: 10px 8px;
+    font-size: 12px;
+  }
+
+  .insert-product-image {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .insert-product-image input[type="file"] {
+    width: 100%;
+    min-width: unset;
+    font-size: 12px;
+  }
+
+  .insert-product-image > div {
+    font-size: 12px;
+  }
+
+  .iud-products-admin label {
+    grid-column: span 1;
+  }
+
+  .iud-products-admin input,
+  .iud-products-admin select,
+  .iud-products-admin textarea {
+    grid-column: span 1;
+    padding: 10px 10px;
+    font-size: 14px;
+    box-sizing: border-box;
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .profile-error-admin,
+  .profile-success-admin {
+    padding: 10px 10px;
+    font-size: 13px;
+    margin-bottom: 10px;
+    box-sizing: border-box;
+  }
+
+  .section-title-admin {
+    font-size: 16px;
+    margin-bottom: 10px;
+  }
+
+  .field-label-admin {
+    font-size: 11px;
+  }
+}
+
+@media (max-width: 325px) {
+  .profile-admin-container {
+    margin: 6px auto;
+    padding: 0 6px;
+  }
+
+  .profile-title-admin {
+    font-size: 15px;
+    margin: 0 0 8px;
+    font-weight: 700;
+  }
+
+  .profile-card-admin {
+    padding: 10px;
+    margin-bottom: 8px;
+    border-radius: 8px;
+  }
+
+  .profile-card-admin h3 {
+    font-size: 14px;
+    margin-bottom: 8px;
+  }
+
+  .profile-nav-admin {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    margin-bottom: 6px;
+  }
+
+  .profile-nav-admin a,
+  .profile-nav-admin .btn-secondary-admin {
+    width: 100%;
+    padding: 9px 6px;
+    font-size: 11px;
+    text-align: center;
+    border-radius: 6px;
+    box-sizing: border-box;
+  }
+
+  .btn-primary-admin {
+    padding: 10px 6px;
+    font-size: 12px;
+    width: 100%;
+    margin-top: 5px;
+    box-sizing: border-box;
+  }
+
+  .btn-danger-admin {
+    padding: 10px 6px;
+    font-size: 12px;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .iud-products-admin {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .iud-products-admin > div {
+    grid-column: span 1;
+  }
+
+  .iud-products-admin > div > div {
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .iud-products-admin > div > div select {
+    width: 100%;
+    padding: 8px 8px;
+    font-size: 12px;
+    box-sizing: border-box;
+  }
+
+  .iud-products-admin > div > div .btn-secondary-admin {
+    width: 100%;
+    padding: 8px 8px;
+    font-size: 11px;
+  }
+
+  .product-select-update {
+    grid-column: span 1;
+  }
+
+  .product-select-update > div {
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .product-select-update select {
+    width: 100%;
+    padding: 8px 8px;
+    font-size: 12px;
+    box-sizing: border-box;
+  }
+
+  .product-select-update .btn-secondary-admin {
+    width: 100%;
+    padding: 8px 8px;
+    font-size: 11px;
+    box-sizing: border-box;
+  }
+
+  .insert-product-image {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+  }
+
+  .insert-product-image input[type="file"] {
+    width: 100%;
+    min-width: unset;
+    font-size: 11px;
+  }
+
+  .insert-product-image > div {
+    font-size: 11px;
+  }
+
+  .iud-products-admin label {
+    grid-column: span 1;
+    font-size: 10px;
+    margin-bottom: 2px;
+  }
+
+  .iud-products-admin input,
+  .iud-products-admin select,
+  .iud-products-admin textarea {
+    grid-column: span 1;
+    padding: 8px 8px;
+    font-size: 12px;
+    box-sizing: border-box;
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .iud-products-admin ::-webkit-file-upload-button {
+    width: 45%;
+  }  
+  .profile-error-admin,
+  .profile-success-admin {
+    padding: 8px 8px;
+    font-size: 11px;
+    margin-bottom: 8px;
+    box-sizing: border-box;
+  }
+
+  .section-title-admin {
+    font-size: 14px;
+    margin-bottom: 8px;
+  }
+
+  .field-label-admin {
+    font-size: 10px;
+  }
+
+  .field-value-admin {
+    font-size: 12px;
+  }
+
+  .section-header-admin {
+    gap: 6px;
+  }
+
+  .empty-box-admin {
+    padding: 8px;
+    font-size: 11px;
+    gap: 4px;
+  }
+}
+
+@media (min-width: 577px) and (max-width: 767px) {
+  .profile-admin-container {
+    margin: 16px auto;
+  }
+
+  .profile-title-admin {
+    font-size: 24px;
+  }
+
+  .iud-products-admin {
+    gap: 12px 12px;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  .profile-card-admin {
+    padding: 18px;
+  }
+}
+
+@media (min-width: 992px) and (max-width: 1199px) {
+}
+
+@media (min-width: 1200px) and (max-width: 1399px) {
+}
+
+@media (min-width: 1400px) {
+}

@@ -1,0 +1,30 @@
+.bar {
+    color: rgba(255, 255, 255, 0.87);
+    background-color: rgba(224, 225, 224, 0.788);
+    width: 95%;
+    border-radius: 5px;
+    padding: 10px;
+    text-align: center;
+    display: flex;
+
+}
+.custom-bar{
+  display: flex;
+  width: 100%;
+  
+}
+
+button{
+  background-color: transparent;
+  color: #4A2D1A;
+  border: none;
+  padding: 10px ;
+  text-align: center;
+  font-weight: bold;
+  transition-duration: 0.75s;
+
+}
+.button:hover{
+   font-size: 16px; 
+   transition: all 0.75s ease; 
+}

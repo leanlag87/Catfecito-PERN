@@ -1,0 +1,222 @@
+body {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+
+/* centrar el contenido dentro del fondo */
+.header {
+  position: relative;
+  background-color: #f5f0e6;
+  box-sizing: border-box;
+  padding: 0 150px;
+  padding-right : 170px; 
+  margin: 0 auto;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  min-height: 91px;
+  border: none;
+  border-bottom: 1px solid rgba(10, 10, 10, 0.12);
+
+}
+
+.profile-card {
+  color: black;
+}
+
+.logo-container {
+  flex: 0 0 220px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 91.2px;
+}
+
+
+.logo-container img {
+  width: 300px;
+  height: 72px;
+  object-fit: contain;
+}
+
+.searcher {
+  flex: 1; /*flex: 1 hace que la caja crezca o se encoja según el espacio disponible.*/
+  min-width: 200px;
+  max-width: 977px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  padding: 7px 11px;
+  position: relative;
+  height: 70px;
+}
+
+.search-rec {
+  flex: 0 0 940px;
+  min-width: 120px;
+  max-width: 100%;
+  height: 43px;
+  background-color: #ffffff;
+  border-radius: 30px;
+  border: 1px solid #0000001a;
+  padding-left: 8px;
+  box-shadow: 0 6px 18px -12px rgba(190, 181, 181, 0.4);
+}
+
+.search-rec::placeholder {
+  color: #999999;
+  opacity: 1;
+  font-size: 14px;
+
+}
+
+.search-icon {
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  position: relative;
+}
+
+.search-icon img {
+  width: 50px;
+  height: 50px;
+  object-fit: contain;
+}
+
+.user-icons {
+  display: flex;
+  align-items: center;
+  justify-content: right;
+  gap: 16px;
+  height: 60px;
+  position: relative;
+  flex: 0 0 auto;
+  width: 13%;
+  flex-shrink: 0;  /* no se achican aunque el espacio sea poco */
+  
+}
+
+.profile-button,
+.cart-button {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 33px;
+  height: 33px;
+  position: relative;
+
+}
+
+.profile-button img,
+.cart-button img {
+  width: 30px;
+  height: 30px;
+  object-fit: contain;
+}
+
+/* --- MEDIA QUERY --- */
+@media (max-width: 983px) {
+  .header {
+    flex-direction: column;
+    align-items: stretch;
+    min-height: auto;
+    gap: 8px;
+    padding: 8px 4vw; /* padding lateral flexible */
+    width: 100%;
+  }
+  .logo-container {
+    flex: 0 0 auto;
+    width: 100%;
+    height: 48px;
+    justify-content: center;
+  }
+  .logo-container img {
+    width: 110px;
+    height: auto;
+  }
+  .searcher {
+    flex: 1 1 0;
+    min-width: 0;
+    max-width: 100%;
+    width: 100%;
+    height: 40px;
+    gap: 6px;
+    padding: 0;
+  }
+  .search-rec {
+    height: 32px;
+    font-size: 14px;
+    padding-left: 8px;
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+  }
+  .header .search-icon {
+    width: 28px;
+    height: 28px;
+  }
+  .search-icon img {
+    width: 20px;
+    height: 20px;
+  }
+  .user-icons {
+    height: 32px;
+    width: 100%;
+    gap: 8px;
+    margin-left: 0;
+    justify-content: center;
+  }
+  .profile-button,
+  .cart-button {
+    width: 22px;
+    height: 22px;
+  }
+  .profile-button img,
+  .cart-button img {
+    width: 18px;
+    height: 18px;
+  }
+}
+
+.navbar {
+  width: 100%;
+  box-sizing: border-box;
+  background: #f5f0e6; /* o el mismo color que header si quieres la franja */
+  padding: 6px 0;
+  display: flex;
+  justify-content: center; /* centra el bloque UL en la página */
+  height: auto;
+  min-height: 30px;
+
+}
+
+.navbar ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  gap: 36px;              /* separacion entre items */
+  align-items: center;
+}
+
+@media (max-width: 983px) {
+  .navbar ul { width: 100%; gap: 16px; flex-wrap: wrap; justify-content: center; }
+  .navbar a { font-size: 14px; }
+}
