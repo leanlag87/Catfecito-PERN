@@ -4,11 +4,11 @@ import "../styles/index.css";
 import "../styles/App.css";
 import "../components/FooterComponent/Footer.css";
 import "./ContactPage.css";
-import MetaData from "../components/ui/MetaData/MetaData";
+import MetaData from "../../components/ui/MetaData/MetaData";
 
-import { NavBar } from "../components/CustomBarComponents/NavBar";
-import { Header } from "../components/CustomBarComponents/Header";
-import { Footer } from "../components/FooterComponent/Footer";
+import { NavBar } from "../../components/CustomBarComponents/NavBar";
+import { Header } from "../../components/CustomBarComponents/Header";
+import { Footer } from "../../components/FooterComponent/Footer";
 
 export const ContactPage = ({
   cartItems,
@@ -20,7 +20,12 @@ export const ContactPage = ({
   onRemoveItem,
   onOpenAuthModal = null,
 }) => {
-  const [form, setForm] = useState({ name: "", email: "", phone: "", message: "" });
+  const [form, setForm] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    message: "",
+  });
   const [status, setStatus] = useState(null);
 
   const handleChange = (e) => {
@@ -103,7 +108,9 @@ export const ContactPage = ({
               required
             />
 
-            <button type="submit" className="cf-btn-primary">Enviar</button>
+            <button type="submit" className="cf-btn-primary">
+              Enviar
+            </button>
 
             {status && <p className="contact-status">{status}</p>}
           </form>
@@ -112,7 +119,14 @@ export const ContactPage = ({
             <h3>Contacto</h3>
             <p>
               <strong>WhatsApp:</strong>
-              <a href="https://wa.me/5491123456789" target="_blank" rel="noreferrer"> +54 9 11 2345 6789</a>
+              <a
+                href="https://wa.me/5491123456789"
+                target="_blank"
+                rel="noreferrer"
+              >
+                {" "}
+                +54 9 11 2345 6789
+              </a>
             </p>
 
             <p>
