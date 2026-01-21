@@ -16,6 +16,11 @@ const config = {
   DB_USER: process.env.DB_USER || "postgres",
   DB_PASSWORD: process.env.DB_PASSWORD || "",
 
+  // AWS DynamoDB
+  AWS_REGION: process.env.AWS_REGION || "sa-east-1",
+  DYNAMODB_TABLE: process.env.DYNAMODB_TABLE || "catfecito-backend-dev",
+ 
+
   // JWT
   JWT_SECRET: process.env.JWT_SECRET || "xyz12345",
   JWT_EXPIRES_IN: process.env.JWT_EXPIRES_IN || "7d",
@@ -46,6 +51,8 @@ export const {
   DB_NAME,
   DB_USER,
   DB_PASSWORD,
+  AWS_REGION,
+  DYNAMODB_TABLE,
   JWT_SECRET,
   JWT_EXPIRES_IN,
   CLIENT_URL,
