@@ -16,6 +16,9 @@ serverless.env.yml
 .env.test.local
 .env.production.local
 
+#AWS
+.env.dev
+
 # Database
 *.db
 *.sqlite
