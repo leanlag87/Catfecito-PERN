@@ -19,7 +19,10 @@ const config = {
   // AWS DynamoDB
   AWS_REGION: process.env.AWS_REGION || "sa-east-1",
   DYNAMODB_TABLE: process.env.DYNAMODB_TABLE || "catfecito-backend-dev",
- 
+
+  //Cognito
+  COGNITO_USER_POOL_ID: process.env.COGNITO_USER_POOL_ID,
+  COGNITO_CLIENT_ID: process.env.COGNITO_CLIENT_ID,
 
   // JWT
   JWT_SECRET: process.env.JWT_SECRET || "xyz12345",

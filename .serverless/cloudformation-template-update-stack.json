@@ -82,6 +82,17 @@
                     "arn:aws:dynamodb:sa-east-1:*:table/catfecito-backend-dev",
                     "arn:aws:dynamodb:sa-east-1:*:table/catfecito-backend-dev/index/*"
                   ]
+                },
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "cognito-idp:AdminCreateUser",
+                    "cognito-idp:AdminSetUserPassword",
+                    "cognito-idp:AdminInitiateAuth",
+                    "cognito-idp:AdminRespondToAuthChallenge",
+                    "cognito-idp:SignUp"
+                  ],
+                  "Resource": "arn:aws:cognito-idp:sa-east-1:*:userpool/sa-east-1_pua4g9m7n"
                 }
               ]
             }
@@ -108,7 +119,7 @@
       "Properties": {
         "Code": {
           "S3Bucket": "serverless-framework-deployments-sa-east-1-b389c947-1ea1",
-          "S3Key": "serverless/catfecito-backend/dev/1769097244899-2026-01-22T15:54:04.899Z/catfecito-backend.zip"
+          "S3Key": "serverless/catfecito-backend/dev/1769108206390-2026-01-22T18:56:46.390Z/catfecito-backend.zip"
         },
         "Handler": "server/functions/auth/register.createUser",
         "Runtime": "nodejs18.x",
@@ -119,7 +130,9 @@
           "Variables": {
             "DYNAMODB_TABLE": "catfecito-backend-dev",
             "JWT_SECRET": "xyz12345",
-            "JWT_EXPIRES_IN": "7d"
+            "JWT_EXPIRES_IN": "7d",
+            "COGNITO_USER_POOL_ID": "sa-east-1_pua4g9m7n",
+            "COGNITO_CLIENT_ID": "426ee7m0co9le8poclthg5ict6"
           }
         },
         "Role": {
@@ -133,14 +146,14 @@
         "RegisterLogGroup"
       ]
     },
-    "RegisterLambdaVersion2oN1KqmLLCGuVJkEP88mgxZXlq5tTkg563L4qcBsUA": {
+    "RegisterLambdaVersionGQ025XqLkyDwOBGPGayrKIgj5kG92zD9m7w1FfgfUV4": {
       "Type": "AWS::Lambda::Version",
       "DeletionPolicy": "Retain",
       "Properties": {
         "FunctionName": {
           "Ref": "RegisterLambdaFunction"
         },
-        "CodeSha256": "Jcc1jWNTksd3jZPDJh01PlNduk2xhwafw76pSJDwOsI="
+        "CodeSha256": "Y4dfWfOjZeAZBR9WkxjuVKGc2jbEHHug9GZs+J14u/c="
       }
     },
     "HttpApi": {
@@ -302,7 +315,7 @@
     "RegisterLambdaFunctionQualifiedArn": {
       "Description": "Current Lambda function version",
       "Value": {
-        "Ref": "RegisterLambdaVersion2oN1KqmLLCGuVJkEP88mgxZXlq5tTkg563L4qcBsUA"
+        "Ref": "RegisterLambdaVersionGQ025XqLkyDwOBGPGayrKIgj5kG92zD9m7w1FfgfUV4"
       },
       "Export": {
         "Name": "sls-catfecito-backend-dev-RegisterLambdaFunctionQualifiedArn"

@@ -14,7 +14,9 @@
         "environment": {
           "DYNAMODB_TABLE": "catfecito-backend-dev",
           "JWT_SECRET": "<REDACTED>",
-          "JWT_EXPIRES_IN": "7d"
+          "JWT_EXPIRES_IN": "7d",
+          "COGNITO_USER_POOL_ID": "sa-east-1_pua4g9m7n",
+          "COGNITO_CLIENT_ID": "426ee7m0co9le8poclthg5ict6"
         },
         "iam": {
           "role": {
@@ -35,6 +37,17 @@
                   "arn:aws:dynamodb:sa-east-1:*:table/catfecito-backend-dev",
                   "arn:aws:dynamodb:sa-east-1:*:table/catfecito-backend-dev/index/*"
                 ]
+              },
+              {
+                "Effect": "Allow",
+                "Action": [
+                  "cognito-idp:AdminCreateUser",
+                  "cognito-idp:AdminSetUserPassword",
+                  "cognito-idp:AdminInitiateAuth",
+                  "cognito-idp:AdminRespondToAuthChallenge",
+                  "cognito-idp:SignUp"
+                ],
+                "Resource": "arn:aws:cognito-idp:sa-east-1:*:userpool/sa-east-1_pua4g9m7n"
               }
             ]
           }
@@ -124,6 +137,17 @@
                             "arn:aws:dynamodb:sa-east-1:*:table/catfecito-backend-dev",
                             "arn:aws:dynamodb:sa-east-1:*:table/catfecito-backend-dev/index/*"
                           ]
+                        },
+                        {
+                          "Effect": "Allow",
+                          "Action": [
+                            "cognito-idp:AdminCreateUser",
+                            "cognito-idp:AdminSetUserPassword",
+                            "cognito-idp:AdminInitiateAuth",
+                            "cognito-idp:AdminRespondToAuthChallenge",
+                            "cognito-idp:SignUp"
+                          ],
+                          "Resource": "arn:aws:cognito-idp:sa-east-1:*:userpool/sa-east-1_pua4g9m7n"
                         }
                       ]
                     }
@@ -150,7 +174,7 @@
               "Properties": {
                 "Code": {
                   "S3Bucket": "serverless-framework-deployments-sa-east-1-b389c947-1ea1",
-                  "S3Key": "serverless/catfecito-backend/dev/1769097244899-2026-01-22T15:54:04.899Z/catfecito-backend.zip"
+                  "S3Key": "serverless/catfecito-backend/dev/1769108206390-2026-01-22T18:56:46.390Z/catfecito-backend.zip"
                 },
                 "Handler": "server/functions/auth/register.createUser",
                 "Runtime": "nodejs18.x",
@@ -161,7 +185,9 @@
                   "Variables": {
                     "DYNAMODB_TABLE": "catfecito-backend-dev",
                     "JWT_SECRET": "<REDACTED>",
-                    "JWT_EXPIRES_IN": "7d"
+                    "JWT_EXPIRES_IN": "7d",
+                    "COGNITO_USER_POOL_ID": "sa-east-1_pua4g9m7n",
+                    "COGNITO_CLIENT_ID": "426ee7m0co9le8poclthg5ict6"
                   }
                 },
                 "Role": {
@@ -175,14 +201,14 @@
                 "RegisterLogGroup"
               ]
             },
-            "RegisterLambdaVersion2oN1KqmLLCGuVJkEP88mgxZXlq5tTkg563L4qcBsUA": {
+            "RegisterLambdaVersionGQ025XqLkyDwOBGPGayrKIgj5kG92zD9m7w1FfgfUV4": {
               "Type": "AWS::Lambda::Version",
               "DeletionPolicy": "Retain",
               "Properties": {
                 "FunctionName": {
                   "Ref": "RegisterLambdaFunction"
                 },
-                "CodeSha256": "Jcc1jWNTksd3jZPDJh01PlNduk2xhwafw76pSJDwOsI="
+                "CodeSha256": "Y4dfWfOjZeAZBR9WkxjuVKGc2jbEHHug9GZs+J14u/c="
               }
             },
             "HttpApi": {
@@ -344,7 +370,7 @@
             "RegisterLambdaFunctionQualifiedArn": {
               "Description": "Current Lambda function version",
               "Value": {
-                "Ref": "RegisterLambdaVersion2oN1KqmLLCGuVJkEP88mgxZXlq5tTkg563L4qcBsUA"
+                "Ref": "RegisterLambdaVersionGQ025XqLkyDwOBGPGayrKIgj5kG92zD9m7w1FfgfUV4"
               },
               "Export": {
                 "Name": "sls-catfecito-backend-dev-RegisterLambdaFunctionQualifiedArn"
@@ -407,7 +433,7 @@
           "timeout": 6,
           "runtime": "nodejs18.x",
           "vpc": {},
-          "versionLogicalId": "RegisterLambdaVersion2oN1KqmLLCGuVJkEP88mgxZXlq5tTkg563L4qcBsUA"
+          "versionLogicalId": "RegisterLambdaVersionGQ025XqLkyDwOBGPGayrKIgj5kG92zD9m7w1FfgfUV4"
         }
       },
       "resources": {
@@ -477,7 +503,9 @@
       "environment": {
         "DYNAMODB_TABLE": "catfecito-backend-dev",
         "JWT_SECRET": "<REDACTED>",
-        "JWT_EXPIRES_IN": "7d"
+        "JWT_EXPIRES_IN": "7d",
+        "COGNITO_USER_POOL_ID": "sa-east-1_pua4g9m7n",
+        "COGNITO_CLIENT_ID": "426ee7m0co9le8poclthg5ict6"
       },
       "iam": {
         "role": {
@@ -498,6 +526,17 @@
                 "arn:aws:dynamodb:sa-east-1:*:table/catfecito-backend-dev",
                 "arn:aws:dynamodb:sa-east-1:*:table/catfecito-backend-dev/index/*"
               ]
+            },
+            {
+              "Effect": "Allow",
+              "Action": [
+                "cognito-idp:AdminCreateUser",
+                "cognito-idp:AdminSetUserPassword",
+                "cognito-idp:AdminInitiateAuth",
+                "cognito-idp:AdminRespondToAuthChallenge",
+                "cognito-idp:SignUp"
+              ],
+              "Resource": "arn:aws:cognito-idp:sa-east-1:*:userpool/sa-east-1_pua4g9m7n"
             }
           ]
         }
@@ -587,6 +626,17 @@
                           "arn:aws:dynamodb:sa-east-1:*:table/catfecito-backend-dev",
                           "arn:aws:dynamodb:sa-east-1:*:table/catfecito-backend-dev/index/*"
                         ]
+                      },
+                      {
+                        "Effect": "Allow",
+                        "Action": [
+                          "cognito-idp:AdminCreateUser",
+                          "cognito-idp:AdminSetUserPassword",
+                          "cognito-idp:AdminInitiateAuth",
+                          "cognito-idp:AdminRespondToAuthChallenge",
+                          "cognito-idp:SignUp"
+                        ],
+                        "Resource": "arn:aws:cognito-idp:sa-east-1:*:userpool/sa-east-1_pua4g9m7n"
                       }
                     ]
                   }
@@ -613,7 +663,7 @@
             "Properties": {
               "Code": {
                 "S3Bucket": "serverless-framework-deployments-sa-east-1-b389c947-1ea1",
-                "S3Key": "serverless/catfecito-backend/dev/1769097244899-2026-01-22T15:54:04.899Z/catfecito-backend.zip"
+                "S3Key": "serverless/catfecito-backend/dev/1769108206390-2026-01-22T18:56:46.390Z/catfecito-backend.zip"
               },
               "Handler": "server/functions/auth/register.createUser",
               "Runtime": "nodejs18.x",
@@ -624,7 +674,9 @@
                 "Variables": {
                   "DYNAMODB_TABLE": "catfecito-backend-dev",
                   "JWT_SECRET": "<REDACTED>",
-                  "JWT_EXPIRES_IN": "7d"
+                  "JWT_EXPIRES_IN": "7d",
+                  "COGNITO_USER_POOL_ID": "sa-east-1_pua4g9m7n",
+                  "COGNITO_CLIENT_ID": "426ee7m0co9le8poclthg5ict6"
                 }
               },
               "Role": {
@@ -638,14 +690,14 @@
               "RegisterLogGroup"
             ]
           },
-          "RegisterLambdaVersion2oN1KqmLLCGuVJkEP88mgxZXlq5tTkg563L4qcBsUA": {
+          "RegisterLambdaVersionGQ025XqLkyDwOBGPGayrKIgj5kG92zD9m7w1FfgfUV4": {
             "Type": "AWS::Lambda::Version",
             "DeletionPolicy": "Retain",
             "Properties": {
               "FunctionName": {
                 "Ref": "RegisterLambdaFunction"
               },
-              "CodeSha256": "Jcc1jWNTksd3jZPDJh01PlNduk2xhwafw76pSJDwOsI="
+              "CodeSha256": "Y4dfWfOjZeAZBR9WkxjuVKGc2jbEHHug9GZs+J14u/c="
             }
           },
           "HttpApi": {
@@ -807,7 +859,7 @@
           "RegisterLambdaFunctionQualifiedArn": {
             "Description": "Current Lambda function version",
             "Value": {
-              "Ref": "RegisterLambdaVersion2oN1KqmLLCGuVJkEP88mgxZXlq5tTkg563L4qcBsUA"
+              "Ref": "RegisterLambdaVersionGQ025XqLkyDwOBGPGayrKIgj5kG92zD9m7w1FfgfUV4"
             },
             "Export": {
               "Name": "sls-catfecito-backend-dev-RegisterLambdaFunctionQualifiedArn"
@@ -860,7 +912,7 @@
       "serviceProvider": null,
       "instanceParameters": null
     },
-    "serviceRawFile": "service: catfecito-backend\r\n\r\nframeworkVersion: \"^4.0.0\"\r\n\r\nprovider:\r\n  name: aws\r\n  runtime: nodejs18.x\r\n  region: sa-east-1\r\n  stage: ${opt:stage, 'dev'}\r\n  environment:\r\n    DYNAMODB_TABLE: ${self:service}-${self:provider.stage}\r\n    JWT_SECRET: ${env:JWT_SECRET}\r\n    JWT_EXPIRES_IN: ${env:JWT_EXPIRES_IN, '7d'}\r\n  iam:\r\n    role:\r\n      statements:\r\n        - Effect: Allow\r\n          Action:\r\n            - dynamodb:Query\r\n            - dynamodb:Scan\r\n            - dynamodb:GetItem\r\n            - dynamodb:PutItem\r\n            - dynamodb:UpdateItem\r\n            - dynamodb:DeleteItem\r\n            - dynamodb:BatchGetItem\r\n            - dynamodb:BatchWriteItem\r\n          Resource:\r\n            - \"arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.DYNAMODB_TABLE}\"\r\n            - \"arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.DYNAMODB_TABLE}/index/*\"\r\n\r\nfunctions:\r\n  register:\r\n    handler: server/functions/auth/register.createUser\r\n    events:\r\n      - httpApi:\r\n          path: /api/auth/register\r\n          method: POST\r\n\r\nresources:\r\n  Resources:\r\n    CatfecitoTable:\r\n      Type: AWS::DynamoDB::Table\r\n      Properties:\r\n        TableName: ${self:provider.environment.DYNAMODB_TABLE}\r\n        BillingMode: PAY_PER_REQUEST\r\n        AttributeDefinitions:\r\n          - AttributeName: PK\r\n            AttributeType: S\r\n          - AttributeName: SK\r\n            AttributeType: S\r\n          - AttributeName: GSI1PK\r\n            AttributeType: S\r\n          - AttributeName: GSI1SK\r\n            AttributeType: S\r\n        KeySchema:\r\n          - AttributeName: PK\r\n            KeyType: HASH\r\n          - AttributeName: SK\r\n            KeyType: RANGE\r\n        GlobalSecondaryIndexes:\r\n          - IndexName: GSI1\r\n            KeySchema:\r\n              - AttributeName: GSI1PK\r\n                KeyType: HASH\r\n              - AttributeName: GSI1SK\r\n                KeyType: RANGE\r\n            Projection:\r\n              ProjectionType: ALL\r\n",
+    "serviceRawFile": "service: catfecito-backend\r\n\r\nframeworkVersion: \"^4.0.0\"\r\n\r\nprovider:\r\n  name: aws\r\n  runtime: nodejs18.x\r\n  region: sa-east-1\r\n  stage: ${opt:stage, 'dev'}\r\n  environment:\r\n    DYNAMODB_TABLE: ${self:service}-${self:provider.stage}\r\n    JWT_SECRET: ${env:JWT_SECRET}\r\n    JWT_EXPIRES_IN: ${env:JWT_EXPIRES_IN, '7d'}\r\n    COGNITO_USER_POOL_ID: ${env:COGNITO_USER_POOL_ID}\r\n    COGNITO_CLIENT_ID: ${env:COGNITO_CLIENT_ID}\r\n  iam:\r\n    role:\r\n      statements:\r\n        - Effect: Allow\r\n          Action:\r\n            - dynamodb:Query\r\n            - dynamodb:Scan\r\n            - dynamodb:GetItem\r\n            - dynamodb:PutItem\r\n            - dynamodb:UpdateItem\r\n            - dynamodb:DeleteItem\r\n            - dynamodb:BatchGetItem\r\n            - dynamodb:BatchWriteItem\r\n          Resource:\r\n            - \"arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.DYNAMODB_TABLE}\"\r\n            - \"arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.DYNAMODB_TABLE}/index/*\"\r\n\r\n        - Effect: Allow\r\n          Action:\r\n            - cognito-idp:AdminCreateUser\r\n            - cognito-idp:AdminSetUserPassword\r\n            - cognito-idp:AdminInitiateAuth\r\n            - cognito-idp:AdminRespondToAuthChallenge\r\n            - cognito-idp:SignUp\r\n          Resource:\r\n            - \"arn:aws:cognito-idp:${self:provider.region}:*:userpool/${env:COGNITO_USER_POOL_ID}\"\r\n\r\nfunctions:\r\n  register:\r\n    handler: server/functions/auth/register.createUser\r\n    events:\r\n      - httpApi:\r\n          path: /api/auth/register\r\n          method: POST\r\n\r\nresources:\r\n  Resources:\r\n    CatfecitoTable:\r\n      Type: AWS::DynamoDB::Table\r\n      Properties:\r\n        TableName: ${self:provider.environment.DYNAMODB_TABLE}\r\n        BillingMode: PAY_PER_REQUEST\r\n        AttributeDefinitions:\r\n          - AttributeName: PK\r\n            AttributeType: S\r\n          - AttributeName: SK\r\n            AttributeType: S\r\n          - AttributeName: GSI1PK\r\n            AttributeType: S\r\n          - AttributeName: GSI1SK\r\n            AttributeType: S\r\n        KeySchema:\r\n          - AttributeName: PK\r\n            KeyType: HASH\r\n          - AttributeName: SK\r\n            KeyType: RANGE\r\n        GlobalSecondaryIndexes:\r\n          - IndexName: GSI1\r\n            KeySchema:\r\n              - AttributeName: GSI1PK\r\n                KeyType: HASH\r\n              - AttributeName: GSI1SK\r\n                KeyType: RANGE\r\n            Projection:\r\n              ProjectionType: ALL\r\n",
     "command": [
       "deploy"
     ],
@@ -875,12 +927,12 @@
     "serviceProviderAwsCfStackName": "catfecito-backend-dev",
     "serviceProviderAwsCfStackId": "arn:aws:cloudformation:sa-east-1:553916359458:stack/catfecito-backend-dev/b92df4a0-f726-11f0-8342-06bde38fa613",
     "serviceProviderAwsCfStackCreated": "2026-01-22T00:10:14.091Z",
-    "serviceProviderAwsCfStackUpdated": "2026-01-22T15:36:29.139Z",
+    "serviceProviderAwsCfStackUpdated": "2026-01-22T18:35:38.169Z",
     "serviceProviderAwsCfStackStatus": "UPDATE_COMPLETE",
     "serviceProviderAwsCfStackOutputs": [
       {
         "OutputKey": "RegisterLambdaFunctionQualifiedArn",
-        "OutputValue": "arn:aws:lambda:sa-east-1:553916359458:function:catfecito-backend-dev-register:5",
+        "OutputValue": "arn:aws:lambda:sa-east-1:553916359458:function:catfecito-backend-dev-register:8",
         "Description": "Current Lambda function version",
         "ExportName": "sls-catfecito-backend-dev-RegisterLambdaFunctionQualifiedArn"
       },
@@ -986,6 +1038,17 @@
                         "arn:aws:dynamodb:sa-east-1:*:table/catfecito-backend-dev",
                         "arn:aws:dynamodb:sa-east-1:*:table/catfecito-backend-dev/index/*"
                       ]
+                    },
+                    {
+                      "Effect": "Allow",
+                      "Action": [
+                        "cognito-idp:AdminCreateUser",
+                        "cognito-idp:AdminSetUserPassword",
+                        "cognito-idp:AdminInitiateAuth",
+                        "cognito-idp:AdminRespondToAuthChallenge",
+                        "cognito-idp:SignUp"
+                      ],
+                      "Resource": "arn:aws:cognito-idp:sa-east-1:*:userpool/sa-east-1_pua4g9m7n"
                     }
                   ]
                 }
@@ -1012,7 +1075,7 @@
           "Properties": {
             "Code": {
               "S3Bucket": "serverless-framework-deployments-sa-east-1-b389c947-1ea1",
-              "S3Key": "serverless/catfecito-backend/dev/1769097244899-2026-01-22T15:54:04.899Z/catfecito-backend.zip"
+              "S3Key": "serverless/catfecito-backend/dev/1769108206390-2026-01-22T18:56:46.390Z/catfecito-backend.zip"
             },
             "Handler": "server/functions/auth/register.createUser",
             "Runtime": "nodejs18.x",
@@ -1023,7 +1086,9 @@
               "Variables": {
                 "DYNAMODB_TABLE": "catfecito-backend-dev",
                 "JWT_SECRET": "<REDACTED>",
-                "JWT_EXPIRES_IN": "7d"
+                "JWT_EXPIRES_IN": "7d",
+                "COGNITO_USER_POOL_ID": "sa-east-1_pua4g9m7n",
+                "COGNITO_CLIENT_ID": "426ee7m0co9le8poclthg5ict6"
               }
             },
             "Role": {
@@ -1037,14 +1102,14 @@
             "RegisterLogGroup"
           ]
         },
-        "RegisterLambdaVersion2oN1KqmLLCGuVJkEP88mgxZXlq5tTkg563L4qcBsUA": {
+        "RegisterLambdaVersionGQ025XqLkyDwOBGPGayrKIgj5kG92zD9m7w1FfgfUV4": {
           "Type": "AWS::Lambda::Version",
           "DeletionPolicy": "Retain",
           "Properties": {
             "FunctionName": {
               "Ref": "RegisterLambdaFunction"
             },
-            "CodeSha256": "Jcc1jWNTksd3jZPDJh01PlNduk2xhwafw76pSJDwOsI="
+            "CodeSha256": "Y4dfWfOjZeAZBR9WkxjuVKGc2jbEHHug9GZs+J14u/c="
           }
         },
         "HttpApi": {
@@ -1206,7 +1271,7 @@
         "RegisterLambdaFunctionQualifiedArn": {
           "Description": "Current Lambda function version",
           "Value": {
-            "Ref": "RegisterLambdaVersion2oN1KqmLLCGuVJkEP88mgxZXlq5tTkg563L4qcBsUA"
+            "Ref": "RegisterLambdaVersionGQ025XqLkyDwOBGPGayrKIgj5kG92zD9m7w1FfgfUV4"
           },
           "Export": {
             "Name": "sls-catfecito-backend-dev-RegisterLambdaFunctionQualifiedArn"
