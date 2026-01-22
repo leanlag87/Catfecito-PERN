@@ -1,5 +1,6 @@
 import { DynamoDBClient, ListTablesCommand } from "@aws-sdk/client-dynamodb";
 import { DynamoDBDocumentClient } from "@aws-sdk/lib-dynamodb";
+import { randomUUID } from "crypto";
 import config from "./config.js";
 
 // Configurar cliente DynamoDB
@@ -20,7 +21,7 @@ export function getTimestamp() {
 
 // Helper para generar IDs únicos
 export function generateId() {
-  return crypto.randomUUID();
+  return randomUUID();
 }
 
 // Test de conexión a DynamoDB
