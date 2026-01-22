@@ -2,7 +2,7 @@ import { docClient, TABLE_NAME, getTimestamp } from "../../dynamodb.js";
 import { QueryCommand, PutCommand } from "@aws-sdk/lib-dynamodb";
 import {
   CognitoIdentityProviderClient,
-  SignUpCommand,
+  AdminCreateUserCommand,
   AdminSetUserPasswordCommand,
 } from "@aws-sdk/client-cognito-identity-provider";
 import config from "../../config.js";
@@ -78,18 +78,20 @@ export const createUser = async (event) => {
 
     console.log("🔐 Creating user in Cognito...");
 
-    const signUpCommand = new SignUpCommand({
-      ClientId: config.COGNITO_CLIENT_ID,
+    const createUserCommand = new AdminCreateUserCommand({
+      UserPoolId: config.COGNITO_USER_POOL_ID,
       Username: email.toLowerCase(),
-      Password: password,
       UserAttributes: [
         { Name: "email", Value: email.toLowerCase() },
+        { Name: "email_verified", Value: "true" },
         { Name: "name", Value: name },
       ],
+      MessageAction: "SUPPRESS", // No enviar email de bienvenida
+      TemporaryPassword: password, // Temporal, luego lo hacemos permanente
     });
 
-    const cognitoResponse = await cognitoClient.send(signUpCommand);
-    const cognitoUserId = cognitoResponse.UserSub;
+    const cognitoResponse = await cognitoClient.send(createUserCommand);
+    const cognitoUserId = cognitoResponse.User.Username;
     console.log("✅ User created in Cognito:", cognitoUserId);
 
     // 3. Establecer contraseña permanente (para que no requiera cambio en primer login)
@@ -160,7 +162,10 @@ export const createUser = async (event) => {
     console.error("❌ Error stack:", error.stack);
 
     // Manejar errores específicos de Cognito
-    if (error.name === "UsernameExistsException") {
+    if (
+      error.name === "UsernameExistsException" ||
+      error.name === "AliasExistsException"
+    ) {
       return {
         statusCode: 409,
         headers: {
