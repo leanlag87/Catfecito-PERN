@@ -24,6 +24,7 @@
   "license": "ISC",
   "description": "Backend para e-commerce Catfecito usando PERN Stack",
   "dependencies": {
+    "@aws-sdk/client-cognito-identity-provider": "^3.972.0",
     "@aws-sdk/client-dynamodb": "^3.972.0",
     "@aws-sdk/lib-dynamodb": "^3.972.0",
     "bcrypt": "^6.0.0",
