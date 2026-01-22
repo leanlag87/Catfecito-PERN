@@ -1,0 +1,189 @@
+{
+  "service": {
+    "service": "catfecito-backend",
+    "serviceObject": {
+      "name": "catfecito-backend"
+    },
+    "provider": {
+      "name": "aws",
+      "runtime": "nodejs18.x",
+      "region": "sa-east-1",
+      "stage": "dev",
+      "environment": {
+        "DYNAMODB_TABLE": "catfecito-backend-dev",
+        "JWT_SECRET": "xyz12345",
+        "JWT_EXPIRES_IN": "7d"
+      },
+      "iam": {
+        "role": {
+          "statements": [
+            {
+              "Effect": "Allow",
+              "Action": [
+                "dynamodb:Query",
+                "dynamodb:Scan",
+                "dynamodb:GetItem",
+                "dynamodb:PutItem",
+                "dynamodb:UpdateItem",
+                "dynamodb:DeleteItem",
+                "dynamodb:BatchGetItem",
+                "dynamodb:BatchWriteItem"
+              ],
+              "Resource": [
+                "arn:aws:dynamodb:sa-east-1:*:table/catfecito-backend-dev",
+                "arn:aws:dynamodb:sa-east-1:*:table/catfecito-backend-dev/index/*"
+              ]
+            }
+          ]
+        }
+      },
+      "versionFunctions": true,
+      "compiledCloudFormationTemplate": {
+        "AWSTemplateFormatVersion": "2010-09-09",
+        "Description": "The AWS CloudFormation template for this Serverless application",
+        "Resources": {
+          "CatfecitoTable": {
+            "Type": "AWS::DynamoDB::Table",
+            "Properties": {
+              "TableName": "catfecito-backend-dev",
+              "BillingMode": "PAY_PER_REQUEST",
+              "AttributeDefinitions": [
+                {
+                  "AttributeName": "PK",
+                  "AttributeType": "S"
+                },
+                {
+                  "AttributeName": "SK",
+                  "AttributeType": "S"
+                },
+                {
+                  "AttributeName": "GSI1PK",
+                  "AttributeType": "S"
+                },
+                {
+                  "AttributeName": "GSI1SK",
+                  "AttributeType": "S"
+                }
+              ],
+              "KeySchema": [
+                {
+                  "AttributeName": "PK",
+                  "KeyType": "HASH"
+                },
+                {
+                  "AttributeName": "SK",
+                  "KeyType": "RANGE"
+                }
+              ],
+              "GlobalSecondaryIndexes": [
+                {
+                  "IndexName": "GSI1",
+                  "KeySchema": [
+                    {
+                      "AttributeName": "GSI1PK",
+                      "KeyType": "HASH"
+                    },
+                    {
+                      "AttributeName": "GSI1SK",
+                      "KeyType": "RANGE"
+                    }
+                  ],
+                  "Projection": {
+                    "ProjectionType": "ALL"
+                  }
+                }
+              ]
+            }
+          }
+        },
+        "Outputs": {
+          "ServerlessDeploymentBucketName": {
+            "Value": "serverless-framework-deployments-sa-east-1-b389c947-1ea1",
+            "Export": {
+              "Name": "sls-catfecito-backend-dev-ServerlessDeploymentBucketName"
+            }
+          }
+        }
+      }
+    },
+    "pluginsData": {},
+    "functions": {},
+    "resources": {
+      "Resources": {
+        "CatfecitoTable": {
+          "Type": "AWS::DynamoDB::Table",
+          "Properties": {
+            "TableName": "catfecito-backend-dev",
+            "BillingMode": "PAY_PER_REQUEST",
+            "AttributeDefinitions": [
+              {
+                "AttributeName": "PK",
+                "AttributeType": "S"
+              },
+              {
+                "AttributeName": "SK",
+                "AttributeType": "S"
+              },
+              {
+                "AttributeName": "GSI1PK",
+                "AttributeType": "S"
+              },
+              {
+                "AttributeName": "GSI1SK",
+                "AttributeType": "S"
+              }
+            ],
+            "KeySchema": [
+              {
+                "AttributeName": "PK",
+                "KeyType": "HASH"
+              },
+              {
+                "AttributeName": "SK",
+                "KeyType": "RANGE"
+              }
+            ],
+            "GlobalSecondaryIndexes": [
+              {
+                "IndexName": "GSI1",
+                "KeySchema": [
+                  {
+                    "AttributeName": "GSI1PK",
+                    "KeyType": "HASH"
+                  },
+                  {
+                    "AttributeName": "GSI1SK",
+                    "KeyType": "RANGE"
+                  }
+                ],
+                "Projection": {
+                  "ProjectionType": "ALL"
+                }
+              }
+            ]
+          }
+        }
+      },
+      "Outputs": {}
+    },
+    "configValidationMode": "warn",
+    "serviceFilename": "serverless",
+    "initialServerlessConfig": {
+      "service": "catfecito-backend",
+      "frameworkVersion": "^4.0.0",
+      "provider": {
+        "$ref": "$[\"service\"][\"provider\"]"
+      },
+      "resources": {
+        "$ref": "$[\"service\"][\"resources\"]"
+      }
+    },
+    "appId": null,
+    "orgId": null,
+    "layers": {}
+  },
+  "package": {
+    "artifactDirectoryName": "serverless/catfecito-backend/dev/1769040607772-2026-01-22T00:10:07.772Z",
+    "artifact": ""
+  }
+}

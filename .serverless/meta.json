@@ -5,7 +5,7 @@
     "serviceConfigFileName": "serverless.yml",
     "service": {
       "service": "catfecito-backend",
-      "frameworkVersion": "3 || 4",
+      "frameworkVersion": "^4.0.0",
       "provider": {
         "name": "aws",
         "runtime": "nodejs18.x",
@@ -37,6 +37,74 @@
                 ]
               }
             ]
+          }
+        },
+        "versionFunctions": true,
+        "compiledCloudFormationTemplate": {
+          "AWSTemplateFormatVersion": "2010-09-09",
+          "Description": "The AWS CloudFormation template for this Serverless application",
+          "Resources": {
+            "CatfecitoTable": {
+              "Type": "AWS::DynamoDB::Table",
+              "Properties": {
+                "TableName": "catfecito-backend-dev",
+                "BillingMode": "PAY_PER_REQUEST",
+                "AttributeDefinitions": [
+                  {
+                    "AttributeName": "PK",
+                    "AttributeType": "S"
+                  },
+                  {
+                    "AttributeName": "SK",
+                    "AttributeType": "S"
+                  },
+                  {
+                    "AttributeName": "GSI1PK",
+                    "AttributeType": "S"
+                  },
+                  {
+                    "AttributeName": "GSI1SK",
+                    "AttributeType": "S"
+                  }
+                ],
+                "KeySchema": [
+                  {
+                    "AttributeName": "PK",
+                    "KeyType": "HASH"
+                  },
+                  {
+                    "AttributeName": "SK",
+                    "KeyType": "RANGE"
+                  }
+                ],
+                "GlobalSecondaryIndexes": [
+                  {
+                    "IndexName": "GSI1",
+                    "KeySchema": [
+                      {
+                        "AttributeName": "GSI1PK",
+                        "KeyType": "HASH"
+                      },
+                      {
+                        "AttributeName": "GSI1SK",
+                        "KeyType": "RANGE"
+                      }
+                    ],
+                    "Projection": {
+                      "ProjectionType": "ALL"
+                    }
+                  }
+                ]
+              }
+            }
+          },
+          "Outputs": {
+            "ServerlessDeploymentBucketName": {
+              "Value": "serverless-framework-deployments-sa-east-1-b389c947-1ea1",
+              "Export": {
+                "Name": "sls-catfecito-backend-dev-ServerlessDeploymentBucketName"
+              }
+            }
           }
         }
       },
@@ -95,7 +163,8 @@
               ]
             }
           }
-        }
+        },
+        "Outputs": {}
       }
     },
     "provider": {
@@ -130,6 +199,74 @@
             }
           ]
         }
+      },
+      "versionFunctions": true,
+      "compiledCloudFormationTemplate": {
+        "AWSTemplateFormatVersion": "2010-09-09",
+        "Description": "The AWS CloudFormation template for this Serverless application",
+        "Resources": {
+          "CatfecitoTable": {
+            "Type": "AWS::DynamoDB::Table",
+            "Properties": {
+              "TableName": "catfecito-backend-dev",
+              "BillingMode": "PAY_PER_REQUEST",
+              "AttributeDefinitions": [
+                {
+                  "AttributeName": "PK",
+                  "AttributeType": "S"
+                },
+                {
+                  "AttributeName": "SK",
+                  "AttributeType": "S"
+                },
+                {
+                  "AttributeName": "GSI1PK",
+                  "AttributeType": "S"
+                },
+                {
+                  "AttributeName": "GSI1SK",
+                  "AttributeType": "S"
+                }
+              ],
+              "KeySchema": [
+                {
+                  "AttributeName": "PK",
+                  "KeyType": "HASH"
+                },
+                {
+                  "AttributeName": "SK",
+                  "KeyType": "RANGE"
+                }
+              ],
+              "GlobalSecondaryIndexes": [
+                {
+                  "IndexName": "GSI1",
+                  "KeySchema": [
+                    {
+                      "AttributeName": "GSI1PK",
+                      "KeyType": "HASH"
+                    },
+                    {
+                      "AttributeName": "GSI1SK",
+                      "KeyType": "RANGE"
+                    }
+                  ],
+                  "Projection": {
+                    "ProjectionType": "ALL"
+                  }
+                }
+              ]
+            }
+          }
+        },
+        "Outputs": {
+          "ServerlessDeploymentBucketName": {
+            "Value": "serverless-framework-deployments-sa-east-1-b389c947-1ea1",
+            "Export": {
+              "Name": "sls-catfecito-backend-dev-ServerlessDeploymentBucketName"
+            }
+          }
+        }
       }
     },
     "dashboard": {
@@ -141,12 +278,7 @@
       "serviceProvider": null,
       "instanceParameters": null
     },
-    "error": {
-      "message": "The Serverless version (4.31.0) does not satisfy the \"frameworkVersion\" (3 || 4) in serverless",
-      "stack": "ServerlessError2: The Serverless version (4.31.0) does not satisfy the \"frameworkVersion\" (3 || 4) in serverless\n    at Service.loadServiceFileParam (file:///C:/Users/lince/.serverless/releases/4.31.0/package/dist/sf-core.js:1802:9202)\n    at Service.load (file:///C:/Users/lince/.serverless/releases/4.31.0/package/dist/sf-core.js:1802:6841)\n    at Serverless.init (file:///C:/Users/lince/.serverless/releases/4.31.0/package/dist/sf-core.js:1808:9810)\n    at runFramework (file:///C:/Users/lince/.serverless/releases/4.31.0/package/dist/sf-core.js:1835:860)\n    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at async TraditionalRunner.run (file:///C:/Users/lince/.serverless/releases/4.31.0/package/dist/sf-core.js:1831:28223)\n    at async route (file:///C:/Users/lince/.serverless/releases/4.31.0/package/dist/sf-core.js:2006:2848)\n    at async Object.run (file:///C:/Users/lince/.serverless/releases/4.31.0/package/dist/sf-core.js:2007:3879)\n    at async run2 (file:///C:/Users/lince/.serverless/releases/4.31.0/package/dist/sf-core.js:2007:5033)",
-      "code": "FRAMEWORK_VERSION_MISMATCH"
-    },
-    "serviceRawFile": "service: catfecito-backend\r\n\r\nframeworkVersion: \"3 || 4\"\r\n\r\nprovider:\r\n  name: aws\r\n  runtime: nodejs18.x\r\n  region: sa-east-1\r\n  stage: ${opt:stage, 'dev'}\r\n  environment:\r\n    DYNAMODB_TABLE: ${self:service}-${self:provider.stage}\r\n    JWT_SECRET: ${env:JWT_SECRET}\r\n    JWT_EXPIRES_IN: ${env:JWT_EXPIRES_IN, '7d'}\r\n  iam:\r\n    role:\r\n      statements:\r\n        - Effect: Allow\r\n          Action:\r\n            - dynamodb:Query\r\n            - dynamodb:Scan\r\n            - dynamodb:GetItem\r\n            - dynamodb:PutItem\r\n            - dynamodb:UpdateItem\r\n            - dynamodb:DeleteItem\r\n            - dynamodb:BatchGetItem\r\n            - dynamodb:BatchWriteItem\r\n          Resource:\r\n            - \"arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.DYNAMODB_TABLE}\"\r\n            - \"arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.DYNAMODB_TABLE}/index/*\"\r\n\r\nresources:\r\n  Resources:\r\n    CatfecitoTable:\r\n      Type: AWS::DynamoDB::Table\r\n      Properties:\r\n        TableName: ${self:provider.environment.DYNAMODB_TABLE}\r\n        BillingMode: PAY_PER_REQUEST\r\n        AttributeDefinitions:\r\n          - AttributeName: PK\r\n            AttributeType: S\r\n          - AttributeName: SK\r\n            AttributeType: S\r\n          - AttributeName: GSI1PK\r\n            AttributeType: S\r\n          - AttributeName: GSI1SK\r\n            AttributeType: S\r\n        KeySchema:\r\n          - AttributeName: PK\r\n            KeyType: HASH\r\n          - AttributeName: SK\r\n            KeyType: RANGE\r\n        GlobalSecondaryIndexes:\r\n          - IndexName: GSI1\r\n            KeySchema:\r\n              - AttributeName: GSI1PK\r\n                KeyType: HASH\r\n              - AttributeName: GSI1SK\r\n                KeyType: RANGE\r\n            Projection:\r\n              ProjectionType: ALL\r\n",
+    "serviceRawFile": "service: catfecito-backend\r\n\r\nframeworkVersion: \"^4.0.0\"\r\n\r\nprovider:\r\n  name: aws\r\n  runtime: nodejs18.x\r\n  region: sa-east-1\r\n  stage: ${opt:stage, 'dev'}\r\n  environment:\r\n    DYNAMODB_TABLE: ${self:service}-${self:provider.stage}\r\n    JWT_SECRET: ${env:JWT_SECRET}\r\n    JWT_EXPIRES_IN: ${env:JWT_EXPIRES_IN, '7d'}\r\n  iam:\r\n    role:\r\n      statements:\r\n        - Effect: Allow\r\n          Action:\r\n            - dynamodb:Query\r\n            - dynamodb:Scan\r\n            - dynamodb:GetItem\r\n            - dynamodb:PutItem\r\n            - dynamodb:UpdateItem\r\n            - dynamodb:DeleteItem\r\n            - dynamodb:BatchGetItem\r\n            - dynamodb:BatchWriteItem\r\n          Resource:\r\n            - \"arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.DYNAMODB_TABLE}\"\r\n            - \"arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.DYNAMODB_TABLE}/index/*\"\r\n\r\nresources:\r\n  Resources:\r\n    CatfecitoTable:\r\n      Type: AWS::DynamoDB::Table\r\n      Properties:\r\n        TableName: ${self:provider.environment.DYNAMODB_TABLE}\r\n        BillingMode: PAY_PER_REQUEST\r\n        AttributeDefinitions:\r\n          - AttributeName: PK\r\n            AttributeType: S\r\n          - AttributeName: SK\r\n            AttributeType: S\r\n          - AttributeName: GSI1PK\r\n            AttributeType: S\r\n          - AttributeName: GSI1SK\r\n            AttributeType: S\r\n        KeySchema:\r\n          - AttributeName: PK\r\n            KeyType: HASH\r\n          - AttributeName: SK\r\n            KeyType: RANGE\r\n        GlobalSecondaryIndexes:\r\n          - IndexName: GSI1\r\n            KeySchema:\r\n              - AttributeName: GSI1PK\r\n                KeyType: HASH\r\n              - AttributeName: GSI1SK\r\n                KeyType: RANGE\r\n            Projection:\r\n              ProjectionType: ALL\r\n",
     "command": [
       "deploy"
     ],
@@ -158,10 +290,84 @@
     "userId": "X98yRsQs99pFy35JZ3",
     "userName": "leandevaws87",
     "serviceProviderAwsAccountId": "553916359458",
-    "serviceProviderAwsCfStackId": null,
-    "serviceProviderAwsCfStackCreated": null,
+    "serviceProviderAwsCfStackName": "catfecito-backend-dev",
+    "serviceProviderAwsCfStackId": "arn:aws:cloudformation:sa-east-1:553916359458:stack/catfecito-backend-dev/b92df4a0-f726-11f0-8342-06bde38fa613",
+    "serviceProviderAwsCfStackCreated": "2026-01-22T00:10:14.091Z",
     "serviceProviderAwsCfStackUpdated": null,
-    "serviceProviderAwsCfStackStatus": null,
-    "serviceProviderAwsCfStackOutputs": null
+    "serviceProviderAwsCfStackStatus": "CREATE_COMPLETE",
+    "serviceProviderAwsCfStackOutputs": [
+      {
+        "OutputKey": "ServerlessDeploymentBucketName",
+        "OutputValue": "serverless-framework-deployments-sa-east-1-b389c947-1ea1",
+        "ExportName": "sls-catfecito-backend-dev-ServerlessDeploymentBucketName"
+      }
+    ],
+    "compiledCloudFormationTemplate": {
+      "AWSTemplateFormatVersion": "2010-09-09",
+      "Description": "The AWS CloudFormation template for this Serverless application",
+      "Resources": {
+        "CatfecitoTable": {
+          "Type": "AWS::DynamoDB::Table",
+          "Properties": {
+            "TableName": "catfecito-backend-dev",
+            "BillingMode": "PAY_PER_REQUEST",
+            "AttributeDefinitions": [
+              {
+                "AttributeName": "PK",
+                "AttributeType": "S"
+              },
+              {
+                "AttributeName": "SK",
+                "AttributeType": "S"
+              },
+              {
+                "AttributeName": "GSI1PK",
+                "AttributeType": "S"
+              },
+              {
+                "AttributeName": "GSI1SK",
+                "AttributeType": "S"
+              }
+            ],
+            "KeySchema": [
+              {
+                "AttributeName": "PK",
+                "KeyType": "HASH"
+              },
+              {
+                "AttributeName": "SK",
+                "KeyType": "RANGE"
+              }
+            ],
+            "GlobalSecondaryIndexes": [
+              {
+                "IndexName": "GSI1",
+                "KeySchema": [
+                  {
+                    "AttributeName": "GSI1PK",
+                    "KeyType": "HASH"
+                  },
+                  {
+                    "AttributeName": "GSI1SK",
+                    "KeyType": "RANGE"
+                  }
+                ],
+                "Projection": {
+                  "ProjectionType": "ALL"
+                }
+              }
+            ]
+          }
+        }
+      },
+      "Outputs": {
+        "ServerlessDeploymentBucketName": {
+          "Value": "serverless-framework-deployments-sa-east-1-b389c947-1ea1",
+          "Export": {
+            "Name": "sls-catfecito-backend-dev-ServerlessDeploymentBucketName"
+          }
+        }
+      }
+    }
   }
 }
