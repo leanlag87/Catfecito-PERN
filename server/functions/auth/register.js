@@ -175,6 +175,22 @@ export const createUser = async (event) => {
         body: JSON.stringify({ message: "El email ya está registrado" }),
       };
     }
+
+    // Manejar error de política de contraseñas
+    if (error.name === "InvalidPasswordException") {
+      return {
+        statusCode: 400,
+        headers: {
+          "Content-Type": "application/json",
+          "Access-Control-Allow-Origin": "*",
+        },
+        body: JSON.stringify({
+          message: "La contraseña no cumple con los requisitos de seguridad",
+          details: error.message,
+        }),
+      };
+    }
+
     return {
       statusCode: 500,
       headers: {
