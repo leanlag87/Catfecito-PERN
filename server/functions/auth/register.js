@@ -12,12 +12,10 @@ const cognitoClient = new CognitoIdentityProviderClient({
 });
 
 export const createUser = async (event) => {
-  console.log("🔍 Event received:", JSON.stringify(event, null, 2));
   // Parsear body (API Gateway puede venir como string)
   let body;
   try {
     body = typeof event.body === "string" ? JSON.parse(event.body) : event.body;
-    console.log("📝 Parsed body:", body);
   } catch (error) {
     console.error("❌ Error parsing body:", error);
     return {
@@ -31,11 +29,8 @@ export const createUser = async (event) => {
   }
 
   const { name, email, password } = body;
-  console.log("👤 User data:", { name, email, password: "***" });
-
   // Validaciones
   if (!name || !email || !password) {
-    console.error("❌ Missing required fields");
     return {
       statusCode: 400,
       headers: {
@@ -49,7 +44,6 @@ export const createUser = async (event) => {
   }
 
   try {
-    console.log("🔍 Checking if email exists...");
     // 1. Verificar si el email ya existe usando GSI
     const emailCheck = await docClient.send(
       new QueryCommand({
@@ -62,10 +56,7 @@ export const createUser = async (event) => {
       }),
     );
 
-    console.log("📊 Email check result:", emailCheck.Items?.length || 0);
-
     if (emailCheck.Items && emailCheck.Items.length > 0) {
-      console.log("❌ Email already exists");
       return {
         statusCode: 409,
         headers: {
@@ -75,8 +66,6 @@ export const createUser = async (event) => {
         body: JSON.stringify({ message: "El email ya está registrado" }),
       };
     }
-
-    console.log("🔐 Creating user in Cognito...");
 
     const createUserCommand = new AdminCreateUserCommand({
       UserPoolId: config.COGNITO_USER_POOL_ID,
@@ -92,10 +81,8 @@ export const createUser = async (event) => {
 
     const cognitoResponse = await cognitoClient.send(createUserCommand);
     const cognitoUserId = cognitoResponse.User.Username;
-    console.log("✅ User created in Cognito:", cognitoUserId);
 
     // 3. Establecer contraseña permanente (para que no requiera cambio en primer login)
-    console.log("🔑 Setting permanent password...");
     await cognitoClient.send(
       new AdminSetUserPasswordCommand({
         UserPoolId: config.COGNITO_USER_POOL_ID,
@@ -104,11 +91,9 @@ export const createUser = async (event) => {
         Permanent: true,
       }),
     );
-    console.log("✅ Permanent password set");
 
     // 4. Crear perfil del usuario en DynamoDB
     const now = getTimestamp();
-    console.log("💾 Creating user profile in DynamoDB...");
     await docClient.send(
       new PutCommand({
         TableName: TABLE_NAME,
@@ -127,7 +112,6 @@ export const createUser = async (event) => {
         },
       }),
     );
-    console.log("✅ User profile created in DynamoDB");
 
     // 5. Preparar datos del usuario
     const user = {
@@ -141,8 +125,7 @@ export const createUser = async (event) => {
     };
 
     // 6. Retornar respuesta exitosa
-    // Nota: El token JWT lo generará Cognito en el login, no aquí
-    console.log("🎉 Registration completed successfully");
+    // El token JWT lo generará Cognito en el login, no aquí
     return {
       statusCode: 201,
       headers: {
@@ -157,10 +140,6 @@ export const createUser = async (event) => {
     };
   } catch (error) {
     console.error("❌ Error en register:", error);
-    console.error("❌ Error name:", error.name);
-    console.error("❌ Error message:", error.message);
-    console.error("❌ Error stack:", error.stack);
-
     // Manejar errores específicos de Cognito
     if (
       error.name === "UsernameExistsException" ||
