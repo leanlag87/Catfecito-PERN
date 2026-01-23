@@ -17,8 +17,6 @@ const calculateSecretHash = (username, clientId, clientSecret) => {
 };
 
 export const loginUser = async (event) => {
-  console.log("🔍 Event received:", JSON.stringify(event, null, 2));
-
   let body;
   try {
     body = typeof event.body === "string" ? JSON.parse(event.body) : event.body;
@@ -37,13 +35,7 @@ export const loginUser = async (event) => {
 
   const { email, password } = body;
 
-  console.log("👤 Login attempt for email:", email);
-  console.log("🔐 Password provided:", password ? "***" : "NO");
-  console.log("🏢 Cognito Client ID:", config.COGNITO_CLIENT_ID);
-  console.log("🌎 AWS Region:", config.AWS_REGION);
-
   if (!email || !password) {
-    console.error("❌ Missing email or password");
     return {
       statusCode: 400,
       headers: {
@@ -55,8 +47,6 @@ export const loginUser = async (event) => {
   }
 
   try {
-    console.log("🚀 Initiating auth with Cognito...");
-
     const authParams = {
       USERNAME: email.toLowerCase(),
       PASSWORD: password,
@@ -70,7 +60,6 @@ export const loginUser = async (event) => {
         config.COGNITO_CLIENT_SECRET,
       );
       authParams.SECRET_HASH = secretHash;
-      console.log("🔑 SECRET_HASH calculated");
     }
 
     const authResponse = await cognitoClient.send(
@@ -80,9 +69,6 @@ export const loginUser = async (event) => {
         AuthParameters: authParams,
       }),
     );
-
-    console.log("✅ Auth successful!");
-    console.log("📦 Auth response:", JSON.stringify(authResponse, null, 2));
 
     return {
       statusCode: 200,
@@ -99,11 +85,6 @@ export const loginUser = async (event) => {
     };
   } catch (error) {
     console.error("❌ Error en login:", error);
-    console.error("❌ Error name:", error.name);
-    console.error("❌ Error message:", error.message);
-    console.error("❌ Error code:", error.$metadata?.httpStatusCode);
-    console.error("❌ Full error:", JSON.stringify(error, null, 2));
-
     return {
       statusCode: 401,
       headers: {
