@@ -124,7 +124,7 @@
       "Properties": {
         "Code": {
           "S3Bucket": "serverless-framework-deployments-sa-east-1-b389c947-1ea1",
-          "S3Key": "serverless/catfecito-backend/dev/1769127695672-2026-01-23T00:21:35.672Z/catfecito-backend.zip"
+          "S3Key": "serverless/catfecito-backend/dev/1769194430589-2026-01-23T18:53:50.589Z/catfecito-backend.zip"
         },
         "Handler": "server/functions/auth/register.createUser",
         "Runtime": "nodejs18.x",
@@ -157,7 +157,7 @@
       "Properties": {
         "Code": {
           "S3Bucket": "serverless-framework-deployments-sa-east-1-b389c947-1ea1",
-          "S3Key": "serverless/catfecito-backend/dev/1769127695672-2026-01-23T00:21:35.672Z/catfecito-backend.zip"
+          "S3Key": "serverless/catfecito-backend/dev/1769194430589-2026-01-23T18:53:50.589Z/catfecito-backend.zip"
         },
         "Handler": "server/functions/auth/login.loginUser",
         "Runtime": "nodejs18.x",
@@ -185,24 +185,24 @@
         "LoginLogGroup"
       ]
     },
-    "RegisterLambdaVersionfNntG5e54hTRKzwexViKw0KiGAloNAC0OlTPkWnd7YQ": {
+    "RegisterLambdaVersionsThuMqmNYvGSchYRSp2Vo5zudFX2s9wgneaVIezHcbQ": {
       "Type": "AWS::Lambda::Version",
       "DeletionPolicy": "Retain",
       "Properties": {
         "FunctionName": {
           "Ref": "RegisterLambdaFunction"
         },
-        "CodeSha256": "yk7ZbVWPP/Hu1PtCxwQWTtZIHmSxmYaU8Baw2VtLtrY="
+        "CodeSha256": "sKn+Z2qOG0Rj3Pj8yGUD1KIgt9fFfUGhMEBWmf5zSvE="
       }
     },
-    "LoginLambdaVersionwEumFXOcw23ezURfivEwP0wggAL7JsQacopqPtzY": {
+    "LoginLambdaVersionbAQJ4Ij0oe7ukRK2pLSwKVE9HpmUBdSqybWp7wBIWw": {
       "Type": "AWS::Lambda::Version",
       "DeletionPolicy": "Retain",
       "Properties": {
         "FunctionName": {
           "Ref": "LoginLambdaFunction"
         },
-        "CodeSha256": "yk7ZbVWPP/Hu1PtCxwQWTtZIHmSxmYaU8Baw2VtLtrY="
+        "CodeSha256": "sKn+Z2qOG0Rj3Pj8yGUD1KIgt9fFfUGhMEBWmf5zSvE="
       }
     },
     "HttpApi": {
@@ -439,7 +439,7 @@
     "RegisterLambdaFunctionQualifiedArn": {
       "Description": "Current Lambda function version",
       "Value": {
-        "Ref": "RegisterLambdaVersionfNntG5e54hTRKzwexViKw0KiGAloNAC0OlTPkWnd7YQ"
+        "Ref": "RegisterLambdaVersionsThuMqmNYvGSchYRSp2Vo5zudFX2s9wgneaVIezHcbQ"
       },
       "Export": {
         "Name": "sls-catfecito-backend-dev-RegisterLambdaFunctionQualifiedArn"
@@ -448,7 +448,7 @@
     "LoginLambdaFunctionQualifiedArn": {
       "Description": "Current Lambda function version",
       "Value": {
-        "Ref": "LoginLambdaVersionwEumFXOcw23ezURfivEwP0wggAL7JsQacopqPtzY"
+        "Ref": "LoginLambdaVersionbAQJ4Ij0oe7ukRK2pLSwKVE9HpmUBdSqybWp7wBIWw"
       },
       "Export": {
         "Name": "sls-catfecito-backend-dev-LoginLambdaFunctionQualifiedArn"
