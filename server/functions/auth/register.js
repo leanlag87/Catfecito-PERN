@@ -6,45 +6,27 @@ import {
   AdminSetUserPasswordCommand,
 } from "@aws-sdk/client-cognito-identity-provider";
 import config from "../../config.js";
+import { parseBody, validateRequired } from "../../utils/validators.js";
+import {
+  created,
+  badRequest,
+  conflict,
+  serverError,
+} from "../../utils/response.js";
 
 const cognitoClient = new CognitoIdentityProviderClient({
   region: config.AWS_REGION,
 });
 
 export const createUser = async (event) => {
-  // Parsear body (API Gateway puede venir como string)
-  let body;
   try {
-    body = typeof event.body === "string" ? JSON.parse(event.body) : event.body;
-  } catch (error) {
-    console.error("❌ Error parsing body:", error);
-    return {
-      statusCode: 400,
-      headers: {
-        "Content-Type": "application/json",
-        "Access-Control-Allow-Origin": "*",
-      },
-      body: JSON.stringify({ message: "Body inválido" }),
-    };
-  }
+    // Parsear y validar body
+    const body = parseBody(event);
+    const { name, email, password } = body;
 
-  const { name, email, password } = body;
-  // Validaciones
-  if (!name || !email || !password) {
-    return {
-      statusCode: 400,
-      headers: {
-        "Content-Type": "application/json",
-        "Access-Control-Allow-Origin": "*",
-      },
-      body: JSON.stringify({
-        message: "name, email y password son requeridos",
-      }),
-    };
-  }
+    validateRequired(body, ["name", "email", "password"]);
 
-  try {
-    // 1. Verificar si el email ya existe usando GSI
+    // Verificar si el email ya existe usando GSI
     const emailCheck = await docClient.send(
       new QueryCommand({
         TableName: TABLE_NAME,
@@ -57,16 +39,10 @@ export const createUser = async (event) => {
     );
 
     if (emailCheck.Items && emailCheck.Items.length > 0) {
-      return {
-        statusCode: 409,
-        headers: {
-          "Content-Type": "application/json",
-          "Access-Control-Allow-Origin": "*",
-        },
-        body: JSON.stringify({ message: "El email ya está registrado" }),
-      };
+      return conflict("El email ya está registrado");
     }
 
+    // Crear usuario en Cognito
     const createUserCommand = new AdminCreateUserCommand({
       UserPoolId: config.COGNITO_USER_POOL_ID,
       Username: email.toLowerCase(),
@@ -75,14 +51,14 @@ export const createUser = async (event) => {
         { Name: "email_verified", Value: "true" },
         { Name: "name", Value: name },
       ],
-      MessageAction: "SUPPRESS", // No enviar email de bienvenida
-      TemporaryPassword: password, // Temporal, luego lo hacemos permanente
+      MessageAction: "SUPPRESS",
+      TemporaryPassword: password,
     });
 
     const cognitoResponse = await cognitoClient.send(createUserCommand);
     const cognitoUserId = cognitoResponse.User.Username;
 
-    // 3. Establecer contraseña permanente (para que no requiera cambio en primer login)
+    // Establecer contraseña permanente
     await cognitoClient.send(
       new AdminSetUserPasswordCommand({
         UserPoolId: config.COGNITO_USER_POOL_ID,
@@ -92,7 +68,7 @@ export const createUser = async (event) => {
       }),
     );
 
-    // 4. Crear perfil del usuario en DynamoDB
+    // Crear perfil del usuario en DynamoDB
     const now = getTimestamp();
     await docClient.send(
       new PutCommand({
@@ -113,7 +89,7 @@ export const createUser = async (event) => {
       }),
     );
 
-    // 5. Preparar datos del usuario
+    // Preparar datos del usuario
     const user = {
       id: cognitoUserId,
       name,
@@ -124,59 +100,37 @@ export const createUser = async (event) => {
       updated_at: now,
     };
 
-    // 6. Retornar respuesta exitosa
-    // El token JWT lo generará Cognito en el login, no aquí
-    return {
-      statusCode: 201,
-      headers: {
-        "Content-Type": "application/json",
-        "Access-Control-Allow-Origin": "*",
-      },
-      body: JSON.stringify({
-        message: "Usuario registrado exitosamente",
-        user,
-        // No retornamos token aquí, el usuario debe hacer login
-      }),
-    };
+    return created({
+      message: "Usuario registrado exitosamente",
+      user,
+    });
   } catch (error) {
-    console.error("❌ Error en register:", error);
-    // Manejar errores específicos de Cognito
+    console.error("Error en register:", error);
+
+    // Validación de campos requeridos
+    if (error.message.startsWith("Campos requeridos")) {
+      return badRequest(error.message);
+    }
+
+    // Body inválido
+    if (error.message === "Body inválido") {
+      return badRequest(error.message);
+    }
+
+    // Errores de Cognito
     if (
       error.name === "UsernameExistsException" ||
       error.name === "AliasExistsException"
     ) {
-      return {
-        statusCode: 409,
-        headers: {
-          "Content-Type": "application/json",
-          "Access-Control-Allow-Origin": "*",
-        },
-        body: JSON.stringify({ message: "El email ya está registrado" }),
-      };
+      return conflict("El email ya está registrado");
     }
 
-    // Manejar error de política de contraseñas
     if (error.name === "InvalidPasswordException") {
-      return {
-        statusCode: 400,
-        headers: {
-          "Content-Type": "application/json",
-          "Access-Control-Allow-Origin": "*",
-        },
-        body: JSON.stringify({
-          message: "La contraseña no cumple con los requisitos de seguridad",
-          details: error.message,
-        }),
-      };
+      return badRequest(
+        "La contraseña no cumple con los requisitos de seguridad",
+      );
     }
 
-    return {
-      statusCode: 500,
-      headers: {
-        "Content-Type": "application/json",
-        "Access-Control-Allow-Origin": "*",
-      },
-      body: JSON.stringify({ message: "Error interno del servidor" }),
-    };
+    return serverError();
   }
 };
