@@ -8,11 +8,11 @@ import {
 import config from "../../config.js";
 import { parseBody, validateRequired } from "../../utils/validators.js";
 import {
-  success,
+  created,
   badRequest,
   conflict,
   serverError,
-} from "../../utils/responses.js";
+} from "../../utils/response.js";
 
 const cognitoClient = new CognitoIdentityProviderClient({
   region: config.AWS_REGION,
@@ -100,13 +100,10 @@ export const createUser = async (event) => {
       updated_at: now,
     };
 
-    return success(
-      {
-        message: "Usuario registrado exitosamente",
-        user,
-      },
-      201,
-    );
+    return created({
+      message: "Usuario registrado exitosamente",
+      user,
+    });
   } catch (error) {
     console.error("Error en register:", error);
 
