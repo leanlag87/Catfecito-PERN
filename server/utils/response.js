@@ -9,6 +9,8 @@ export const success = (data, statusCode = 200) => ({
   body: JSON.stringify(data),
 });
 
+export const created = (data) => success(data, 201);
+
 export const error = (message, statusCode = 500, details = null) => ({
   statusCode,
   headers,
