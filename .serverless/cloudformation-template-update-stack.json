@@ -8,6 +8,12 @@
         "LogGroupName": "/aws/lambda/catfecito-backend-dev-register"
       }
     },
+    "LoginLogGroup": {
+      "Type": "AWS::Logs::LogGroup",
+      "Properties": {
+        "LogGroupName": "/aws/lambda/catfecito-backend-dev-login"
+      }
+    },
     "IamRoleLambdaExecution": {
       "Type": "AWS::IAM::Role",
       "Properties": {
@@ -118,7 +124,7 @@
       "Properties": {
         "Code": {
           "S3Bucket": "serverless-framework-deployments-sa-east-1-b389c947-1ea1",
-          "S3Key": "serverless/catfecito-backend/dev/1769112347749-2026-01-22T20:05:47.749Z/catfecito-backend.zip"
+          "S3Key": "serverless/catfecito-backend/dev/1769127695672-2026-01-23T00:21:35.672Z/catfecito-backend.zip"
         },
         "Handler": "server/functions/auth/register.createUser",
         "Runtime": "nodejs18.x",
@@ -131,7 +137,8 @@
             "JWT_SECRET": "xyz12345",
             "JWT_EXPIRES_IN": "7d",
             "COGNITO_USER_POOL_ID": "sa-east-1_pua4g9m7n",
-            "COGNITO_CLIENT_ID": "426ee7m0co9le8poclthg5ict6"
+            "COGNITO_CLIENT_ID": "426ee7m0co9le8poclthg5ict6",
+            "COGNITO_CLIENT_SECRET": "17h0k8iadm66t52jjsm20ua0e5740753ldn8l0i23hnp6ehmb4uo"
           }
         },
         "Role": {
@@ -145,14 +152,57 @@
         "RegisterLogGroup"
       ]
     },
-    "RegisterLambdaVersionsb9KpT2rHSSo1OfPawdqOzs67XE5BAbEUNgw93tlCM4": {
+    "LoginLambdaFunction": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Code": {
+          "S3Bucket": "serverless-framework-deployments-sa-east-1-b389c947-1ea1",
+          "S3Key": "serverless/catfecito-backend/dev/1769127695672-2026-01-23T00:21:35.672Z/catfecito-backend.zip"
+        },
+        "Handler": "server/functions/auth/login.loginUser",
+        "Runtime": "nodejs18.x",
+        "FunctionName": "catfecito-backend-dev-login",
+        "MemorySize": 1024,
+        "Timeout": 6,
+        "Environment": {
+          "Variables": {
+            "DYNAMODB_TABLE": "catfecito-backend-dev",
+            "JWT_SECRET": "xyz12345",
+            "JWT_EXPIRES_IN": "7d",
+            "COGNITO_USER_POOL_ID": "sa-east-1_pua4g9m7n",
+            "COGNITO_CLIENT_ID": "426ee7m0co9le8poclthg5ict6",
+            "COGNITO_CLIENT_SECRET": "17h0k8iadm66t52jjsm20ua0e5740753ldn8l0i23hnp6ehmb4uo"
+          }
+        },
+        "Role": {
+          "Fn::GetAtt": [
+            "IamRoleLambdaExecution",
+            "Arn"
+          ]
+        }
+      },
+      "DependsOn": [
+        "LoginLogGroup"
+      ]
+    },
+    "RegisterLambdaVersionfNntG5e54hTRKzwexViKw0KiGAloNAC0OlTPkWnd7YQ": {
       "Type": "AWS::Lambda::Version",
       "DeletionPolicy": "Retain",
       "Properties": {
         "FunctionName": {
           "Ref": "RegisterLambdaFunction"
         },
-        "CodeSha256": "i/ly1dp8opUlr5oT03WVxTadiK2ChlDHXaGmW1Kyhhc="
+        "CodeSha256": "yk7ZbVWPP/Hu1PtCxwQWTtZIHmSxmYaU8Baw2VtLtrY="
+      }
+    },
+    "LoginLambdaVersionwEumFXOcw23ezURfivEwP0wggAL7JsQacopqPtzY": {
+      "Type": "AWS::Lambda::Version",
+      "DeletionPolicy": "Retain",
+      "Properties": {
+        "FunctionName": {
+          "Ref": "LoginLambdaFunction"
+        },
+        "CodeSha256": "yk7ZbVWPP/Hu1PtCxwQWTtZIHmSxmYaU8Baw2VtLtrY="
       }
     },
     "HttpApi": {
@@ -250,6 +300,81 @@
       },
       "DependsOn": "HttpApiIntegrationRegister"
     },
+    "LoginLambdaPermissionHttpApi": {
+      "Type": "AWS::Lambda::Permission",
+      "Properties": {
+        "FunctionName": {
+          "Fn::GetAtt": [
+            "LoginLambdaFunction",
+            "Arn"
+          ]
+        },
+        "Action": "lambda:InvokeFunction",
+        "Principal": "apigateway.amazonaws.com",
+        "SourceArn": {
+          "Fn::Join": [
+            "",
+            [
+              "arn:",
+              {
+                "Ref": "AWS::Partition"
+              },
+              ":execute-api:",
+              {
+                "Ref": "AWS::Region"
+              },
+              ":",
+              {
+                "Ref": "AWS::AccountId"
+              },
+              ":",
+              {
+                "Ref": "HttpApi"
+              },
+              "/*"
+            ]
+          ]
+        }
+      }
+    },
+    "HttpApiIntegrationLogin": {
+      "Type": "AWS::ApiGatewayV2::Integration",
+      "Properties": {
+        "ApiId": {
+          "Ref": "HttpApi"
+        },
+        "IntegrationType": "AWS_PROXY",
+        "IntegrationUri": {
+          "Fn::GetAtt": [
+            "LoginLambdaFunction",
+            "Arn"
+          ]
+        },
+        "PayloadFormatVersion": "2.0",
+        "TimeoutInMillis": 30000
+      }
+    },
+    "HttpApiRoutePostApiAuthLogin": {
+      "Type": "AWS::ApiGatewayV2::Route",
+      "Properties": {
+        "ApiId": {
+          "Ref": "HttpApi"
+        },
+        "RouteKey": "POST /api/auth/login",
+        "Target": {
+          "Fn::Join": [
+            "/",
+            [
+              "integrations",
+              {
+                "Ref": "HttpApiIntegrationLogin"
+              }
+            ]
+          ]
+        }
+      },
+      "DependsOn": "HttpApiIntegrationLogin"
+    },
     "CatfecitoTable": {
       "Type": "AWS::DynamoDB::Table",
       "Properties": {
@@ -314,10 +439,19 @@
     "RegisterLambdaFunctionQualifiedArn": {
       "Description": "Current Lambda function version",
       "Value": {
-        "Ref": "RegisterLambdaVersionsb9KpT2rHSSo1OfPawdqOzs67XE5BAbEUNgw93tlCM4"
+        "Ref": "RegisterLambdaVersionfNntG5e54hTRKzwexViKw0KiGAloNAC0OlTPkWnd7YQ"
       },
       "Export": {
         "Name": "sls-catfecito-backend-dev-RegisterLambdaFunctionQualifiedArn"
+      }
+    },
+    "LoginLambdaFunctionQualifiedArn": {
+      "Description": "Current Lambda function version",
+      "Value": {
+        "Ref": "LoginLambdaVersionwEumFXOcw23ezURfivEwP0wggAL7JsQacopqPtzY"
+      },
+      "Export": {
+        "Name": "sls-catfecito-backend-dev-LoginLambdaFunctionQualifiedArn"
       }
     },
     "HttpApiId": {

@@ -23,6 +23,7 @@ const config = {
   //Cognito
   COGNITO_USER_POOL_ID: process.env.COGNITO_USER_POOL_ID,
   COGNITO_CLIENT_ID: process.env.COGNITO_CLIENT_ID,
+  COGNITO_CLIENT_SECRET: process.env.COGNITO_CLIENT_SECRET || "",
 
   // JWT
   JWT_SECRET: process.env.JWT_SECRET || "xyz12345",
