@@ -20,6 +20,12 @@
         "LogGroupName": "/aws/lambda/catfecito-backend-dev-getProfile"
       }
     },
+    "UpdateProfileLogGroup": {
+      "Type": "AWS::Logs::LogGroup",
+      "Properties": {
+        "LogGroupName": "/aws/lambda/catfecito-backend-dev-updateProfile"
+      }
+    },
     "IamRoleLambdaExecution": {
       "Type": "AWS::IAM::Role",
       "Properties": {
@@ -130,7 +136,7 @@
       "Properties": {
         "Code": {
           "S3Bucket": "serverless-framework-deployments-sa-east-1-b389c947-1ea1",
-          "S3Key": "serverless/catfecito-backend/dev/1769216781287-2026-01-24T01:06:21.287Z/catfecito-backend.zip"
+          "S3Key": "serverless/catfecito-backend/dev/1769281395073-2026-01-24T19:03:15.073Z/catfecito-backend.zip"
         },
         "Handler": "server/functions/auth/register.createUser",
         "Runtime": "nodejs18.x",
@@ -163,7 +169,7 @@
       "Properties": {
         "Code": {
           "S3Bucket": "serverless-framework-deployments-sa-east-1-b389c947-1ea1",
-          "S3Key": "serverless/catfecito-backend/dev/1769216781287-2026-01-24T01:06:21.287Z/catfecito-backend.zip"
+          "S3Key": "serverless/catfecito-backend/dev/1769281395073-2026-01-24T19:03:15.073Z/catfecito-backend.zip"
         },
         "Handler": "server/functions/auth/login.loginUser",
         "Runtime": "nodejs18.x",
@@ -196,7 +202,7 @@
       "Properties": {
         "Code": {
           "S3Bucket": "serverless-framework-deployments-sa-east-1-b389c947-1ea1",
-          "S3Key": "serverless/catfecito-backend/dev/1769216781287-2026-01-24T01:06:21.287Z/catfecito-backend.zip"
+          "S3Key": "serverless/catfecito-backend/dev/1769281395073-2026-01-24T19:03:15.073Z/catfecito-backend.zip"
         },
         "Handler": "server/functions/users/getProfile.getProfile",
         "Runtime": "nodejs18.x",
@@ -224,34 +230,77 @@
         "GetProfileLogGroup"
       ]
     },
-    "RegisterLambdaVersionSYpi2LNEg4u7MQujUAHOUTYGbCLGEYiQDUd4X3ieU": {
+    "UpdateProfileLambdaFunction": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Code": {
+          "S3Bucket": "serverless-framework-deployments-sa-east-1-b389c947-1ea1",
+          "S3Key": "serverless/catfecito-backend/dev/1769281395073-2026-01-24T19:03:15.073Z/catfecito-backend.zip"
+        },
+        "Handler": "server/functions/users/updateProfile.updateProfile",
+        "Runtime": "nodejs18.x",
+        "FunctionName": "catfecito-backend-dev-updateProfile",
+        "MemorySize": 1024,
+        "Timeout": 6,
+        "Environment": {
+          "Variables": {
+            "DYNAMODB_TABLE": "catfecito-backend-dev",
+            "JWT_SECRET": "xyz12345",
+            "JWT_EXPIRES_IN": "7d",
+            "COGNITO_USER_POOL_ID": "sa-east-1_pua4g9m7n",
+            "COGNITO_CLIENT_ID": "426ee7m0co9le8poclthg5ict6",
+            "COGNITO_CLIENT_SECRET": "17h0k8iadm66t52jjsm20ua0e5740753ldn8l0i23hnp6ehmb4uo"
+          }
+        },
+        "Role": {
+          "Fn::GetAtt": [
+            "IamRoleLambdaExecution",
+            "Arn"
+          ]
+        }
+      },
+      "DependsOn": [
+        "UpdateProfileLogGroup"
+      ]
+    },
+    "RegisterLambdaVersion8OhBuUDeRvID2pKB9FNAlZCYmN5HR4TzuGF5xPXc8Y": {
       "Type": "AWS::Lambda::Version",
       "DeletionPolicy": "Retain",
       "Properties": {
         "FunctionName": {
           "Ref": "RegisterLambdaFunction"
         },
-        "CodeSha256": "Ed1tqSe7/h67AQLHEGUUAHQKKSwq7n4G0Uilyu2BL+w="
+        "CodeSha256": "cYejkfaUO5vVDp/W+Lx5BRL6wIj/vWJBeeSgBaPsXls="
       }
     },
-    "LoginLambdaVersion0pM0tuYJB5nzT3Tb27193BizQoLnLdOkyrjmI7CfY": {
+    "LoginLambdaVersionKJQ1J8YDiFBzgz83aWpD5IX4NvlswDzXTYF0qj6mVPA": {
       "Type": "AWS::Lambda::Version",
       "DeletionPolicy": "Retain",
       "Properties": {
         "FunctionName": {
           "Ref": "LoginLambdaFunction"
         },
-        "CodeSha256": "Ed1tqSe7/h67AQLHEGUUAHQKKSwq7n4G0Uilyu2BL+w="
+        "CodeSha256": "cYejkfaUO5vVDp/W+Lx5BRL6wIj/vWJBeeSgBaPsXls="
       }
     },
-    "GetProfileLambdaVersion9Aey3K4qVnEpVEFuQVZAKUyjTAdfE22jqtBtH7Xqn6o": {
+    "GetProfileLambdaVersionAZJLCXlThZCpxnShPkCl8ziUjBAdgNPSSmhFxFyVw": {
       "Type": "AWS::Lambda::Version",
       "DeletionPolicy": "Retain",
       "Properties": {
         "FunctionName": {
           "Ref": "GetProfileLambdaFunction"
         },
-        "CodeSha256": "Ed1tqSe7/h67AQLHEGUUAHQKKSwq7n4G0Uilyu2BL+w="
+        "CodeSha256": "cYejkfaUO5vVDp/W+Lx5BRL6wIj/vWJBeeSgBaPsXls="
+      }
+    },
+    "UpdateProfileLambdaVersioncOb1i3j5tBlx4WmYZNUpeHnNj3ZfkOZfoYQx5guF89M": {
+      "Type": "AWS::Lambda::Version",
+      "DeletionPolicy": "Retain",
+      "Properties": {
+        "FunctionName": {
+          "Ref": "UpdateProfileLambdaFunction"
+        },
+        "CodeSha256": "cYejkfaUO5vVDp/W+Lx5BRL6wIj/vWJBeeSgBaPsXls="
       }
     },
     "HttpApi": {
@@ -499,6 +548,81 @@
       },
       "DependsOn": "HttpApiIntegrationGetProfile"
     },
+    "UpdateProfileLambdaPermissionHttpApi": {
+      "Type": "AWS::Lambda::Permission",
+      "Properties": {
+        "FunctionName": {
+          "Fn::GetAtt": [
+            "UpdateProfileLambdaFunction",
+            "Arn"
+          ]
+        },
+        "Action": "lambda:InvokeFunction",
+        "Principal": "apigateway.amazonaws.com",
+        "SourceArn": {
+          "Fn::Join": [
+            "",
+            [
+              "arn:",
+              {
+                "Ref": "AWS::Partition"
+              },
+              ":execute-api:",
+              {
+                "Ref": "AWS::Region"
+              },
+              ":",
+              {
+                "Ref": "AWS::AccountId"
+              },
+              ":",
+              {
+                "Ref": "HttpApi"
+              },
+              "/*"
+            ]
+          ]
+        }
+      }
+    },
+    "HttpApiIntegrationUpdateProfile": {
+      "Type": "AWS::ApiGatewayV2::Integration",
+      "Properties": {
+        "ApiId": {
+          "Ref": "HttpApi"
+        },
+        "IntegrationType": "AWS_PROXY",
+        "IntegrationUri": {
+          "Fn::GetAtt": [
+            "UpdateProfileLambdaFunction",
+            "Arn"
+          ]
+        },
+        "PayloadFormatVersion": "2.0",
+        "TimeoutInMillis": 30000
+      }
+    },
+    "HttpApiRoutePutApiUsersProfile": {
+      "Type": "AWS::ApiGatewayV2::Route",
+      "Properties": {
+        "ApiId": {
+          "Ref": "HttpApi"
+        },
+        "RouteKey": "PUT /api/users/profile",
+        "Target": {
+          "Fn::Join": [
+            "/",
+            [
+              "integrations",
+              {
+                "Ref": "HttpApiIntegrationUpdateProfile"
+              }
+            ]
+          ]
+        }
+      },
+      "DependsOn": "HttpApiIntegrationUpdateProfile"
+    },
     "CatfecitoTable": {
       "Type": "AWS::DynamoDB::Table",
       "Properties": {
@@ -563,7 +687,7 @@
     "RegisterLambdaFunctionQualifiedArn": {
       "Description": "Current Lambda function version",
       "Value": {
-        "Ref": "RegisterLambdaVersionSYpi2LNEg4u7MQujUAHOUTYGbCLGEYiQDUd4X3ieU"
+        "Ref": "RegisterLambdaVersion8OhBuUDeRvID2pKB9FNAlZCYmN5HR4TzuGF5xPXc8Y"
       },
       "Export": {
         "Name": "sls-catfecito-backend-dev-RegisterLambdaFunctionQualifiedArn"
@@ -572,7 +696,7 @@
     "LoginLambdaFunctionQualifiedArn": {
       "Description": "Current Lambda function version",
       "Value": {
-        "Ref": "LoginLambdaVersion0pM0tuYJB5nzT3Tb27193BizQoLnLdOkyrjmI7CfY"
+        "Ref": "LoginLambdaVersionKJQ1J8YDiFBzgz83aWpD5IX4NvlswDzXTYF0qj6mVPA"
       },
       "Export": {
         "Name": "sls-catfecito-backend-dev-LoginLambdaFunctionQualifiedArn"
@@ -581,10 +705,19 @@
     "GetProfileLambdaFunctionQualifiedArn": {
       "Description": "Current Lambda function version",
       "Value": {
-        "Ref": "GetProfileLambdaVersion9Aey3K4qVnEpVEFuQVZAKUyjTAdfE22jqtBtH7Xqn6o"
+        "Ref": "GetProfileLambdaVersionAZJLCXlThZCpxnShPkCl8ziUjBAdgNPSSmhFxFyVw"
       },
       "Export": {
         "Name": "sls-catfecito-backend-dev-GetProfileLambdaFunctionQualifiedArn"
+      }
+    },
+    "UpdateProfileLambdaFunctionQualifiedArn": {
+      "Description": "Current Lambda function version",
+      "Value": {
+        "Ref": "UpdateProfileLambdaVersioncOb1i3j5tBlx4WmYZNUpeHnNj3ZfkOZfoYQx5guF89M"
+      },
+      "Export": {
+        "Name": "sls-catfecito-backend-dev-UpdateProfileLambdaFunctionQualifiedArn"
       }
     },
     "HttpApiId": {
