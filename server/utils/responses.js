@@ -22,6 +22,7 @@ export const error = (message, statusCode = 500, details = null) => ({
 
 export const badRequest = (message) => error(message, 400);
 export const unauthorized = (message = "No autorizado") => error(message, 401);
+export const forbidden = (message = "Acceso prohibido") => error(message, 403);
 export const notFound = (message = "No encontrado") => error(message, 404);
 export const conflict = (message) => error(message, 409);
 export const serverError = (message = "Error interno del servidor") =>
