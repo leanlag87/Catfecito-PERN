@@ -12,7 +12,7 @@ import {
   badRequest,
   conflict,
   serverError,
-} from "../../utils/response.js";
+} from "../../utils/responses.js";
 
 const cognitoClient = new CognitoIdentityProviderClient({
   region: config.AWS_REGION,

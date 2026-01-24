@@ -4,7 +4,7 @@ import {
 } from "@aws-sdk/client-cognito-identity-provider";
 import config from "../../config.js";
 import { parseBody, validateRequired } from "../../utils/validators.js";
-import { success, badRequest, unauthorized } from "../../utils/response.js";
+import { success, badRequest, unauthorized } from "../../utils/responses.js";
 import { buildAuthParams } from "../../utils/cognitoHelpers.js";
 
 const cognitoClient = new CognitoIdentityProviderClient({
