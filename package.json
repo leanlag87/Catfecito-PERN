@@ -26,8 +26,10 @@
   "dependencies": {
     "@aws-sdk/client-cognito-identity-provider": "^3.972.0",
     "@aws-sdk/client-dynamodb": "^3.972.0",
+    "@aws-sdk/client-s3": "^3.975.0",
     "@aws-sdk/lib-dynamodb": "^3.972.0",
     "bcrypt": "^6.0.0",
+    "busboy": "^1.6.0",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",
