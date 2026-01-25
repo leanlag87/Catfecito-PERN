@@ -44,41 +44,6 @@ provider:
             - "arn:aws:cognito-idp:${self:provider.region}:*:userpool/${env:COGNITO_USER_POOL_ID}"
 
 functions:
-  # Admin Functions
-  getAllUsers:
-    handler: server/functions/admin/users/getAllUsers.getAllUsers
-    events:
-      - httpApi:
-          path: /api/admin/users
-          method: GET
-
-  getUserById:
-    handler: server/functions/admin/users/getUserById.getUserById
-    events:
-      - httpApi:
-          path: /api/admin/users/{id}
-          method: GET
-
-  updateUserRole:
-    handler: server/functions/admin/users/updateUserRole.updateUserRole
-    events:
-      - httpApi:
-          path: /api/admin/users/{id}/role
-          method: PATCH
-
-  toggleUserStatus:
-    handler: server/functions/admin/users/toggleUserStatus.toggleUserStatus
-    events:
-      - httpApi:
-          path: /api/admin/users/{id}/status
-          method: PATCH
-
-  deleteUser:
-    handler: server/functions/admin/users/deleteUser.deleteUser
-    events:
-      - httpApi:
-          path: /api/admin/users/{id}
-          method: DELETE
 
 resources:
   Resources:
