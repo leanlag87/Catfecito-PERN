@@ -44,50 +44,6 @@ provider:
             - "arn:aws:cognito-idp:${self:provider.region}:*:userpool/${env:COGNITO_USER_POOL_ID}"
 
 functions:
-  register:
-    handler: server/functions/auth/register.createUser
-    events:
-      - httpApi:
-          path: /api/auth/register
-          method: POST
-
-  login:
-    handler: server/functions/auth/login.loginUser
-    events:
-      - httpApi:
-          path: /api/auth/login
-          method: POST
-
-          # ========== USERS (Requiere auth) ==========
-
-  getProfile:
-    handler: server/functions/users/profile/getProfile.getProfile
-    events:
-      - httpApi:
-          path: /api/users/profile
-          method: GET
-
-  updateProfile:
-    handler: server/functions/users/profile/updateProfile.updateProfile
-    events:
-      - httpApi:
-          path: /api/users/profile
-          method: PUT
-
-  updateAddress:
-    handler: server/functions/users/profile/updateAddress.updateAddress
-    events:
-      - httpApi:
-          path: /api/users/address
-          method: PUT
-
-  changePassword:
-    handler: server/functions/users/profile/changePassword.changePassword
-    events:
-      - httpApi:
-          path: /api/users/password
-          method: PUT
-
   # Admin Functions
   getAllUsers:
     handler: server/functions/admin/users/getAllUsers.getAllUsers

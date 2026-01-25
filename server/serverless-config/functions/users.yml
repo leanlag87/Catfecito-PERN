@@ -1,0 +1,29 @@
+# ========== USERS (Requiere auth) ==========
+
+getProfile:
+  handler: server/functions/users/profile/getProfile.getProfile
+  events:
+    - httpApi:
+        path: /api/users/profile
+        method: GET
+
+updateProfile:
+  handler: server/functions/users/profile/updateProfile.updateProfile
+  events:
+    - httpApi:
+        path: /api/users/profile
+        method: PUT
+
+updateAddress:
+  handler: server/functions/users/profile/updateAddress.updateAddress
+  events:
+    - httpApi:
+        path: /api/users/address
+        method: PUT
+
+changePassword:
+  handler: server/functions/users/profile/changePassword.changePassword
+  events:
+    - httpApi:
+        path: /api/users/password
+        method: PUT
