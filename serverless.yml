@@ -43,6 +43,14 @@ provider:
           Resource:
             - "arn:aws:cognito-idp:${self:provider.region}:*:userpool/${env:COGNITO_USER_POOL_ID}"
 
+        - Effect: Allow
+          Action:
+            - s3:PutObject
+            - s3:GetObject
+            - s3:DeleteObject
+          Resource:
+            - "arn:aws:s3:::${self:provider.environment.S3_BUCKET}/*"
+
 functions:
   - ${file(server/serverless-config/functions/auth.yml)}
   - ${file(server/serverless-config/functions/users.yml)}
@@ -52,3 +60,4 @@ functions:
     # Importar recursos
 resources:
   - ${file(server/serverless-config/resources/dynamo.yml)}
+  - ${file(server/serverless-config/resources/s3.yml)}

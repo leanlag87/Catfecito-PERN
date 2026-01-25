@@ -1,0 +1,35 @@
+Resources:
+  ProductImagesBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: ${self:provider.environment.S3_BUCKET}
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: false
+        BlockPublicPolicy: false
+        IgnorePublicAcls: false
+        RestrictPublicBuckets: false
+      CorsConfiguration:
+        CorsRules:
+          - AllowedHeaders:
+              - "*"
+            AllowedMethods:
+              - GET
+              - PUT
+              - POST
+              - DELETE
+            AllowedOrigins:
+              - "*"
+            MaxAge: 3000
+
+  ProductImagesBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref ProductImagesBucket
+      PolicyDocument:
+        Statement:
+          - Effect: Allow
+            Principal: "*"
+            Action:
+              - s3:GetObject
+            Resource:
+              - !Sub "${ProductImagesBucket.Arn}/*"
