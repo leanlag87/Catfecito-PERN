@@ -44,3 +44,10 @@ provider:
             - "arn:aws:cognito-idp:${self:provider.region}:*:userpool/${env:COGNITO_USER_POOL_ID}"
 
 functions:
+  - ${file(server/serverless-config/functions/auth.yml)}
+  - ${file(server/serverless-config/functions/users.yml)}
+  - ${file(server/serverless-config/functions/admin.yml)}
+
+    # Importar recursos
+resources:
+  - ${file(server/serverless-config/resources/dynamo.yml)}
