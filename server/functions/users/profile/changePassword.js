@@ -2,15 +2,15 @@ import {
   CognitoIdentityProviderClient,
   ChangePasswordCommand,
 } from "@aws-sdk/client-cognito-identity-provider";
-import config from "../../config.js";
-import { requireAuth } from "../../utils/auth.js";
-import { parseBody, validateRequired } from "../../utils/validators.js";
+import config from "../../../config.js";
+import { requireAuth } from "../../../utils/auth.js";
+import { parseBody, validateRequired } from "../../../utils/validators.js";
 import {
   success,
   badRequest,
   unauthorized,
   serverError,
-} from "../../utils/responses.js";
+} from "../../../utils/responses.js";
 
 const cognitoClient = new CognitoIdentityProviderClient({
   region: config.AWS_REGION,

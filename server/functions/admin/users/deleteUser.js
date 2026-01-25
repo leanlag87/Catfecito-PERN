@@ -1,17 +1,17 @@
-import { docClient, TABLE_NAME } from "../../dynamodb.js";
+import { docClient, TABLE_NAME } from "../../../dynamodb.js";
 import {
   CognitoIdentityProviderClient,
   AdminDeleteUserCommand,
 } from "@aws-sdk/client-cognito-identity-provider";
 import { DeleteCommand, GetCommand } from "@aws-sdk/lib-dynamodb";
-import config from "../../config.js";
-import { requireAdmin } from "../../utils/auth.js";
+import config from "../../../config.js";
+import { requireAdmin } from "../../../utils/auth.js";
 import {
   success,
   badRequest,
   notFound,
   serverError,
-} from "../../utils/responses.js";
+} from "../../../utils/responses.js";
 
 const cognitoClient = new CognitoIdentityProviderClient({
   region: config.AWS_REGION,

@@ -1,7 +1,7 @@
-import { docClient, TABLE_NAME } from "../../dynamodb.js";
+import { docClient, TABLE_NAME } from "../../../dynamodb.js";
 import { GetCommand } from "@aws-sdk/lib-dynamodb";
-import { requireAuth } from "../../utils/auth.js";
-import { success, notFound, serverError } from "../../utils/responses.js";
+import { requireAuth } from "../../../utils/auth.js";
+import { success, notFound, serverError } from "../../../utils/responses.js";
 
 const getProfileHandler = async (event) => {
   try {

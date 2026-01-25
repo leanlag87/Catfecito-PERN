@@ -1,8 +1,8 @@
-import { docClient, TABLE_NAME, getTimestamp } from "../../dynamodb.js";
+import { docClient, TABLE_NAME, getTimestamp } from "../../../dynamodb.js";
 import { UpdateCommand } from "@aws-sdk/lib-dynamodb";
-import { requireAuth } from "../../utils/auth.js";
-import { parseBody } from "../../utils/validators.js";
-import { success, serverError } from "../../utils/responses.js";
+import { requireAuth } from "../../../utils/auth.js";
+import { parseBody } from "../../../utils/validators.js";
+import { success, serverError } from "../../../utils/responses.js";
 
 const updateAddressHandler = async (event) => {
   try {
