@@ -47,7 +47,8 @@
                   "cognito-idp:AdminInitiateAuth",
                   "cognito-idp:AdminRespondToAuthChallenge",
                   "cognito-idp:GlobalSignOut",
-                  "cognito-idp:ChangePassword"
+                  "cognito-idp:ChangePassword",
+                  "cognito-idp:AdminDeleteUser"
                 ],
                 "Resource": "arn:aws:cognito-idp:sa-east-1:*:userpool/sa-east-1_pua4g9m7n"
               }
@@ -112,6 +113,12 @@
               "Type": "AWS::Logs::LogGroup",
               "Properties": {
                 "LogGroupName": "/aws/lambda/catfecito-backend-dev-toggleUserStatus"
+              }
+            },
+            "DeleteUserLogGroup": {
+              "Type": "AWS::Logs::LogGroup",
+              "Properties": {
+                "LogGroupName": "/aws/lambda/catfecito-backend-dev-deleteUser"
               }
             },
             "IamRoleLambdaExecution": {
@@ -197,7 +204,8 @@
                             "cognito-idp:AdminInitiateAuth",
                             "cognito-idp:AdminRespondToAuthChallenge",
                             "cognito-idp:GlobalSignOut",
-                            "cognito-idp:ChangePassword"
+                            "cognito-idp:ChangePassword",
+                            "cognito-idp:AdminDeleteUser"
                           ],
                           "Resource": "arn:aws:cognito-idp:sa-east-1:*:userpool/sa-east-1_pua4g9m7n"
                         }
@@ -226,7 +234,7 @@
               "Properties": {
                 "Code": {
                   "S3Bucket": "serverless-framework-deployments-sa-east-1-b389c947-1ea1",
-                  "S3Key": "serverless/catfecito-backend/dev/1769297357225-2026-01-24T23:29:17.225Z/catfecito-backend.zip"
+                  "S3Key": "serverless/catfecito-backend/dev/1769300761579-2026-01-25T00:26:01.579Z/catfecito-backend.zip"
                 },
                 "Handler": "server/functions/auth/register.createUser",
                 "Runtime": "nodejs18.x",
@@ -259,7 +267,7 @@
               "Properties": {
                 "Code": {
                   "S3Bucket": "serverless-framework-deployments-sa-east-1-b389c947-1ea1",
-                  "S3Key": "serverless/catfecito-backend/dev/1769297357225-2026-01-24T23:29:17.225Z/catfecito-backend.zip"
+                  "S3Key": "serverless/catfecito-backend/dev/1769300761579-2026-01-25T00:26:01.579Z/catfecito-backend.zip"
                 },
                 "Handler": "server/functions/auth/login.loginUser",
                 "Runtime": "nodejs18.x",
@@ -292,7 +300,7 @@
               "Properties": {
                 "Code": {
                   "S3Bucket": "serverless-framework-deployments-sa-east-1-b389c947-1ea1",
-                  "S3Key": "serverless/catfecito-backend/dev/1769297357225-2026-01-24T23:29:17.225Z/catfecito-backend.zip"
+                  "S3Key": "serverless/catfecito-backend/dev/1769300761579-2026-01-25T00:26:01.579Z/catfecito-backend.zip"
                 },
                 "Handler": "server/functions/users/getProfile.getProfile",
                 "Runtime": "nodejs18.x",
@@ -325,7 +333,7 @@
               "Properties": {
                 "Code": {
                   "S3Bucket": "serverless-framework-deployments-sa-east-1-b389c947-1ea1",
-                  "S3Key": "serverless/catfecito-backend/dev/1769297357225-2026-01-24T23:29:17.225Z/catfecito-backend.zip"
+                  "S3Key": "serverless/catfecito-backend/dev/1769300761579-2026-01-25T00:26:01.579Z/catfecito-backend.zip"
                 },
                 "Handler": "server/functions/users/updateProfile.updateProfile",
                 "Runtime": "nodejs18.x",
@@ -358,7 +366,7 @@
               "Properties": {
                 "Code": {
                   "S3Bucket": "serverless-framework-deployments-sa-east-1-b389c947-1ea1",
-                  "S3Key": "serverless/catfecito-backend/dev/1769297357225-2026-01-24T23:29:17.225Z/catfecito-backend.zip"
+                  "S3Key": "serverless/catfecito-backend/dev/1769300761579-2026-01-25T00:26:01.579Z/catfecito-backend.zip"
                 },
                 "Handler": "server/functions/users/updateAddress.updateAddress",
                 "Runtime": "nodejs18.x",
@@ -392,7 +400,7 @@
               "Properties": {
                 "Code": {
                   "S3Bucket": "serverless-framework-deployments-sa-east-1-b389c947-1ea1",
-                  "S3Key": "serverless/catfecito-backend/dev/1769297357225-2026-01-24T23:29:17.225Z/catfecito-backend.zip"
+                  "S3Key": "serverless/catfecito-backend/dev/1769300761579-2026-01-25T00:26:01.579Z/catfecito-backend.zip"
                 },
                 "Handler": "server/functions/admin/getAllUsers.getAllUsers",
                 "Runtime": "nodejs18.x",
@@ -425,7 +433,7 @@
               "Properties": {
                 "Code": {
                   "S3Bucket": "serverless-framework-deployments-sa-east-1-b389c947-1ea1",
-                  "S3Key": "serverless/catfecito-backend/dev/1769297357225-2026-01-24T23:29:17.225Z/catfecito-backend.zip"
+                  "S3Key": "serverless/catfecito-backend/dev/1769300761579-2026-01-25T00:26:01.579Z/catfecito-backend.zip"
                 },
                 "Handler": "server/functions/admin/getUserById.getUserById",
                 "Runtime": "nodejs18.x",
@@ -458,7 +466,7 @@
               "Properties": {
                 "Code": {
                   "S3Bucket": "serverless-framework-deployments-sa-east-1-b389c947-1ea1",
-                  "S3Key": "serverless/catfecito-backend/dev/1769297357225-2026-01-24T23:29:17.225Z/catfecito-backend.zip"
+                  "S3Key": "serverless/catfecito-backend/dev/1769300761579-2026-01-25T00:26:01.579Z/catfecito-backend.zip"
                 },
                 "Handler": "server/functions/admin/updateUserRole.updateUserRole",
                 "Runtime": "nodejs18.x",
@@ -491,7 +499,7 @@
               "Properties": {
                 "Code": {
                   "S3Bucket": "serverless-framework-deployments-sa-east-1-b389c947-1ea1",
-                  "S3Key": "serverless/catfecito-backend/dev/1769297357225-2026-01-24T23:29:17.225Z/catfecito-backend.zip"
+                  "S3Key": "serverless/catfecito-backend/dev/1769300761579-2026-01-25T00:26:01.579Z/catfecito-backend.zip"
                 },
                 "Handler": "server/functions/admin/toggleUserStatus.toggleUserStatus",
                 "Runtime": "nodejs18.x",
@@ -519,95 +527,138 @@
                 "ToggleUserStatusLogGroup"
               ]
             },
-            "RegisterLambdaVersioned2bXe1FjHab7eN5aSiIavEGCB8r8HHvHn1564r7Y": {
+            "DeleteUserLambdaFunction": {
+              "Type": "AWS::Lambda::Function",
+              "Properties": {
+                "Code": {
+                  "S3Bucket": "serverless-framework-deployments-sa-east-1-b389c947-1ea1",
+                  "S3Key": "serverless/catfecito-backend/dev/1769300761579-2026-01-25T00:26:01.579Z/catfecito-backend.zip"
+                },
+                "Handler": "server/functions/admin/deleteUser.deleteUser",
+                "Runtime": "nodejs18.x",
+                "FunctionName": "catfecito-backend-dev-deleteUser",
+                "MemorySize": 1024,
+                "Timeout": 6,
+                "Environment": {
+                  "Variables": {
+                    "DYNAMODB_TABLE": "catfecito-backend-dev",
+                    "JWT_SECRET": "<REDACTED>",
+                    "JWT_EXPIRES_IN": "7d",
+                    "COGNITO_USER_POOL_ID": "sa-east-1_pua4g9m7n",
+                    "COGNITO_CLIENT_ID": "426ee7m0co9le8poclthg5ict6",
+                    "COGNITO_CLIENT_SECRET": "<REDACTED>"
+                  }
+                },
+                "Role": {
+                  "Fn::GetAtt": [
+                    "IamRoleLambdaExecution",
+                    "Arn"
+                  ]
+                }
+              },
+              "DependsOn": [
+                "DeleteUserLogGroup"
+              ]
+            },
+            "RegisterLambdaVersionZJHs8VKpcopJJS5dS3RBTpWMm7pb9lsx31VqiHOy8SI": {
               "Type": "AWS::Lambda::Version",
               "DeletionPolicy": "Retain",
               "Properties": {
                 "FunctionName": {
                   "Ref": "RegisterLambdaFunction"
                 },
-                "CodeSha256": "wEOApJd9whXJERVpVKkFYWr3iNuJ32Mu3VGO0dalyvs="
+                "CodeSha256": "F3A6fE84X2b8aPWlEe5zHLcxAJTLHeygQT+3Jm1KiIw="
               }
             },
-            "LoginLambdaVersiontbEL2fyGUpfXA4pRKA1TjPbKw4XP9comdcKUrbN5pw": {
+            "LoginLambdaVersionDeUsAEwlfckwJRQoOz0bYGVAcfDWEEcCrlUF0SgFQ8": {
               "Type": "AWS::Lambda::Version",
               "DeletionPolicy": "Retain",
               "Properties": {
                 "FunctionName": {
                   "Ref": "LoginLambdaFunction"
                 },
-                "CodeSha256": "wEOApJd9whXJERVpVKkFYWr3iNuJ32Mu3VGO0dalyvs="
+                "CodeSha256": "F3A6fE84X2b8aPWlEe5zHLcxAJTLHeygQT+3Jm1KiIw="
               }
             },
-            "GetProfileLambdaVersionFvWuH85LCtD1ZZPqXmdJ0NNJVEzoxYnNhXEKs5zRyk": {
+            "GetProfileLambdaVersionUzHHzJfsGyLoh34X6oQ6ZeCqVojmHJPclW2rS0S0": {
               "Type": "AWS::Lambda::Version",
               "DeletionPolicy": "Retain",
               "Properties": {
                 "FunctionName": {
                   "Ref": "GetProfileLambdaFunction"
                 },
-                "CodeSha256": "wEOApJd9whXJERVpVKkFYWr3iNuJ32Mu3VGO0dalyvs="
+                "CodeSha256": "F3A6fE84X2b8aPWlEe5zHLcxAJTLHeygQT+3Jm1KiIw="
               }
             },
-            "UpdateProfileLambdaVersionrgpVtbFEFAkxz1gnnqe6J0Of2CVOs5BC24uyehLJW8": {
+            "UpdateProfileLambdaVersionIUq2phjeRO5cCFIAdiRDpvxKcukLGUeurXDDppMSW4": {
               "Type": "AWS::Lambda::Version",
               "DeletionPolicy": "Retain",
               "Properties": {
                 "FunctionName": {
                   "Ref": "UpdateProfileLambdaFunction"
                 },
-                "CodeSha256": "wEOApJd9whXJERVpVKkFYWr3iNuJ32Mu3VGO0dalyvs="
+                "CodeSha256": "F3A6fE84X2b8aPWlEe5zHLcxAJTLHeygQT+3Jm1KiIw="
               }
             },
-            "UpdateAddressLambdaVersion3RqbihDfAOUcD8mnnrVRFrGuTLx1g9M38f3NJfbjE": {
+            "UpdateAddressLambdaVersionn5muJCkau6I2XCgj77Jc1PXqujWUhMvbvKvDcSvWRg": {
               "Type": "AWS::Lambda::Version",
               "DeletionPolicy": "Retain",
               "Properties": {
                 "FunctionName": {
                   "Ref": "UpdateAddressLambdaFunction"
                 },
-                "CodeSha256": "wEOApJd9whXJERVpVKkFYWr3iNuJ32Mu3VGO0dalyvs="
+                "CodeSha256": "F3A6fE84X2b8aPWlEe5zHLcxAJTLHeygQT+3Jm1KiIw="
               }
             },
-            "ChangePasswordLambdaVersionQbZZZ3Q9TWUP6r0V62esKPVtL0mX7NsA3aFth7jbrps": "<REDACTED>",
-            "GetAllUsersLambdaVersion6rG1lG2Z5q7luMfvZZImDUULchHjVsvA6lc68BB1FiU": {
+            "ChangePasswordLambdaVersionMHzOwGSBBDngBfEEpxJSxvfylYRzmI68PYv3pzI2iHc": "<REDACTED>",
+            "GetAllUsersLambdaVersionh7lv8wBgGoJzw2PPC1rEsCCxw9NwaJmvHn1Mv3Tx9JQ": {
               "Type": "AWS::Lambda::Version",
               "DeletionPolicy": "Retain",
               "Properties": {
                 "FunctionName": {
                   "Ref": "GetAllUsersLambdaFunction"
                 },
-                "CodeSha256": "wEOApJd9whXJERVpVKkFYWr3iNuJ32Mu3VGO0dalyvs="
+                "CodeSha256": "F3A6fE84X2b8aPWlEe5zHLcxAJTLHeygQT+3Jm1KiIw="
               }
             },
-            "GetUserByIdLambdaVersion58SXVpS6bi4uk72BT4GH28R5VovjhDDbqRbfecgYng": {
+            "GetUserByIdLambdaVersionst3Z8uaPwZP2F6m6mZvvgOQqRbw9toCsI9k99YR30": {
               "Type": "AWS::Lambda::Version",
               "DeletionPolicy": "Retain",
               "Properties": {
                 "FunctionName": {
                   "Ref": "GetUserByIdLambdaFunction"
                 },
-                "CodeSha256": "wEOApJd9whXJERVpVKkFYWr3iNuJ32Mu3VGO0dalyvs="
+                "CodeSha256": "F3A6fE84X2b8aPWlEe5zHLcxAJTLHeygQT+3Jm1KiIw="
               }
             },
-            "UpdateUserRoleLambdaVersion5iBX5mZXtWLRVFxlQmyfKwJiumTqQwqCl11qqkcg4ZU": {
+            "UpdateUserRoleLambdaVersion1FVW2ksx0MtP6LB6b9qMlAJEJTZq8lpBMwVsxb2Yic": {
               "Type": "AWS::Lambda::Version",
               "DeletionPolicy": "Retain",
               "Properties": {
                 "FunctionName": {
                   "Ref": "UpdateUserRoleLambdaFunction"
                 },
-                "CodeSha256": "wEOApJd9whXJERVpVKkFYWr3iNuJ32Mu3VGO0dalyvs="
+                "CodeSha256": "F3A6fE84X2b8aPWlEe5zHLcxAJTLHeygQT+3Jm1KiIw="
               }
             },
-            "ToggleUserStatusLambdaVersionVOxJ3eakcugIJ5Ec2avKgwQFpXrh8soWajPtC4Rg3A": {
+            "ToggleUserStatusLambdaVersionN81wGwZ6BkU3VQW7lRsG8NmXQmkzZxTSGPKZmWHfLU": {
               "Type": "AWS::Lambda::Version",
               "DeletionPolicy": "Retain",
               "Properties": {
                 "FunctionName": {
                   "Ref": "ToggleUserStatusLambdaFunction"
                 },
-                "CodeSha256": "wEOApJd9whXJERVpVKkFYWr3iNuJ32Mu3VGO0dalyvs="
+                "CodeSha256": "F3A6fE84X2b8aPWlEe5zHLcxAJTLHeygQT+3Jm1KiIw="
+              }
+            },
+            "DeleteUserLambdaVersionJ3nYuIAlOX1V12WQK6mjS8kqfhmn3ys6vN3Xel3Qk0": {
+              "Type": "AWS::Lambda::Version",
+              "DeletionPolicy": "Retain",
+              "Properties": {
+                "FunctionName": {
+                  "Ref": "DeleteUserLambdaFunction"
+                },
+                "CodeSha256": "F3A6fE84X2b8aPWlEe5zHLcxAJTLHeygQT+3Jm1KiIw="
               }
             },
             "HttpApi": {
@@ -1308,6 +1359,81 @@
               },
               "DependsOn": "HttpApiIntegrationToggleUserStatus"
             },
+            "DeleteUserLambdaPermissionHttpApi": {
+              "Type": "AWS::Lambda::Permission",
+              "Properties": {
+                "FunctionName": {
+                  "Fn::GetAtt": [
+                    "DeleteUserLambdaFunction",
+                    "Arn"
+                  ]
+                },
+                "Action": "lambda:InvokeFunction",
+                "Principal": "apigateway.amazonaws.com",
+                "SourceArn": {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:",
+                      {
+                        "Ref": "AWS::Partition"
+                      },
+                      ":execute-api:",
+                      {
+                        "Ref": "AWS::Region"
+                      },
+                      ":",
+                      {
+                        "Ref": "AWS::AccountId"
+                      },
+                      ":",
+                      {
+                        "Ref": "HttpApi"
+                      },
+                      "/*"
+                    ]
+                  ]
+                }
+              }
+            },
+            "HttpApiIntegrationDeleteUser": {
+              "Type": "AWS::ApiGatewayV2::Integration",
+              "Properties": {
+                "ApiId": {
+                  "Ref": "HttpApi"
+                },
+                "IntegrationType": "AWS_PROXY",
+                "IntegrationUri": {
+                  "Fn::GetAtt": [
+                    "DeleteUserLambdaFunction",
+                    "Arn"
+                  ]
+                },
+                "PayloadFormatVersion": "2.0",
+                "TimeoutInMillis": 30000
+              }
+            },
+            "HttpApiRouteDeleteApiAdminUsersIdVar": {
+              "Type": "AWS::ApiGatewayV2::Route",
+              "Properties": {
+                "ApiId": {
+                  "Ref": "HttpApi"
+                },
+                "RouteKey": "DELETE /api/admin/users/{id}",
+                "Target": {
+                  "Fn::Join": [
+                    "/",
+                    [
+                      "integrations",
+                      {
+                        "Ref": "HttpApiIntegrationDeleteUser"
+                      }
+                    ]
+                  ]
+                }
+              },
+              "DependsOn": "HttpApiIntegrationDeleteUser"
+            },
             "CatfecitoTable": {
               "Type": "AWS::DynamoDB::Table",
               "Properties": {
@@ -1372,7 +1498,7 @@
             "RegisterLambdaFunctionQualifiedArn": {
               "Description": "Current Lambda function version",
               "Value": {
-                "Ref": "RegisterLambdaVersioned2bXe1FjHab7eN5aSiIavEGCB8r8HHvHn1564r7Y"
+                "Ref": "RegisterLambdaVersionZJHs8VKpcopJJS5dS3RBTpWMm7pb9lsx31VqiHOy8SI"
               },
               "Export": {
                 "Name": "sls-catfecito-backend-dev-RegisterLambdaFunctionQualifiedArn"
@@ -1381,7 +1507,7 @@
             "LoginLambdaFunctionQualifiedArn": {
               "Description": "Current Lambda function version",
               "Value": {
-                "Ref": "LoginLambdaVersiontbEL2fyGUpfXA4pRKA1TjPbKw4XP9comdcKUrbN5pw"
+                "Ref": "LoginLambdaVersionDeUsAEwlfckwJRQoOz0bYGVAcfDWEEcCrlUF0SgFQ8"
               },
               "Export": {
                 "Name": "sls-catfecito-backend-dev-LoginLambdaFunctionQualifiedArn"
@@ -1390,7 +1516,7 @@
             "GetProfileLambdaFunctionQualifiedArn": {
               "Description": "Current Lambda function version",
               "Value": {
-                "Ref": "GetProfileLambdaVersionFvWuH85LCtD1ZZPqXmdJ0NNJVEzoxYnNhXEKs5zRyk"
+                "Ref": "GetProfileLambdaVersionUzHHzJfsGyLoh34X6oQ6ZeCqVojmHJPclW2rS0S0"
               },
               "Export": {
                 "Name": "sls-catfecito-backend-dev-GetProfileLambdaFunctionQualifiedArn"
@@ -1399,7 +1525,7 @@
             "UpdateProfileLambdaFunctionQualifiedArn": {
               "Description": "Current Lambda function version",
               "Value": {
-                "Ref": "UpdateProfileLambdaVersionrgpVtbFEFAkxz1gnnqe6J0Of2CVOs5BC24uyehLJW8"
+                "Ref": "UpdateProfileLambdaVersionIUq2phjeRO5cCFIAdiRDpvxKcukLGUeurXDDppMSW4"
               },
               "Export": {
                 "Name": "sls-catfecito-backend-dev-UpdateProfileLambdaFunctionQualifiedArn"
@@ -1408,7 +1534,7 @@
             "UpdateAddressLambdaFunctionQualifiedArn": {
               "Description": "Current Lambda function version",
               "Value": {
-                "Ref": "UpdateAddressLambdaVersion3RqbihDfAOUcD8mnnrVRFrGuTLx1g9M38f3NJfbjE"
+                "Ref": "UpdateAddressLambdaVersionn5muJCkau6I2XCgj77Jc1PXqujWUhMvbvKvDcSvWRg"
               },
               "Export": {
                 "Name": "sls-catfecito-backend-dev-UpdateAddressLambdaFunctionQualifiedArn"
@@ -1418,7 +1544,7 @@
             "GetAllUsersLambdaFunctionQualifiedArn": {
               "Description": "Current Lambda function version",
               "Value": {
-                "Ref": "GetAllUsersLambdaVersion6rG1lG2Z5q7luMfvZZImDUULchHjVsvA6lc68BB1FiU"
+                "Ref": "GetAllUsersLambdaVersionh7lv8wBgGoJzw2PPC1rEsCCxw9NwaJmvHn1Mv3Tx9JQ"
               },
               "Export": {
                 "Name": "sls-catfecito-backend-dev-GetAllUsersLambdaFunctionQualifiedArn"
@@ -1427,7 +1553,7 @@
             "GetUserByIdLambdaFunctionQualifiedArn": {
               "Description": "Current Lambda function version",
               "Value": {
-                "Ref": "GetUserByIdLambdaVersion58SXVpS6bi4uk72BT4GH28R5VovjhDDbqRbfecgYng"
+                "Ref": "GetUserByIdLambdaVersionst3Z8uaPwZP2F6m6mZvvgOQqRbw9toCsI9k99YR30"
               },
               "Export": {
                 "Name": "sls-catfecito-backend-dev-GetUserByIdLambdaFunctionQualifiedArn"
@@ -1436,7 +1562,7 @@
             "UpdateUserRoleLambdaFunctionQualifiedArn": {
               "Description": "Current Lambda function version",
               "Value": {
-                "Ref": "UpdateUserRoleLambdaVersion5iBX5mZXtWLRVFxlQmyfKwJiumTqQwqCl11qqkcg4ZU"
+                "Ref": "UpdateUserRoleLambdaVersion1FVW2ksx0MtP6LB6b9qMlAJEJTZq8lpBMwVsxb2Yic"
               },
               "Export": {
                 "Name": "sls-catfecito-backend-dev-UpdateUserRoleLambdaFunctionQualifiedArn"
@@ -1445,10 +1571,19 @@
             "ToggleUserStatusLambdaFunctionQualifiedArn": {
               "Description": "Current Lambda function version",
               "Value": {
-                "Ref": "ToggleUserStatusLambdaVersionVOxJ3eakcugIJ5Ec2avKgwQFpXrh8soWajPtC4Rg3A"
+                "Ref": "ToggleUserStatusLambdaVersionN81wGwZ6BkU3VQW7lRsG8NmXQmkzZxTSGPKZmWHfLU"
               },
               "Export": {
                 "Name": "sls-catfecito-backend-dev-ToggleUserStatusLambdaFunctionQualifiedArn"
+              }
+            },
+            "DeleteUserLambdaFunctionQualifiedArn": {
+              "Description": "Current Lambda function version",
+              "Value": {
+                "Ref": "DeleteUserLambdaVersionJ3nYuIAlOX1V12WQK6mjS8kqfhmn3ys6vN3Xel3Qk0"
+              },
+              "Export": {
+                "Name": "sls-catfecito-backend-dev-DeleteUserLambdaFunctionQualifiedArn"
               }
             },
             "HttpApiId": {
@@ -1508,7 +1643,7 @@
           "timeout": 6,
           "runtime": "nodejs18.x",
           "vpc": {},
-          "versionLogicalId": "RegisterLambdaVersioned2bXe1FjHab7eN5aSiIavEGCB8r8HHvHn1564r7Y"
+          "versionLogicalId": "RegisterLambdaVersionZJHs8VKpcopJJS5dS3RBTpWMm7pb9lsx31VqiHOy8SI"
         },
         "login": {
           "handler": "server/functions/auth/login.loginUser",
@@ -1528,7 +1663,7 @@
           "timeout": 6,
           "runtime": "nodejs18.x",
           "vpc": {},
-          "versionLogicalId": "LoginLambdaVersiontbEL2fyGUpfXA4pRKA1TjPbKw4XP9comdcKUrbN5pw"
+          "versionLogicalId": "LoginLambdaVersionDeUsAEwlfckwJRQoOz0bYGVAcfDWEEcCrlUF0SgFQ8"
         },
         "getProfile": {
           "handler": "server/functions/users/getProfile.getProfile",
@@ -1548,7 +1683,7 @@
           "timeout": 6,
           "runtime": "nodejs18.x",
           "vpc": {},
-          "versionLogicalId": "GetProfileLambdaVersionFvWuH85LCtD1ZZPqXmdJ0NNJVEzoxYnNhXEKs5zRyk"
+          "versionLogicalId": "GetProfileLambdaVersionUzHHzJfsGyLoh34X6oQ6ZeCqVojmHJPclW2rS0S0"
         },
         "updateProfile": {
           "handler": "server/functions/users/updateProfile.updateProfile",
@@ -1568,7 +1703,7 @@
           "timeout": 6,
           "runtime": "nodejs18.x",
           "vpc": {},
-          "versionLogicalId": "UpdateProfileLambdaVersionrgpVtbFEFAkxz1gnnqe6J0Of2CVOs5BC24uyehLJW8"
+          "versionLogicalId": "UpdateProfileLambdaVersionIUq2phjeRO5cCFIAdiRDpvxKcukLGUeurXDDppMSW4"
         },
         "updateAddress": {
           "handler": "server/functions/users/updateAddress.updateAddress",
@@ -1588,7 +1723,7 @@
           "timeout": 6,
           "runtime": "nodejs18.x",
           "vpc": {},
-          "versionLogicalId": "UpdateAddressLambdaVersion3RqbihDfAOUcD8mnnrVRFrGuTLx1g9M38f3NJfbjE"
+          "versionLogicalId": "UpdateAddressLambdaVersionn5muJCkau6I2XCgj77Jc1PXqujWUhMvbvKvDcSvWRg"
         },
         "changePassword": "<REDACTED>",
         "getAllUsers": {
@@ -1609,7 +1744,7 @@
           "timeout": 6,
           "runtime": "nodejs18.x",
           "vpc": {},
-          "versionLogicalId": "GetAllUsersLambdaVersion6rG1lG2Z5q7luMfvZZImDUULchHjVsvA6lc68BB1FiU"
+          "versionLogicalId": "GetAllUsersLambdaVersionh7lv8wBgGoJzw2PPC1rEsCCxw9NwaJmvHn1Mv3Tx9JQ"
         },
         "getUserById": {
           "handler": "server/functions/admin/getUserById.getUserById",
@@ -1629,7 +1764,7 @@
           "timeout": 6,
           "runtime": "nodejs18.x",
           "vpc": {},
-          "versionLogicalId": "GetUserByIdLambdaVersion58SXVpS6bi4uk72BT4GH28R5VovjhDDbqRbfecgYng"
+          "versionLogicalId": "GetUserByIdLambdaVersionst3Z8uaPwZP2F6m6mZvvgOQqRbw9toCsI9k99YR30"
         },
         "updateUserRole": {
           "handler": "server/functions/admin/updateUserRole.updateUserRole",
@@ -1649,7 +1784,7 @@
           "timeout": 6,
           "runtime": "nodejs18.x",
           "vpc": {},
-          "versionLogicalId": "UpdateUserRoleLambdaVersion5iBX5mZXtWLRVFxlQmyfKwJiumTqQwqCl11qqkcg4ZU"
+          "versionLogicalId": "UpdateUserRoleLambdaVersion1FVW2ksx0MtP6LB6b9qMlAJEJTZq8lpBMwVsxb2Yic"
         },
         "toggleUserStatus": {
           "handler": "server/functions/admin/toggleUserStatus.toggleUserStatus",
@@ -1669,7 +1804,27 @@
           "timeout": 6,
           "runtime": "nodejs18.x",
           "vpc": {},
-          "versionLogicalId": "ToggleUserStatusLambdaVersionVOxJ3eakcugIJ5Ec2avKgwQFpXrh8soWajPtC4Rg3A"
+          "versionLogicalId": "ToggleUserStatusLambdaVersionN81wGwZ6BkU3VQW7lRsG8NmXQmkzZxTSGPKZmWHfLU"
+        },
+        "deleteUser": {
+          "handler": "server/functions/admin/deleteUser.deleteUser",
+          "events": [
+            {
+              "httpApi": {
+                "path": "/api/admin/users/{id}",
+                "method": "DELETE"
+              },
+              "resolvedMethod": "DELETE",
+              "resolvedPath": "/api/admin/users/{id}"
+            }
+          ],
+          "name": "catfecito-backend-dev-deleteUser",
+          "package": {},
+          "memory": 1024,
+          "timeout": 6,
+          "runtime": "nodejs18.x",
+          "vpc": {},
+          "versionLogicalId": "DeleteUserLambdaVersionJ3nYuIAlOX1V12WQK6mjS8kqfhmn3ys6vN3Xel3Qk0"
         }
       },
       "resources": {
@@ -1772,7 +1927,8 @@
                 "cognito-idp:AdminInitiateAuth",
                 "cognito-idp:AdminRespondToAuthChallenge",
                 "cognito-idp:GlobalSignOut",
-                "cognito-idp:ChangePassword"
+                "cognito-idp:ChangePassword",
+                "cognito-idp:AdminDeleteUser"
               ],
               "Resource": "arn:aws:cognito-idp:sa-east-1:*:userpool/sa-east-1_pua4g9m7n"
             }
@@ -1837,6 +1993,12 @@
             "Type": "AWS::Logs::LogGroup",
             "Properties": {
               "LogGroupName": "/aws/lambda/catfecito-backend-dev-toggleUserStatus"
+            }
+          },
+          "DeleteUserLogGroup": {
+            "Type": "AWS::Logs::LogGroup",
+            "Properties": {
+              "LogGroupName": "/aws/lambda/catfecito-backend-dev-deleteUser"
             }
           },
           "IamRoleLambdaExecution": {
@@ -1922,7 +2084,8 @@
                           "cognito-idp:AdminInitiateAuth",
                           "cognito-idp:AdminRespondToAuthChallenge",
                           "cognito-idp:GlobalSignOut",
-                          "cognito-idp:ChangePassword"
+                          "cognito-idp:ChangePassword",
+                          "cognito-idp:AdminDeleteUser"
                         ],
                         "Resource": "arn:aws:cognito-idp:sa-east-1:*:userpool/sa-east-1_pua4g9m7n"
                       }
@@ -1951,7 +2114,7 @@
             "Properties": {
               "Code": {
                 "S3Bucket": "serverless-framework-deployments-sa-east-1-b389c947-1ea1",
-                "S3Key": "serverless/catfecito-backend/dev/1769297357225-2026-01-24T23:29:17.225Z/catfecito-backend.zip"
+                "S3Key": "serverless/catfecito-backend/dev/1769300761579-2026-01-25T00:26:01.579Z/catfecito-backend.zip"
               },
               "Handler": "server/functions/auth/register.createUser",
               "Runtime": "nodejs18.x",
@@ -1984,7 +2147,7 @@
             "Properties": {
               "Code": {
                 "S3Bucket": "serverless-framework-deployments-sa-east-1-b389c947-1ea1",
-                "S3Key": "serverless/catfecito-backend/dev/1769297357225-2026-01-24T23:29:17.225Z/catfecito-backend.zip"
+                "S3Key": "serverless/catfecito-backend/dev/1769300761579-2026-01-25T00:26:01.579Z/catfecito-backend.zip"
               },
               "Handler": "server/functions/auth/login.loginUser",
               "Runtime": "nodejs18.x",
@@ -2017,7 +2180,7 @@
             "Properties": {
               "Code": {
                 "S3Bucket": "serverless-framework-deployments-sa-east-1-b389c947-1ea1",
-                "S3Key": "serverless/catfecito-backend/dev/1769297357225-2026-01-24T23:29:17.225Z/catfecito-backend.zip"
+                "S3Key": "serverless/catfecito-backend/dev/1769300761579-2026-01-25T00:26:01.579Z/catfecito-backend.zip"
               },
               "Handler": "server/functions/users/getProfile.getProfile",
               "Runtime": "nodejs18.x",
@@ -2050,7 +2213,7 @@
             "Properties": {
               "Code": {
                 "S3Bucket": "serverless-framework-deployments-sa-east-1-b389c947-1ea1",
-                "S3Key": "serverless/catfecito-backend/dev/1769297357225-2026-01-24T23:29:17.225Z/catfecito-backend.zip"
+                "S3Key": "serverless/catfecito-backend/dev/1769300761579-2026-01-25T00:26:01.579Z/catfecito-backend.zip"
               },
               "Handler": "server/functions/users/updateProfile.updateProfile",
               "Runtime": "nodejs18.x",
@@ -2083,7 +2246,7 @@
             "Properties": {
               "Code": {
                 "S3Bucket": "serverless-framework-deployments-sa-east-1-b389c947-1ea1",
-                "S3Key": "serverless/catfecito-backend/dev/1769297357225-2026-01-24T23:29:17.225Z/catfecito-backend.zip"
+                "S3Key": "serverless/catfecito-backend/dev/1769300761579-2026-01-25T00:26:01.579Z/catfecito-backend.zip"
               },
               "Handler": "server/functions/users/updateAddress.updateAddress",
               "Runtime": "nodejs18.x",
@@ -2117,7 +2280,7 @@
             "Properties": {
               "Code": {
                 "S3Bucket": "serverless-framework-deployments-sa-east-1-b389c947-1ea1",
-                "S3Key": "serverless/catfecito-backend/dev/1769297357225-2026-01-24T23:29:17.225Z/catfecito-backend.zip"
+                "S3Key": "serverless/catfecito-backend/dev/1769300761579-2026-01-25T00:26:01.579Z/catfecito-backend.zip"
               },
               "Handler": "server/functions/admin/getAllUsers.getAllUsers",
               "Runtime": "nodejs18.x",
@@ -2150,7 +2313,7 @@
             "Properties": {
               "Code": {
                 "S3Bucket": "serverless-framework-deployments-sa-east-1-b389c947-1ea1",
-                "S3Key": "serverless/catfecito-backend/dev/1769297357225-2026-01-24T23:29:17.225Z/catfecito-backend.zip"
+                "S3Key": "serverless/catfecito-backend/dev/1769300761579-2026-01-25T00:26:01.579Z/catfecito-backend.zip"
               },
               "Handler": "server/functions/admin/getUserById.getUserById",
               "Runtime": "nodejs18.x",
@@ -2183,7 +2346,7 @@
             "Properties": {
               "Code": {
                 "S3Bucket": "serverless-framework-deployments-sa-east-1-b389c947-1ea1",
-                "S3Key": "serverless/catfecito-backend/dev/1769297357225-2026-01-24T23:29:17.225Z/catfecito-backend.zip"
+                "S3Key": "serverless/catfecito-backend/dev/1769300761579-2026-01-25T00:26:01.579Z/catfecito-backend.zip"
               },
               "Handler": "server/functions/admin/updateUserRole.updateUserRole",
               "Runtime": "nodejs18.x",
@@ -2216,7 +2379,7 @@
             "Properties": {
               "Code": {
                 "S3Bucket": "serverless-framework-deployments-sa-east-1-b389c947-1ea1",
-                "S3Key": "serverless/catfecito-backend/dev/1769297357225-2026-01-24T23:29:17.225Z/catfecito-backend.zip"
+                "S3Key": "serverless/catfecito-backend/dev/1769300761579-2026-01-25T00:26:01.579Z/catfecito-backend.zip"
               },
               "Handler": "server/functions/admin/toggleUserStatus.toggleUserStatus",
               "Runtime": "nodejs18.x",
@@ -2244,95 +2407,138 @@
               "ToggleUserStatusLogGroup"
             ]
           },
-          "RegisterLambdaVersioned2bXe1FjHab7eN5aSiIavEGCB8r8HHvHn1564r7Y": {
+          "DeleteUserLambdaFunction": {
+            "Type": "AWS::Lambda::Function",
+            "Properties": {
+              "Code": {
+                "S3Bucket": "serverless-framework-deployments-sa-east-1-b389c947-1ea1",
+                "S3Key": "serverless/catfecito-backend/dev/1769300761579-2026-01-25T00:26:01.579Z/catfecito-backend.zip"
+              },
+              "Handler": "server/functions/admin/deleteUser.deleteUser",
+              "Runtime": "nodejs18.x",
+              "FunctionName": "catfecito-backend-dev-deleteUser",
+              "MemorySize": 1024,
+              "Timeout": 6,
+              "Environment": {
+                "Variables": {
+                  "DYNAMODB_TABLE": "catfecito-backend-dev",
+                  "JWT_SECRET": "<REDACTED>",
+                  "JWT_EXPIRES_IN": "7d",
+                  "COGNITO_USER_POOL_ID": "sa-east-1_pua4g9m7n",
+                  "COGNITO_CLIENT_ID": "426ee7m0co9le8poclthg5ict6",
+                  "COGNITO_CLIENT_SECRET": "<REDACTED>"
+                }
+              },
+              "Role": {
+                "Fn::GetAtt": [
+                  "IamRoleLambdaExecution",
+                  "Arn"
+                ]
+              }
+            },
+            "DependsOn": [
+              "DeleteUserLogGroup"
+            ]
+          },
+          "RegisterLambdaVersionZJHs8VKpcopJJS5dS3RBTpWMm7pb9lsx31VqiHOy8SI": {
             "Type": "AWS::Lambda::Version",
             "DeletionPolicy": "Retain",
             "Properties": {
               "FunctionName": {
                 "Ref": "RegisterLambdaFunction"
               },
-              "CodeSha256": "wEOApJd9whXJERVpVKkFYWr3iNuJ32Mu3VGO0dalyvs="
+              "CodeSha256": "F3A6fE84X2b8aPWlEe5zHLcxAJTLHeygQT+3Jm1KiIw="
             }
           },
-          "LoginLambdaVersiontbEL2fyGUpfXA4pRKA1TjPbKw4XP9comdcKUrbN5pw": {
+          "LoginLambdaVersionDeUsAEwlfckwJRQoOz0bYGVAcfDWEEcCrlUF0SgFQ8": {
             "Type": "AWS::Lambda::Version",
             "DeletionPolicy": "Retain",
             "Properties": {
               "FunctionName": {
                 "Ref": "LoginLambdaFunction"
               },
-              "CodeSha256": "wEOApJd9whXJERVpVKkFYWr3iNuJ32Mu3VGO0dalyvs="
+              "CodeSha256": "F3A6fE84X2b8aPWlEe5zHLcxAJTLHeygQT+3Jm1KiIw="
             }
           },
-          "GetProfileLambdaVersionFvWuH85LCtD1ZZPqXmdJ0NNJVEzoxYnNhXEKs5zRyk": {
+          "GetProfileLambdaVersionUzHHzJfsGyLoh34X6oQ6ZeCqVojmHJPclW2rS0S0": {
             "Type": "AWS::Lambda::Version",
             "DeletionPolicy": "Retain",
             "Properties": {
               "FunctionName": {
                 "Ref": "GetProfileLambdaFunction"
               },
-              "CodeSha256": "wEOApJd9whXJERVpVKkFYWr3iNuJ32Mu3VGO0dalyvs="
+              "CodeSha256": "F3A6fE84X2b8aPWlEe5zHLcxAJTLHeygQT+3Jm1KiIw="
             }
           },
-          "UpdateProfileLambdaVersionrgpVtbFEFAkxz1gnnqe6J0Of2CVOs5BC24uyehLJW8": {
+          "UpdateProfileLambdaVersionIUq2phjeRO5cCFIAdiRDpvxKcukLGUeurXDDppMSW4": {
             "Type": "AWS::Lambda::Version",
             "DeletionPolicy": "Retain",
             "Properties": {
               "FunctionName": {
                 "Ref": "UpdateProfileLambdaFunction"
               },
-              "CodeSha256": "wEOApJd9whXJERVpVKkFYWr3iNuJ32Mu3VGO0dalyvs="
+              "CodeSha256": "F3A6fE84X2b8aPWlEe5zHLcxAJTLHeygQT+3Jm1KiIw="
             }
           },
-          "UpdateAddressLambdaVersion3RqbihDfAOUcD8mnnrVRFrGuTLx1g9M38f3NJfbjE": {
+          "UpdateAddressLambdaVersionn5muJCkau6I2XCgj77Jc1PXqujWUhMvbvKvDcSvWRg": {
             "Type": "AWS::Lambda::Version",
             "DeletionPolicy": "Retain",
             "Properties": {
               "FunctionName": {
                 "Ref": "UpdateAddressLambdaFunction"
               },
-              "CodeSha256": "wEOApJd9whXJERVpVKkFYWr3iNuJ32Mu3VGO0dalyvs="
+              "CodeSha256": "F3A6fE84X2b8aPWlEe5zHLcxAJTLHeygQT+3Jm1KiIw="
             }
           },
-          "ChangePasswordLambdaVersionQbZZZ3Q9TWUP6r0V62esKPVtL0mX7NsA3aFth7jbrps": "<REDACTED>",
-          "GetAllUsersLambdaVersion6rG1lG2Z5q7luMfvZZImDUULchHjVsvA6lc68BB1FiU": {
+          "ChangePasswordLambdaVersionMHzOwGSBBDngBfEEpxJSxvfylYRzmI68PYv3pzI2iHc": "<REDACTED>",
+          "GetAllUsersLambdaVersionh7lv8wBgGoJzw2PPC1rEsCCxw9NwaJmvHn1Mv3Tx9JQ": {
             "Type": "AWS::Lambda::Version",
             "DeletionPolicy": "Retain",
             "Properties": {
               "FunctionName": {
                 "Ref": "GetAllUsersLambdaFunction"
               },
-              "CodeSha256": "wEOApJd9whXJERVpVKkFYWr3iNuJ32Mu3VGO0dalyvs="
+              "CodeSha256": "F3A6fE84X2b8aPWlEe5zHLcxAJTLHeygQT+3Jm1KiIw="
             }
           },
-          "GetUserByIdLambdaVersion58SXVpS6bi4uk72BT4GH28R5VovjhDDbqRbfecgYng": {
+          "GetUserByIdLambdaVersionst3Z8uaPwZP2F6m6mZvvgOQqRbw9toCsI9k99YR30": {
             "Type": "AWS::Lambda::Version",
             "DeletionPolicy": "Retain",
             "Properties": {
               "FunctionName": {
                 "Ref": "GetUserByIdLambdaFunction"
               },
-              "CodeSha256": "wEOApJd9whXJERVpVKkFYWr3iNuJ32Mu3VGO0dalyvs="
+              "CodeSha256": "F3A6fE84X2b8aPWlEe5zHLcxAJTLHeygQT+3Jm1KiIw="
             }
           },
-          "UpdateUserRoleLambdaVersion5iBX5mZXtWLRVFxlQmyfKwJiumTqQwqCl11qqkcg4ZU": {
+          "UpdateUserRoleLambdaVersion1FVW2ksx0MtP6LB6b9qMlAJEJTZq8lpBMwVsxb2Yic": {
             "Type": "AWS::Lambda::Version",
             "DeletionPolicy": "Retain",
             "Properties": {
               "FunctionName": {
                 "Ref": "UpdateUserRoleLambdaFunction"
               },
-              "CodeSha256": "wEOApJd9whXJERVpVKkFYWr3iNuJ32Mu3VGO0dalyvs="
+              "CodeSha256": "F3A6fE84X2b8aPWlEe5zHLcxAJTLHeygQT+3Jm1KiIw="
             }
           },
-          "ToggleUserStatusLambdaVersionVOxJ3eakcugIJ5Ec2avKgwQFpXrh8soWajPtC4Rg3A": {
+          "ToggleUserStatusLambdaVersionN81wGwZ6BkU3VQW7lRsG8NmXQmkzZxTSGPKZmWHfLU": {
             "Type": "AWS::Lambda::Version",
             "DeletionPolicy": "Retain",
             "Properties": {
               "FunctionName": {
                 "Ref": "ToggleUserStatusLambdaFunction"
               },
-              "CodeSha256": "wEOApJd9whXJERVpVKkFYWr3iNuJ32Mu3VGO0dalyvs="
+              "CodeSha256": "F3A6fE84X2b8aPWlEe5zHLcxAJTLHeygQT+3Jm1KiIw="
+            }
+          },
+          "DeleteUserLambdaVersionJ3nYuIAlOX1V12WQK6mjS8kqfhmn3ys6vN3Xel3Qk0": {
+            "Type": "AWS::Lambda::Version",
+            "DeletionPolicy": "Retain",
+            "Properties": {
+              "FunctionName": {
+                "Ref": "DeleteUserLambdaFunction"
+              },
+              "CodeSha256": "F3A6fE84X2b8aPWlEe5zHLcxAJTLHeygQT+3Jm1KiIw="
             }
           },
           "HttpApi": {
@@ -3033,6 +3239,81 @@
             },
             "DependsOn": "HttpApiIntegrationToggleUserStatus"
           },
+          "DeleteUserLambdaPermissionHttpApi": {
+            "Type": "AWS::Lambda::Permission",
+            "Properties": {
+              "FunctionName": {
+                "Fn::GetAtt": [
+                  "DeleteUserLambdaFunction",
+                  "Arn"
+                ]
+              },
+              "Action": "lambda:InvokeFunction",
+              "Principal": "apigateway.amazonaws.com",
+              "SourceArn": {
+                "Fn::Join": [
+                  "",
+                  [
+                    "arn:",
+                    {
+                      "Ref": "AWS::Partition"
+                    },
+                    ":execute-api:",
+                    {
+                      "Ref": "AWS::Region"
+                    },
+                    ":",
+                    {
+                      "Ref": "AWS::AccountId"
+                    },
+                    ":",
+                    {
+                      "Ref": "HttpApi"
+                    },
+                    "/*"
+                  ]
+                ]
+              }
+            }
+          },
+          "HttpApiIntegrationDeleteUser": {
+            "Type": "AWS::ApiGatewayV2::Integration",
+            "Properties": {
+              "ApiId": {
+                "Ref": "HttpApi"
+              },
+              "IntegrationType": "AWS_PROXY",
+              "IntegrationUri": {
+                "Fn::GetAtt": [
+                  "DeleteUserLambdaFunction",
+                  "Arn"
+                ]
+              },
+              "PayloadFormatVersion": "2.0",
+              "TimeoutInMillis": 30000
+            }
+          },
+          "HttpApiRouteDeleteApiAdminUsersIdVar": {
+            "Type": "AWS::ApiGatewayV2::Route",
+            "Properties": {
+              "ApiId": {
+                "Ref": "HttpApi"
+              },
+              "RouteKey": "DELETE /api/admin/users/{id}",
+              "Target": {
+                "Fn::Join": [
+                  "/",
+                  [
+                    "integrations",
+                    {
+                      "Ref": "HttpApiIntegrationDeleteUser"
+                    }
+                  ]
+                ]
+              }
+            },
+            "DependsOn": "HttpApiIntegrationDeleteUser"
+          },
           "CatfecitoTable": {
             "Type": "AWS::DynamoDB::Table",
             "Properties": {
@@ -3097,7 +3378,7 @@
           "RegisterLambdaFunctionQualifiedArn": {
             "Description": "Current Lambda function version",
             "Value": {
-              "Ref": "RegisterLambdaVersioned2bXe1FjHab7eN5aSiIavEGCB8r8HHvHn1564r7Y"
+              "Ref": "RegisterLambdaVersionZJHs8VKpcopJJS5dS3RBTpWMm7pb9lsx31VqiHOy8SI"
             },
             "Export": {
               "Name": "sls-catfecito-backend-dev-RegisterLambdaFunctionQualifiedArn"
@@ -3106,7 +3387,7 @@
           "LoginLambdaFunctionQualifiedArn": {
             "Description": "Current Lambda function version",
             "Value": {
-              "Ref": "LoginLambdaVersiontbEL2fyGUpfXA4pRKA1TjPbKw4XP9comdcKUrbN5pw"
+              "Ref": "LoginLambdaVersionDeUsAEwlfckwJRQoOz0bYGVAcfDWEEcCrlUF0SgFQ8"
             },
             "Export": {
               "Name": "sls-catfecito-backend-dev-LoginLambdaFunctionQualifiedArn"
@@ -3115,7 +3396,7 @@
           "GetProfileLambdaFunctionQualifiedArn": {
             "Description": "Current Lambda function version",
             "Value": {
-              "Ref": "GetProfileLambdaVersionFvWuH85LCtD1ZZPqXmdJ0NNJVEzoxYnNhXEKs5zRyk"
+              "Ref": "GetProfileLambdaVersionUzHHzJfsGyLoh34X6oQ6ZeCqVojmHJPclW2rS0S0"
             },
             "Export": {
               "Name": "sls-catfecito-backend-dev-GetProfileLambdaFunctionQualifiedArn"
@@ -3124,7 +3405,7 @@
           "UpdateProfileLambdaFunctionQualifiedArn": {
             "Description": "Current Lambda function version",
             "Value": {
-              "Ref": "UpdateProfileLambdaVersionrgpVtbFEFAkxz1gnnqe6J0Of2CVOs5BC24uyehLJW8"
+              "Ref": "UpdateProfileLambdaVersionIUq2phjeRO5cCFIAdiRDpvxKcukLGUeurXDDppMSW4"
             },
             "Export": {
               "Name": "sls-catfecito-backend-dev-UpdateProfileLambdaFunctionQualifiedArn"
@@ -3133,7 +3414,7 @@
           "UpdateAddressLambdaFunctionQualifiedArn": {
             "Description": "Current Lambda function version",
             "Value": {
-              "Ref": "UpdateAddressLambdaVersion3RqbihDfAOUcD8mnnrVRFrGuTLx1g9M38f3NJfbjE"
+              "Ref": "UpdateAddressLambdaVersionn5muJCkau6I2XCgj77Jc1PXqujWUhMvbvKvDcSvWRg"
             },
             "Export": {
               "Name": "sls-catfecito-backend-dev-UpdateAddressLambdaFunctionQualifiedArn"
@@ -3143,7 +3424,7 @@
           "GetAllUsersLambdaFunctionQualifiedArn": {
             "Description": "Current Lambda function version",
             "Value": {
-              "Ref": "GetAllUsersLambdaVersion6rG1lG2Z5q7luMfvZZImDUULchHjVsvA6lc68BB1FiU"
+              "Ref": "GetAllUsersLambdaVersionh7lv8wBgGoJzw2PPC1rEsCCxw9NwaJmvHn1Mv3Tx9JQ"
             },
             "Export": {
               "Name": "sls-catfecito-backend-dev-GetAllUsersLambdaFunctionQualifiedArn"
@@ -3152,7 +3433,7 @@
           "GetUserByIdLambdaFunctionQualifiedArn": {
             "Description": "Current Lambda function version",
             "Value": {
-              "Ref": "GetUserByIdLambdaVersion58SXVpS6bi4uk72BT4GH28R5VovjhDDbqRbfecgYng"
+              "Ref": "GetUserByIdLambdaVersionst3Z8uaPwZP2F6m6mZvvgOQqRbw9toCsI9k99YR30"
             },
             "Export": {
               "Name": "sls-catfecito-backend-dev-GetUserByIdLambdaFunctionQualifiedArn"
@@ -3161,7 +3442,7 @@
           "UpdateUserRoleLambdaFunctionQualifiedArn": {
             "Description": "Current Lambda function version",
             "Value": {
-              "Ref": "UpdateUserRoleLambdaVersion5iBX5mZXtWLRVFxlQmyfKwJiumTqQwqCl11qqkcg4ZU"
+              "Ref": "UpdateUserRoleLambdaVersion1FVW2ksx0MtP6LB6b9qMlAJEJTZq8lpBMwVsxb2Yic"
             },
             "Export": {
               "Name": "sls-catfecito-backend-dev-UpdateUserRoleLambdaFunctionQualifiedArn"
@@ -3170,10 +3451,19 @@
           "ToggleUserStatusLambdaFunctionQualifiedArn": {
             "Description": "Current Lambda function version",
             "Value": {
-              "Ref": "ToggleUserStatusLambdaVersionVOxJ3eakcugIJ5Ec2avKgwQFpXrh8soWajPtC4Rg3A"
+              "Ref": "ToggleUserStatusLambdaVersionN81wGwZ6BkU3VQW7lRsG8NmXQmkzZxTSGPKZmWHfLU"
             },
             "Export": {
               "Name": "sls-catfecito-backend-dev-ToggleUserStatusLambdaFunctionQualifiedArn"
+            }
+          },
+          "DeleteUserLambdaFunctionQualifiedArn": {
+            "Description": "Current Lambda function version",
+            "Value": {
+              "Ref": "DeleteUserLambdaVersionJ3nYuIAlOX1V12WQK6mjS8kqfhmn3ys6vN3Xel3Qk0"
+            },
+            "Export": {
+              "Name": "sls-catfecito-backend-dev-DeleteUserLambdaFunctionQualifiedArn"
             }
           },
           "HttpApiId": {
@@ -3223,7 +3513,7 @@
       "serviceProvider": null,
       "instanceParameters": null
     },
-    "serviceRawFile": "service: catfecito-backend\r\n\r\nframeworkVersion: \"^4.0.0\"\r\n\r\nprovider:\r\n  name: aws\r\n  runtime: nodejs18.x\r\n  region: sa-east-1\r\n  stage: ${opt:stage, 'dev'}\r\n  environment:\r\n    DYNAMODB_TABLE: ${self:service}-${self:provider.stage}\r\n    JWT_SECRET: ${env:JWT_SECRET}\r\n    JWT_EXPIRES_IN: ${env:JWT_EXPIRES_IN, '7d'}\r\n    COGNITO_USER_POOL_ID: ${env:COGNITO_USER_POOL_ID}\r\n    COGNITO_CLIENT_ID: ${env:COGNITO_CLIENT_ID}\r\n    COGNITO_CLIENT_SECRET: ${env:COGNITO_CLIENT_SECRET, ''}\r\n  iam:\r\n    role:\r\n      statements:\r\n        - Effect: Allow\r\n          Action:\r\n            - dynamodb:Query\r\n            - dynamodb:Scan\r\n            - dynamodb:GetItem\r\n            - dynamodb:PutItem\r\n            - dynamodb:UpdateItem\r\n            - dynamodb:DeleteItem\r\n            - dynamodb:BatchGetItem\r\n            - dynamodb:BatchWriteItem\r\n          Resource:\r\n            - \"arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.DYNAMODB_TABLE}\"\r\n            - \"arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.DYNAMODB_TABLE}/index/*\"\r\n\r\n        - Effect: Allow\r\n          Action:\r\n            - cognito-idp:AdminCreateUser\r\n            - cognito-idp:AdminSetUserPassword\r\n            - cognito-idp:AdminInitiateAuth\r\n            - cognito-idp:AdminRespondToAuthChallenge\r\n            - cognito-idp:GlobalSignOut\r\n            - cognito-idp:ChangePassword\r\n          Resource:\r\n            - \"arn:aws:cognito-idp:${self:provider.region}:*:userpool/${env:COGNITO_USER_POOL_ID}\"\r\n\r\nfunctions:\r\n  register:\r\n    handler: server/functions/auth/register.createUser\r\n    events:\r\n      - httpApi:\r\n          path: /api/auth/register\r\n          method: POST\r\n\r\n  login:\r\n    handler: server/functions/auth/login.loginUser\r\n    events:\r\n      - httpApi:\r\n          path: /api/auth/login\r\n          method: POST\r\n\r\n  getProfile:\r\n    handler: server/functions/users/getProfile.getProfile\r\n    events:\r\n      - httpApi:\r\n          path: /api/users/profile\r\n          method: GET\r\n\r\n  updateProfile:\r\n    handler: server/functions/users/updateProfile.updateProfile\r\n    events:\r\n      - httpApi:\r\n          path: /api/users/profile\r\n          method: PUT\r\n\r\n  updateAddress:\r\n    handler: server/functions/users/updateAddress.updateAddress\r\n    events:\r\n      - httpApi:\r\n          path: /api/users/address\r\n          method: PUT\r\n\r\n  changePassword:\r\n    handler: server/functions/users/changePassword.changePassword\r\n    events:\r\n      - httpApi:\r\n          path: /api/users/password\r\n          method: PUT\r\n\r\n  # Admin Functions\r\n  getAllUsers:\r\n    handler: server/functions/admin/getAllUsers.getAllUsers\r\n    events:\r\n      - httpApi:\r\n          path: /api/admin/users\r\n          method: GET\r\n\r\n  getUserById:\r\n    handler: server/functions/admin/getUserById.getUserById\r\n    events:\r\n      - httpApi:\r\n          path: /api/admin/users/{id}\r\n          method: GET\r\n\r\n  updateUserRole:\r\n    handler: server/functions/admin/updateUserRole.updateUserRole\r\n    events:\r\n      - httpApi:\r\n          path: /api/admin/users/{id}/role\r\n          method: PATCH\r\n\r\n  toggleUserStatus:\r\n    handler: server/functions/admin/toggleUserStatus.toggleUserStatus\r\n    events:\r\n      - httpApi:\r\n          path: /api/admin/users/{id}/status\r\n          method: PATCH\r\n\r\nresources:\r\n  Resources:\r\n    CatfecitoTable:\r\n      Type: AWS::DynamoDB::Table\r\n      Properties:\r\n        TableName: ${self:provider.environment.DYNAMODB_TABLE}\r\n        BillingMode: PAY_PER_REQUEST\r\n        AttributeDefinitions:\r\n          - AttributeName: PK\r\n            AttributeType: S\r\n          - AttributeName: SK\r\n            AttributeType: S\r\n          - AttributeName: GSI1PK\r\n            AttributeType: S\r\n          - AttributeName: GSI1SK\r\n            AttributeType: S\r\n        KeySchema:\r\n          - AttributeName: PK\r\n            KeyType: HASH\r\n          - AttributeName: SK\r\n            KeyType: RANGE\r\n        GlobalSecondaryIndexes:\r\n          - IndexName: GSI1\r\n            KeySchema:\r\n              - AttributeName: GSI1PK\r\n                KeyType: HASH\r\n              - AttributeName: GSI1SK\r\n                KeyType: RANGE\r\n            Projection:\r\n              ProjectionType: ALL\r\n",
+    "serviceRawFile": "service: catfecito-backend\r\n\r\nframeworkVersion: \"^4.0.0\"\r\n\r\nprovider:\r\n  name: aws\r\n  runtime: nodejs18.x\r\n  region: sa-east-1\r\n  stage: ${opt:stage, 'dev'}\r\n  environment:\r\n    DYNAMODB_TABLE: ${self:service}-${self:provider.stage}\r\n    JWT_SECRET: ${env:JWT_SECRET}\r\n    JWT_EXPIRES_IN: ${env:JWT_EXPIRES_IN, '7d'}\r\n    COGNITO_USER_POOL_ID: ${env:COGNITO_USER_POOL_ID}\r\n    COGNITO_CLIENT_ID: ${env:COGNITO_CLIENT_ID}\r\n    COGNITO_CLIENT_SECRET: ${env:COGNITO_CLIENT_SECRET, ''}\r\n  iam:\r\n    role:\r\n      statements:\r\n        - Effect: Allow\r\n          Action:\r\n            - dynamodb:Query\r\n            - dynamodb:Scan\r\n            - dynamodb:GetItem\r\n            - dynamodb:PutItem\r\n            - dynamodb:UpdateItem\r\n            - dynamodb:DeleteItem\r\n            - dynamodb:BatchGetItem\r\n            - dynamodb:BatchWriteItem\r\n          Resource:\r\n            - \"arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.DYNAMODB_TABLE}\"\r\n            - \"arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.DYNAMODB_TABLE}/index/*\"\r\n\r\n        - Effect: Allow\r\n          Action:\r\n            - cognito-idp:AdminCreateUser\r\n            - cognito-idp:AdminSetUserPassword\r\n            - cognito-idp:AdminInitiateAuth\r\n            - cognito-idp:AdminRespondToAuthChallenge\r\n            - cognito-idp:GlobalSignOut\r\n            - cognito-idp:ChangePassword\r\n            - cognito-idp:AdminDeleteUser\r\n          Resource:\r\n            - \"arn:aws:cognito-idp:${self:provider.region}:*:userpool/${env:COGNITO_USER_POOL_ID}\"\r\n\r\nfunctions:\r\n  register:\r\n    handler: server/functions/auth/register.createUser\r\n    events:\r\n      - httpApi:\r\n          path: /api/auth/register\r\n          method: POST\r\n\r\n  login:\r\n    handler: server/functions/auth/login.loginUser\r\n    events:\r\n      - httpApi:\r\n          path: /api/auth/login\r\n          method: POST\r\n\r\n  getProfile:\r\n    handler: server/functions/users/getProfile.getProfile\r\n    events:\r\n      - httpApi:\r\n          path: /api/users/profile\r\n          method: GET\r\n\r\n  updateProfile:\r\n    handler: server/functions/users/updateProfile.updateProfile\r\n    events:\r\n      - httpApi:\r\n          path: /api/users/profile\r\n          method: PUT\r\n\r\n  updateAddress:\r\n    handler: server/functions/users/updateAddress.updateAddress\r\n    events:\r\n      - httpApi:\r\n          path: /api/users/address\r\n          method: PUT\r\n\r\n  changePassword:\r\n    handler: server/functions/users/changePassword.changePassword\r\n    events:\r\n      - httpApi:\r\n          path: /api/users/password\r\n          method: PUT\r\n\r\n  # Admin Functions\r\n  getAllUsers:\r\n    handler: server/functions/admin/getAllUsers.getAllUsers\r\n    events:\r\n      - httpApi:\r\n          path: /api/admin/users\r\n          method: GET\r\n\r\n  getUserById:\r\n    handler: server/functions/admin/getUserById.getUserById\r\n    events:\r\n      - httpApi:\r\n          path: /api/admin/users/{id}\r\n          method: GET\r\n\r\n  updateUserRole:\r\n    handler: server/functions/admin/updateUserRole.updateUserRole\r\n    events:\r\n      - httpApi:\r\n          path: /api/admin/users/{id}/role\r\n          method: PATCH\r\n\r\n  toggleUserStatus:\r\n    handler: server/functions/admin/toggleUserStatus.toggleUserStatus\r\n    events:\r\n      - httpApi:\r\n          path: /api/admin/users/{id}/status\r\n          method: PATCH\r\n\r\n  deleteUser:\r\n    handler: server/functions/admin/deleteUser.deleteUser\r\n    events:\r\n      - httpApi:\r\n          path: /api/admin/users/{id}\r\n          method: DELETE\r\n\r\nresources:\r\n  Resources:\r\n    CatfecitoTable:\r\n      Type: AWS::DynamoDB::Table\r\n      Properties:\r\n        TableName: ${self:provider.environment.DYNAMODB_TABLE}\r\n        BillingMode: PAY_PER_REQUEST\r\n        AttributeDefinitions:\r\n          - AttributeName: PK\r\n            AttributeType: S\r\n          - AttributeName: SK\r\n            AttributeType: S\r\n          - AttributeName: GSI1PK\r\n            AttributeType: S\r\n          - AttributeName: GSI1SK\r\n            AttributeType: S\r\n        KeySchema:\r\n          - AttributeName: PK\r\n            KeyType: HASH\r\n          - AttributeName: SK\r\n            KeyType: RANGE\r\n        GlobalSecondaryIndexes:\r\n          - IndexName: GSI1\r\n            KeySchema:\r\n              - AttributeName: GSI1PK\r\n                KeyType: HASH\r\n              - AttributeName: GSI1SK\r\n                KeyType: RANGE\r\n            Projection:\r\n              ProjectionType: ALL\r\n",
     "command": [
       "deploy"
     ],
@@ -3238,68 +3528,44 @@
     "serviceProviderAwsCfStackName": "catfecito-backend-dev",
     "serviceProviderAwsCfStackId": "arn:aws:cloudformation:sa-east-1:553916359458:stack/catfecito-backend-dev/b92df4a0-f726-11f0-8342-06bde38fa613",
     "serviceProviderAwsCfStackCreated": "2026-01-22T00:10:14.091Z",
-    "serviceProviderAwsCfStackUpdated": "2026-01-24T23:02:58.857Z",
+    "serviceProviderAwsCfStackUpdated": "2026-01-25T00:19:26.730Z",
     "serviceProviderAwsCfStackStatus": "UPDATE_COMPLETE",
     "serviceProviderAwsCfStackOutputs": [
       {
-        "OutputKey": "UpdateProfileLambdaFunctionQualifiedArn",
-        "OutputValue": "arn:aws:lambda:sa-east-1:553916359458:function:catfecito-backend-dev-updateProfile:11",
+        "OutputKey": "DeleteUserLambdaFunctionQualifiedArn",
+        "OutputValue": "arn:aws:lambda:sa-east-1:553916359458:function:catfecito-backend-dev-deleteUser:4",
         "Description": "Current Lambda function version",
-        "ExportName": "sls-catfecito-backend-dev-UpdateProfileLambdaFunctionQualifiedArn"
+        "ExportName": "sls-catfecito-backend-dev-DeleteUserLambdaFunctionQualifiedArn"
       },
       {
         "OutputKey": "UpdateAddressLambdaFunctionQualifiedArn",
-        "OutputValue": "arn:aws:lambda:sa-east-1:553916359458:function:catfecito-backend-dev-updateAddress:8",
+        "OutputValue": "arn:aws:lambda:sa-east-1:553916359458:function:catfecito-backend-dev-updateAddress:13",
         "Description": "Current Lambda function version",
         "ExportName": "sls-catfecito-backend-dev-UpdateAddressLambdaFunctionQualifiedArn"
       },
       {
         "OutputKey": "UpdateUserRoleLambdaFunctionQualifiedArn",
-        "OutputValue": "arn:aws:lambda:sa-east-1:553916359458:function:catfecito-backend-dev-updateUserRole:1",
+        "OutputValue": "arn:aws:lambda:sa-east-1:553916359458:function:catfecito-backend-dev-updateUserRole:6",
         "Description": "Current Lambda function version",
         "ExportName": "sls-catfecito-backend-dev-UpdateUserRoleLambdaFunctionQualifiedArn"
       },
       {
-        "OutputKey": "GetAllUsersLambdaFunctionQualifiedArn",
-        "OutputValue": "arn:aws:lambda:sa-east-1:553916359458:function:catfecito-backend-dev-getAllUsers:6",
-        "Description": "Current Lambda function version",
-        "ExportName": "sls-catfecito-backend-dev-GetAllUsersLambdaFunctionQualifiedArn"
-      },
-      {
         "OutputKey": "RegisterLambdaFunctionQualifiedArn",
-        "OutputValue": "arn:aws:lambda:sa-east-1:553916359458:function:catfecito-backend-dev-register:32",
+        "OutputValue": "arn:aws:lambda:sa-east-1:553916359458:function:catfecito-backend-dev-register:37",
         "Description": "Current Lambda function version",
         "ExportName": "sls-catfecito-backend-dev-RegisterLambdaFunctionQualifiedArn"
       },
       {
-        "OutputKey": "GetProfileLambdaFunctionQualifiedArn",
-        "OutputValue": "arn:aws:lambda:sa-east-1:553916359458:function:catfecito-backend-dev-getProfile:16",
+        "OutputKey": "ToggleUserStatusLambdaFunctionQualifiedArn",
+        "OutputValue": "arn:aws:lambda:sa-east-1:553916359458:function:catfecito-backend-dev-toggleUserStatus:5",
         "Description": "Current Lambda function version",
-        "ExportName": "sls-catfecito-backend-dev-GetProfileLambdaFunctionQualifiedArn"
-      },
-      {
-        "OutputKey": "ChangePasswordLambdaFunctionQualifiedArn",
-        "OutputValue": "arn:aws:lambda:sa-east-1:553916359458:function:catfecito-backend-dev-changePassword:7",
-        "Description": "Current Lambda function version",
-        "ExportName": "sls-catfecito-backend-dev-ChangePasswordLambdaFunctionQualifiedArn"
+        "ExportName": "sls-catfecito-backend-dev-ToggleUserStatusLambdaFunctionQualifiedArn"
       },
       {
         "OutputKey": "HttpApiId",
         "OutputValue": "oc4084kllb",
         "Description": "Id of the HTTP API",
         "ExportName": "sls-catfecito-backend-dev-HttpApiId"
-      },
-      {
-        "OutputKey": "GetUserByIdLambdaFunctionQualifiedArn",
-        "OutputValue": "arn:aws:lambda:sa-east-1:553916359458:function:catfecito-backend-dev-getUserById:2",
-        "Description": "Current Lambda function version",
-        "ExportName": "sls-catfecito-backend-dev-GetUserByIdLambdaFunctionQualifiedArn"
-      },
-      {
-        "OutputKey": "LoginLambdaFunctionQualifiedArn",
-        "OutputValue": "arn:aws:lambda:sa-east-1:553916359458:function:catfecito-backend-dev-login:21",
-        "Description": "Current Lambda function version",
-        "ExportName": "sls-catfecito-backend-dev-LoginLambdaFunctionQualifiedArn"
       },
       {
         "OutputKey": "ServerlessDeploymentBucketName",
@@ -3311,6 +3577,42 @@
         "OutputValue": "https://oc4084kllb.execute-api.sa-east-1.amazonaws.com",
         "Description": "URL of the HTTP API",
         "ExportName": "sls-catfecito-backend-dev-HttpApiUrl"
+      },
+      {
+        "OutputKey": "UpdateProfileLambdaFunctionQualifiedArn",
+        "OutputValue": "arn:aws:lambda:sa-east-1:553916359458:function:catfecito-backend-dev-updateProfile:16",
+        "Description": "Current Lambda function version",
+        "ExportName": "sls-catfecito-backend-dev-UpdateProfileLambdaFunctionQualifiedArn"
+      },
+      {
+        "OutputKey": "GetAllUsersLambdaFunctionQualifiedArn",
+        "OutputValue": "arn:aws:lambda:sa-east-1:553916359458:function:catfecito-backend-dev-getAllUsers:11",
+        "Description": "Current Lambda function version",
+        "ExportName": "sls-catfecito-backend-dev-GetAllUsersLambdaFunctionQualifiedArn"
+      },
+      {
+        "OutputKey": "GetProfileLambdaFunctionQualifiedArn",
+        "OutputValue": "arn:aws:lambda:sa-east-1:553916359458:function:catfecito-backend-dev-getProfile:21",
+        "Description": "Current Lambda function version",
+        "ExportName": "sls-catfecito-backend-dev-GetProfileLambdaFunctionQualifiedArn"
+      },
+      {
+        "OutputKey": "ChangePasswordLambdaFunctionQualifiedArn",
+        "OutputValue": "arn:aws:lambda:sa-east-1:553916359458:function:catfecito-backend-dev-changePassword:12",
+        "Description": "Current Lambda function version",
+        "ExportName": "sls-catfecito-backend-dev-ChangePasswordLambdaFunctionQualifiedArn"
+      },
+      {
+        "OutputKey": "GetUserByIdLambdaFunctionQualifiedArn",
+        "OutputValue": "arn:aws:lambda:sa-east-1:553916359458:function:catfecito-backend-dev-getUserById:7",
+        "Description": "Current Lambda function version",
+        "ExportName": "sls-catfecito-backend-dev-GetUserByIdLambdaFunctionQualifiedArn"
+      },
+      {
+        "OutputKey": "LoginLambdaFunctionQualifiedArn",
+        "OutputValue": "arn:aws:lambda:sa-east-1:553916359458:function:catfecito-backend-dev-login:26",
+        "Description": "Current Lambda function version",
+        "ExportName": "sls-catfecito-backend-dev-LoginLambdaFunctionQualifiedArn"
       }
     ],
     "compiledCloudFormationTemplate": {
@@ -3370,6 +3672,12 @@
           "Type": "AWS::Logs::LogGroup",
           "Properties": {
             "LogGroupName": "/aws/lambda/catfecito-backend-dev-toggleUserStatus"
+          }
+        },
+        "DeleteUserLogGroup": {
+          "Type": "AWS::Logs::LogGroup",
+          "Properties": {
+            "LogGroupName": "/aws/lambda/catfecito-backend-dev-deleteUser"
           }
         },
         "IamRoleLambdaExecution": {
@@ -3455,7 +3763,8 @@
                         "cognito-idp:AdminInitiateAuth",
                         "cognito-idp:AdminRespondToAuthChallenge",
                         "cognito-idp:GlobalSignOut",
-                        "cognito-idp:ChangePassword"
+                        "cognito-idp:ChangePassword",
+                        "cognito-idp:AdminDeleteUser"
                       ],
                       "Resource": "arn:aws:cognito-idp:sa-east-1:*:userpool/sa-east-1_pua4g9m7n"
                     }
@@ -3484,7 +3793,7 @@
           "Properties": {
             "Code": {
               "S3Bucket": "serverless-framework-deployments-sa-east-1-b389c947-1ea1",
-              "S3Key": "serverless/catfecito-backend/dev/1769297357225-2026-01-24T23:29:17.225Z/catfecito-backend.zip"
+              "S3Key": "serverless/catfecito-backend/dev/1769300761579-2026-01-25T00:26:01.579Z/catfecito-backend.zip"
             },
             "Handler": "server/functions/auth/register.createUser",
             "Runtime": "nodejs18.x",
@@ -3517,7 +3826,7 @@
           "Properties": {
             "Code": {
               "S3Bucket": "serverless-framework-deployments-sa-east-1-b389c947-1ea1",
-              "S3Key": "serverless/catfecito-backend/dev/1769297357225-2026-01-24T23:29:17.225Z/catfecito-backend.zip"
+              "S3Key": "serverless/catfecito-backend/dev/1769300761579-2026-01-25T00:26:01.579Z/catfecito-backend.zip"
             },
             "Handler": "server/functions/auth/login.loginUser",
             "Runtime": "nodejs18.x",
@@ -3550,7 +3859,7 @@
           "Properties": {
             "Code": {
               "S3Bucket": "serverless-framework-deployments-sa-east-1-b389c947-1ea1",
-              "S3Key": "serverless/catfecito-backend/dev/1769297357225-2026-01-24T23:29:17.225Z/catfecito-backend.zip"
+              "S3Key": "serverless/catfecito-backend/dev/1769300761579-2026-01-25T00:26:01.579Z/catfecito-backend.zip"
             },
             "Handler": "server/functions/users/getProfile.getProfile",
             "Runtime": "nodejs18.x",
@@ -3583,7 +3892,7 @@
           "Properties": {
             "Code": {
               "S3Bucket": "serverless-framework-deployments-sa-east-1-b389c947-1ea1",
-              "S3Key": "serverless/catfecito-backend/dev/1769297357225-2026-01-24T23:29:17.225Z/catfecito-backend.zip"
+              "S3Key": "serverless/catfecito-backend/dev/1769300761579-2026-01-25T00:26:01.579Z/catfecito-backend.zip"
             },
             "Handler": "server/functions/users/updateProfile.updateProfile",
             "Runtime": "nodejs18.x",
@@ -3616,7 +3925,7 @@
           "Properties": {
             "Code": {
               "S3Bucket": "serverless-framework-deployments-sa-east-1-b389c947-1ea1",
-              "S3Key": "serverless/catfecito-backend/dev/1769297357225-2026-01-24T23:29:17.225Z/catfecito-backend.zip"
+              "S3Key": "serverless/catfecito-backend/dev/1769300761579-2026-01-25T00:26:01.579Z/catfecito-backend.zip"
             },
             "Handler": "server/functions/users/updateAddress.updateAddress",
             "Runtime": "nodejs18.x",
@@ -3650,7 +3959,7 @@
           "Properties": {
             "Code": {
               "S3Bucket": "serverless-framework-deployments-sa-east-1-b389c947-1ea1",
-              "S3Key": "serverless/catfecito-backend/dev/1769297357225-2026-01-24T23:29:17.225Z/catfecito-backend.zip"
+              "S3Key": "serverless/catfecito-backend/dev/1769300761579-2026-01-25T00:26:01.579Z/catfecito-backend.zip"
             },
             "Handler": "server/functions/admin/getAllUsers.getAllUsers",
             "Runtime": "nodejs18.x",
@@ -3683,7 +3992,7 @@
           "Properties": {
             "Code": {
               "S3Bucket": "serverless-framework-deployments-sa-east-1-b389c947-1ea1",
-              "S3Key": "serverless/catfecito-backend/dev/1769297357225-2026-01-24T23:29:17.225Z/catfecito-backend.zip"
+              "S3Key": "serverless/catfecito-backend/dev/1769300761579-2026-01-25T00:26:01.579Z/catfecito-backend.zip"
             },
             "Handler": "server/functions/admin/getUserById.getUserById",
             "Runtime": "nodejs18.x",
@@ -3716,7 +4025,7 @@
           "Properties": {
             "Code": {
               "S3Bucket": "serverless-framework-deployments-sa-east-1-b389c947-1ea1",
-              "S3Key": "serverless/catfecito-backend/dev/1769297357225-2026-01-24T23:29:17.225Z/catfecito-backend.zip"
+              "S3Key": "serverless/catfecito-backend/dev/1769300761579-2026-01-25T00:26:01.579Z/catfecito-backend.zip"
             },
             "Handler": "server/functions/admin/updateUserRole.updateUserRole",
             "Runtime": "nodejs18.x",
@@ -3749,7 +4058,7 @@
           "Properties": {
             "Code": {
               "S3Bucket": "serverless-framework-deployments-sa-east-1-b389c947-1ea1",
-              "S3Key": "serverless/catfecito-backend/dev/1769297357225-2026-01-24T23:29:17.225Z/catfecito-backend.zip"
+              "S3Key": "serverless/catfecito-backend/dev/1769300761579-2026-01-25T00:26:01.579Z/catfecito-backend.zip"
             },
             "Handler": "server/functions/admin/toggleUserStatus.toggleUserStatus",
             "Runtime": "nodejs18.x",
@@ -3777,95 +4086,138 @@
             "ToggleUserStatusLogGroup"
           ]
         },
-        "RegisterLambdaVersioned2bXe1FjHab7eN5aSiIavEGCB8r8HHvHn1564r7Y": {
+        "DeleteUserLambdaFunction": {
+          "Type": "AWS::Lambda::Function",
+          "Properties": {
+            "Code": {
+              "S3Bucket": "serverless-framework-deployments-sa-east-1-b389c947-1ea1",
+              "S3Key": "serverless/catfecito-backend/dev/1769300761579-2026-01-25T00:26:01.579Z/catfecito-backend.zip"
+            },
+            "Handler": "server/functions/admin/deleteUser.deleteUser",
+            "Runtime": "nodejs18.x",
+            "FunctionName": "catfecito-backend-dev-deleteUser",
+            "MemorySize": 1024,
+            "Timeout": 6,
+            "Environment": {
+              "Variables": {
+                "DYNAMODB_TABLE": "catfecito-backend-dev",
+                "JWT_SECRET": "<REDACTED>",
+                "JWT_EXPIRES_IN": "7d",
+                "COGNITO_USER_POOL_ID": "sa-east-1_pua4g9m7n",
+                "COGNITO_CLIENT_ID": "426ee7m0co9le8poclthg5ict6",
+                "COGNITO_CLIENT_SECRET": "<REDACTED>"
+              }
+            },
+            "Role": {
+              "Fn::GetAtt": [
+                "IamRoleLambdaExecution",
+                "Arn"
+              ]
+            }
+          },
+          "DependsOn": [
+            "DeleteUserLogGroup"
+          ]
+        },
+        "RegisterLambdaVersionZJHs8VKpcopJJS5dS3RBTpWMm7pb9lsx31VqiHOy8SI": {
           "Type": "AWS::Lambda::Version",
           "DeletionPolicy": "Retain",
           "Properties": {
             "FunctionName": {
               "Ref": "RegisterLambdaFunction"
             },
-            "CodeSha256": "wEOApJd9whXJERVpVKkFYWr3iNuJ32Mu3VGO0dalyvs="
+            "CodeSha256": "F3A6fE84X2b8aPWlEe5zHLcxAJTLHeygQT+3Jm1KiIw="
           }
         },
-        "LoginLambdaVersiontbEL2fyGUpfXA4pRKA1TjPbKw4XP9comdcKUrbN5pw": {
+        "LoginLambdaVersionDeUsAEwlfckwJRQoOz0bYGVAcfDWEEcCrlUF0SgFQ8": {
           "Type": "AWS::Lambda::Version",
           "DeletionPolicy": "Retain",
           "Properties": {
             "FunctionName": {
               "Ref": "LoginLambdaFunction"
             },
-            "CodeSha256": "wEOApJd9whXJERVpVKkFYWr3iNuJ32Mu3VGO0dalyvs="
+            "CodeSha256": "F3A6fE84X2b8aPWlEe5zHLcxAJTLHeygQT+3Jm1KiIw="
           }
         },
-        "GetProfileLambdaVersionFvWuH85LCtD1ZZPqXmdJ0NNJVEzoxYnNhXEKs5zRyk": {
+        "GetProfileLambdaVersionUzHHzJfsGyLoh34X6oQ6ZeCqVojmHJPclW2rS0S0": {
           "Type": "AWS::Lambda::Version",
           "DeletionPolicy": "Retain",
           "Properties": {
             "FunctionName": {
               "Ref": "GetProfileLambdaFunction"
             },
-            "CodeSha256": "wEOApJd9whXJERVpVKkFYWr3iNuJ32Mu3VGO0dalyvs="
+            "CodeSha256": "F3A6fE84X2b8aPWlEe5zHLcxAJTLHeygQT+3Jm1KiIw="
           }
         },
-        "UpdateProfileLambdaVersionrgpVtbFEFAkxz1gnnqe6J0Of2CVOs5BC24uyehLJW8": {
+        "UpdateProfileLambdaVersionIUq2phjeRO5cCFIAdiRDpvxKcukLGUeurXDDppMSW4": {
           "Type": "AWS::Lambda::Version",
           "DeletionPolicy": "Retain",
           "Properties": {
             "FunctionName": {
               "Ref": "UpdateProfileLambdaFunction"
             },
-            "CodeSha256": "wEOApJd9whXJERVpVKkFYWr3iNuJ32Mu3VGO0dalyvs="
+            "CodeSha256": "F3A6fE84X2b8aPWlEe5zHLcxAJTLHeygQT+3Jm1KiIw="
           }
         },
-        "UpdateAddressLambdaVersion3RqbihDfAOUcD8mnnrVRFrGuTLx1g9M38f3NJfbjE": {
+        "UpdateAddressLambdaVersionn5muJCkau6I2XCgj77Jc1PXqujWUhMvbvKvDcSvWRg": {
           "Type": "AWS::Lambda::Version",
           "DeletionPolicy": "Retain",
           "Properties": {
             "FunctionName": {
               "Ref": "UpdateAddressLambdaFunction"
             },
-            "CodeSha256": "wEOApJd9whXJERVpVKkFYWr3iNuJ32Mu3VGO0dalyvs="
+            "CodeSha256": "F3A6fE84X2b8aPWlEe5zHLcxAJTLHeygQT+3Jm1KiIw="
           }
         },
-        "ChangePasswordLambdaVersionQbZZZ3Q9TWUP6r0V62esKPVtL0mX7NsA3aFth7jbrps": "<REDACTED>",
-        "GetAllUsersLambdaVersion6rG1lG2Z5q7luMfvZZImDUULchHjVsvA6lc68BB1FiU": {
+        "ChangePasswordLambdaVersionMHzOwGSBBDngBfEEpxJSxvfylYRzmI68PYv3pzI2iHc": "<REDACTED>",
+        "GetAllUsersLambdaVersionh7lv8wBgGoJzw2PPC1rEsCCxw9NwaJmvHn1Mv3Tx9JQ": {
           "Type": "AWS::Lambda::Version",
           "DeletionPolicy": "Retain",
           "Properties": {
             "FunctionName": {
               "Ref": "GetAllUsersLambdaFunction"
             },
-            "CodeSha256": "wEOApJd9whXJERVpVKkFYWr3iNuJ32Mu3VGO0dalyvs="
+            "CodeSha256": "F3A6fE84X2b8aPWlEe5zHLcxAJTLHeygQT+3Jm1KiIw="
           }
         },
-        "GetUserByIdLambdaVersion58SXVpS6bi4uk72BT4GH28R5VovjhDDbqRbfecgYng": {
+        "GetUserByIdLambdaVersionst3Z8uaPwZP2F6m6mZvvgOQqRbw9toCsI9k99YR30": {
           "Type": "AWS::Lambda::Version",
           "DeletionPolicy": "Retain",
           "Properties": {
             "FunctionName": {
               "Ref": "GetUserByIdLambdaFunction"
             },
-            "CodeSha256": "wEOApJd9whXJERVpVKkFYWr3iNuJ32Mu3VGO0dalyvs="
+            "CodeSha256": "F3A6fE84X2b8aPWlEe5zHLcxAJTLHeygQT+3Jm1KiIw="
           }
         },
-        "UpdateUserRoleLambdaVersion5iBX5mZXtWLRVFxlQmyfKwJiumTqQwqCl11qqkcg4ZU": {
+        "UpdateUserRoleLambdaVersion1FVW2ksx0MtP6LB6b9qMlAJEJTZq8lpBMwVsxb2Yic": {
           "Type": "AWS::Lambda::Version",
           "DeletionPolicy": "Retain",
           "Properties": {
             "FunctionName": {
               "Ref": "UpdateUserRoleLambdaFunction"
             },
-            "CodeSha256": "wEOApJd9whXJERVpVKkFYWr3iNuJ32Mu3VGO0dalyvs="
+            "CodeSha256": "F3A6fE84X2b8aPWlEe5zHLcxAJTLHeygQT+3Jm1KiIw="
           }
         },
-        "ToggleUserStatusLambdaVersionVOxJ3eakcugIJ5Ec2avKgwQFpXrh8soWajPtC4Rg3A": {
+        "ToggleUserStatusLambdaVersionN81wGwZ6BkU3VQW7lRsG8NmXQmkzZxTSGPKZmWHfLU": {
           "Type": "AWS::Lambda::Version",
           "DeletionPolicy": "Retain",
           "Properties": {
             "FunctionName": {
               "Ref": "ToggleUserStatusLambdaFunction"
             },
-            "CodeSha256": "wEOApJd9whXJERVpVKkFYWr3iNuJ32Mu3VGO0dalyvs="
+            "CodeSha256": "F3A6fE84X2b8aPWlEe5zHLcxAJTLHeygQT+3Jm1KiIw="
+          }
+        },
+        "DeleteUserLambdaVersionJ3nYuIAlOX1V12WQK6mjS8kqfhmn3ys6vN3Xel3Qk0": {
+          "Type": "AWS::Lambda::Version",
+          "DeletionPolicy": "Retain",
+          "Properties": {
+            "FunctionName": {
+              "Ref": "DeleteUserLambdaFunction"
+            },
+            "CodeSha256": "F3A6fE84X2b8aPWlEe5zHLcxAJTLHeygQT+3Jm1KiIw="
           }
         },
         "HttpApi": {
@@ -4566,6 +4918,81 @@
           },
           "DependsOn": "HttpApiIntegrationToggleUserStatus"
         },
+        "DeleteUserLambdaPermissionHttpApi": {
+          "Type": "AWS::Lambda::Permission",
+          "Properties": {
+            "FunctionName": {
+              "Fn::GetAtt": [
+                "DeleteUserLambdaFunction",
+                "Arn"
+              ]
+            },
+            "Action": "lambda:InvokeFunction",
+            "Principal": "apigateway.amazonaws.com",
+            "SourceArn": {
+              "Fn::Join": [
+                "",
+                [
+                  "arn:",
+                  {
+                    "Ref": "AWS::Partition"
+                  },
+                  ":execute-api:",
+                  {
+                    "Ref": "AWS::Region"
+                  },
+                  ":",
+                  {
+                    "Ref": "AWS::AccountId"
+                  },
+                  ":",
+                  {
+                    "Ref": "HttpApi"
+                  },
+                  "/*"
+                ]
+              ]
+            }
+          }
+        },
+        "HttpApiIntegrationDeleteUser": {
+          "Type": "AWS::ApiGatewayV2::Integration",
+          "Properties": {
+            "ApiId": {
+              "Ref": "HttpApi"
+            },
+            "IntegrationType": "AWS_PROXY",
+            "IntegrationUri": {
+              "Fn::GetAtt": [
+                "DeleteUserLambdaFunction",
+                "Arn"
+              ]
+            },
+            "PayloadFormatVersion": "2.0",
+            "TimeoutInMillis": 30000
+          }
+        },
+        "HttpApiRouteDeleteApiAdminUsersIdVar": {
+          "Type": "AWS::ApiGatewayV2::Route",
+          "Properties": {
+            "ApiId": {
+              "Ref": "HttpApi"
+            },
+            "RouteKey": "DELETE /api/admin/users/{id}",
+            "Target": {
+              "Fn::Join": [
+                "/",
+                [
+                  "integrations",
+                  {
+                    "Ref": "HttpApiIntegrationDeleteUser"
+                  }
+                ]
+              ]
+            }
+          },
+          "DependsOn": "HttpApiIntegrationDeleteUser"
+        },
         "CatfecitoTable": {
           "Type": "AWS::DynamoDB::Table",
           "Properties": {
@@ -4630,7 +5057,7 @@
         "RegisterLambdaFunctionQualifiedArn": {
           "Description": "Current Lambda function version",
           "Value": {
-            "Ref": "RegisterLambdaVersioned2bXe1FjHab7eN5aSiIavEGCB8r8HHvHn1564r7Y"
+            "Ref": "RegisterLambdaVersionZJHs8VKpcopJJS5dS3RBTpWMm7pb9lsx31VqiHOy8SI"
           },
           "Export": {
             "Name": "sls-catfecito-backend-dev-RegisterLambdaFunctionQualifiedArn"
@@ -4639,7 +5066,7 @@
         "LoginLambdaFunctionQualifiedArn": {
           "Description": "Current Lambda function version",
           "Value": {
-            "Ref": "LoginLambdaVersiontbEL2fyGUpfXA4pRKA1TjPbKw4XP9comdcKUrbN5pw"
+            "Ref": "LoginLambdaVersionDeUsAEwlfckwJRQoOz0bYGVAcfDWEEcCrlUF0SgFQ8"
           },
           "Export": {
             "Name": "sls-catfecito-backend-dev-LoginLambdaFunctionQualifiedArn"
@@ -4648,7 +5075,7 @@
         "GetProfileLambdaFunctionQualifiedArn": {
           "Description": "Current Lambda function version",
           "Value": {
-            "Ref": "GetProfileLambdaVersionFvWuH85LCtD1ZZPqXmdJ0NNJVEzoxYnNhXEKs5zRyk"
+            "Ref": "GetProfileLambdaVersionUzHHzJfsGyLoh34X6oQ6ZeCqVojmHJPclW2rS0S0"
           },
           "Export": {
             "Name": "sls-catfecito-backend-dev-GetProfileLambdaFunctionQualifiedArn"
@@ -4657,7 +5084,7 @@
         "UpdateProfileLambdaFunctionQualifiedArn": {
           "Description": "Current Lambda function version",
           "Value": {
-            "Ref": "UpdateProfileLambdaVersionrgpVtbFEFAkxz1gnnqe6J0Of2CVOs5BC24uyehLJW8"
+            "Ref": "UpdateProfileLambdaVersionIUq2phjeRO5cCFIAdiRDpvxKcukLGUeurXDDppMSW4"
           },
           "Export": {
             "Name": "sls-catfecito-backend-dev-UpdateProfileLambdaFunctionQualifiedArn"
@@ -4666,7 +5093,7 @@
         "UpdateAddressLambdaFunctionQualifiedArn": {
           "Description": "Current Lambda function version",
           "Value": {
-            "Ref": "UpdateAddressLambdaVersion3RqbihDfAOUcD8mnnrVRFrGuTLx1g9M38f3NJfbjE"
+            "Ref": "UpdateAddressLambdaVersionn5muJCkau6I2XCgj77Jc1PXqujWUhMvbvKvDcSvWRg"
           },
           "Export": {
             "Name": "sls-catfecito-backend-dev-UpdateAddressLambdaFunctionQualifiedArn"
@@ -4676,7 +5103,7 @@
         "GetAllUsersLambdaFunctionQualifiedArn": {
           "Description": "Current Lambda function version",
           "Value": {
-            "Ref": "GetAllUsersLambdaVersion6rG1lG2Z5q7luMfvZZImDUULchHjVsvA6lc68BB1FiU"
+            "Ref": "GetAllUsersLambdaVersionh7lv8wBgGoJzw2PPC1rEsCCxw9NwaJmvHn1Mv3Tx9JQ"
           },
           "Export": {
             "Name": "sls-catfecito-backend-dev-GetAllUsersLambdaFunctionQualifiedArn"
@@ -4685,7 +5112,7 @@
         "GetUserByIdLambdaFunctionQualifiedArn": {
           "Description": "Current Lambda function version",
           "Value": {
-            "Ref": "GetUserByIdLambdaVersion58SXVpS6bi4uk72BT4GH28R5VovjhDDbqRbfecgYng"
+            "Ref": "GetUserByIdLambdaVersionst3Z8uaPwZP2F6m6mZvvgOQqRbw9toCsI9k99YR30"
           },
           "Export": {
             "Name": "sls-catfecito-backend-dev-GetUserByIdLambdaFunctionQualifiedArn"
@@ -4694,7 +5121,7 @@
         "UpdateUserRoleLambdaFunctionQualifiedArn": {
           "Description": "Current Lambda function version",
           "Value": {
-            "Ref": "UpdateUserRoleLambdaVersion5iBX5mZXtWLRVFxlQmyfKwJiumTqQwqCl11qqkcg4ZU"
+            "Ref": "UpdateUserRoleLambdaVersion1FVW2ksx0MtP6LB6b9qMlAJEJTZq8lpBMwVsxb2Yic"
           },
           "Export": {
             "Name": "sls-catfecito-backend-dev-UpdateUserRoleLambdaFunctionQualifiedArn"
@@ -4703,10 +5130,19 @@
         "ToggleUserStatusLambdaFunctionQualifiedArn": {
           "Description": "Current Lambda function version",
           "Value": {
-            "Ref": "ToggleUserStatusLambdaVersionVOxJ3eakcugIJ5Ec2avKgwQFpXrh8soWajPtC4Rg3A"
+            "Ref": "ToggleUserStatusLambdaVersionN81wGwZ6BkU3VQW7lRsG8NmXQmkzZxTSGPKZmWHfLU"
           },
           "Export": {
             "Name": "sls-catfecito-backend-dev-ToggleUserStatusLambdaFunctionQualifiedArn"
+          }
+        },
+        "DeleteUserLambdaFunctionQualifiedArn": {
+          "Description": "Current Lambda function version",
+          "Value": {
+            "Ref": "DeleteUserLambdaVersionJ3nYuIAlOX1V12WQK6mjS8kqfhmn3ys6vN3Xel3Qk0"
+          },
+          "Export": {
+            "Name": "sls-catfecito-backend-dev-DeleteUserLambdaFunctionQualifiedArn"
           }
         },
         "HttpApiId": {
