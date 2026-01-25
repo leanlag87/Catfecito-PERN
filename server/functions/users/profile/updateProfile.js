@@ -1,13 +1,13 @@
-import { docClient, TABLE_NAME, getTimestamp } from "../../dynamodb.js";
+import { docClient, TABLE_NAME, getTimestamp } from "../../../dynamodb.js";
 import { UpdateCommand, QueryCommand } from "@aws-sdk/lib-dynamodb";
-import { requireAuth } from "../../utils/auth.js";
-import { parseBody } from "../../utils/validators.js";
+import { requireAuth } from "../../../utils/auth.js";
+import { parseBody } from "../../../utils/validators.js";
 import {
   success,
   conflict,
   badRequest,
   serverError,
-} from "../../utils/responses.js";
+} from "../../../utils/responses.js";
 
 const updateProfileHandler = async (event) => {
   try {

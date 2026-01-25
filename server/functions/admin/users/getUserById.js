@@ -1,7 +1,7 @@
-import { docClient, TABLE_NAME } from "../../dynamodb.js";
+import { docClient, TABLE_NAME } from "../../../dynamodb.js";
 import { GetCommand } from "@aws-sdk/lib-dynamodb";
-import { requireAdmin } from "../../utils/auth.js";
-import { success, notFound, serverError } from "../../utils/responses.js";
+import { requireAdmin } from "../../../utils/auth.js";
+import { success, notFound, serverError } from "../../../utils/responses.js";
 
 const getUserByIdHandler = async (event) => {
   try {

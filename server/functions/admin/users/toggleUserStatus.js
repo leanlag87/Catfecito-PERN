@@ -1,12 +1,12 @@
-import { docClient, TABLE_NAME, getTimestamp } from "../../dynamodb.js";
+import { docClient, TABLE_NAME, getTimestamp } from "../../../dynamodb.js";
 import { GetCommand, UpdateCommand } from "@aws-sdk/lib-dynamodb";
-import { requireAdmin } from "../../utils/auth.js";
+import { requireAdmin } from "../../../utils/auth.js";
 import {
   success,
   badRequest,
   notFound,
   serverError,
-} from "../../utils/responses.js";
+} from "../../../utils/responses.js";
 
 const toggleUserStatusHandler = async (event) => {
   try {
