@@ -1,0 +1,156 @@
+service: catfecito-backend
+
+frameworkVersion: "^4.0.0"
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+  region: sa-east-1
+  stage: ${opt:stage, 'dev'}
+  environment:
+    DYNAMODB_TABLE: ${self:service}-${self:provider.stage}
+    JWT_SECRET: ${env:JWT_SECRET}
+    JWT_EXPIRES_IN: ${env:JWT_EXPIRES_IN, '7d'}
+    COGNITO_USER_POOL_ID: ${env:COGNITO_USER_POOL_ID}
+    COGNITO_CLIENT_ID: ${env:COGNITO_CLIENT_ID}
+    COGNITO_CLIENT_SECRET: ${env:COGNITO_CLIENT_SECRET, ''}
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - dynamodb:Query
+            - dynamodb:Scan
+            - dynamodb:GetItem
+            - dynamodb:PutItem
+            - dynamodb:UpdateItem
+            - dynamodb:DeleteItem
+            - dynamodb:BatchGetItem
+            - dynamodb:BatchWriteItem
+          Resource:
+            - "arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.DYNAMODB_TABLE}"
+            - "arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.DYNAMODB_TABLE}/index/*"
+
+        - Effect: Allow
+          Action:
+            - cognito-idp:AdminCreateUser
+            - cognito-idp:AdminSetUserPassword
+            - cognito-idp:AdminInitiateAuth
+            - cognito-idp:AdminRespondToAuthChallenge
+            - cognito-idp:GlobalSignOut
+            - cognito-idp:ChangePassword
+            - cognito-idp:AdminDeleteUser
+          Resource:
+            - "arn:aws:cognito-idp:${self:provider.region}:*:userpool/${env:COGNITO_USER_POOL_ID}"
+
+functions:
+  register:
+    handler: server/functions/auth/register.createUser
+    events:
+      - httpApi:
+          path: /api/auth/register
+          method: POST
+
+  login:
+    handler: server/functions/auth/login.loginUser
+    events:
+      - httpApi:
+          path: /api/auth/login
+          method: POST
+
+          # ========== USERS (Requiere auth) ==========
+
+  getProfile:
+    handler: server/functions/users/profile/getProfile.getProfile
+    events:
+      - httpApi:
+          path: /api/users/profile
+          method: GET
+
+  updateProfile:
+    handler: server/functions/users/profile/updateProfile.updateProfile
+    events:
+      - httpApi:
+          path: /api/users/profile
+          method: PUT
+
+  updateAddress:
+    handler: server/functions/users/profile/updateAddress.updateAddress
+    events:
+      - httpApi:
+          path: /api/users/address
+          method: PUT
+
+  changePassword:
+    handler: server/functions/users/profile/changePassword.changePassword
+    events:
+      - httpApi:
+          path: /api/users/password
+          method: PUT
+
+  # Admin Functions
+  getAllUsers:
+    handler: server/functions/admin/users/getAllUsers.getAllUsers
+    events:
+      - httpApi:
+          path: /api/admin/users
+          method: GET
+
+  getUserById:
+    handler: server/functions/admin/users/getUserById.getUserById
+    events:
+      - httpApi:
+          path: /api/admin/users/{id}
+          method: GET
+
+  updateUserRole:
+    handler: server/functions/admin/users/updateUserRole.updateUserRole
+    events:
+      - httpApi:
+          path: /api/admin/users/{id}/role
+          method: PATCH
+
+  toggleUserStatus:
+    handler: server/functions/admin/users/toggleUserStatus.toggleUserStatus
+    events:
+      - httpApi:
+          path: /api/admin/users/{id}/status
+          method: PATCH
+
+  deleteUser:
+    handler: server/functions/admin/users/deleteUser.deleteUser
+    events:
+      - httpApi:
+          path: /api/admin/users/{id}
+          method: DELETE
+
+resources:
+  Resources:
+    CatfecitoTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:provider.environment.DYNAMODB_TABLE}
+        BillingMode: PAY_PER_REQUEST
+        AttributeDefinitions:
+          - AttributeName: PK
+            AttributeType: S
+          - AttributeName: SK
+            AttributeType: S
+          - AttributeName: GSI1PK
+            AttributeType: S
+          - AttributeName: GSI1SK
+            AttributeType: S
+        KeySchema:
+          - AttributeName: PK
+            KeyType: HASH
+          - AttributeName: SK
+            KeyType: RANGE
+        GlobalSecondaryIndexes:
+          - IndexName: GSI1
+            KeySchema:
+              - AttributeName: GSI1PK
+                KeyType: HASH
+              - AttributeName: GSI1SK
+                KeyType: RANGE
+            Projection:
+              ProjectionType: ALL
