@@ -47,6 +47,7 @@ functions:
   - ${file(server/serverless-config/functions/auth.yml)}
   - ${file(server/serverless-config/functions/users.yml)}
   - ${file(server/serverless-config/functions/admin.yml)}
+  - ${file(server/serverless-config/functions/products.yml)}
 
     # Importar recursos
 resources:

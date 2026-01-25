@@ -1,0 +1,21 @@
+# Funciones públicas de productos
+getAllProducts:
+  handler: server/functions/products/getAllProducts.getAllProducts
+  events:
+    - httpApi:
+        path: /api/products
+        method: GET
+
+getProductById:
+  handler: server/functions/products/getProductById.getProductById
+  events:
+    - httpApi:
+        path: /api/products/{id}
+        method: GET
+
+getProductsByCategory:
+  handler: server/functions/products/getProductsByCategory.getProductsByCategory
+  events:
+    - httpApi:
+        path: /api/products/category/{categoryId}
+        method: GET
