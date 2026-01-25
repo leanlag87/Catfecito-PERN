@@ -1,0 +1,14 @@
+# Funciones de autenticación
+register:
+  handler: server/functions/auth/register.createUser
+  events:
+    - httpApi:
+        path: /api/auth/register
+        method: POST
+
+login:
+  handler: server/functions/auth/login.loginUser
+  events:
+    - httpApi:
+        path: /api/auth/login
+        method: POST
