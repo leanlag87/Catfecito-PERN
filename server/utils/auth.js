@@ -1,11 +1,13 @@
 import jwt from "jsonwebtoken";
 import { unauthorized, forbidden } from "./responses.js";
+import { docClient, TABLE_NAME } from "../dynamodb.js";
+import { GetCommand } from "@aws-sdk/lib-dynamodb";
 
 /**
  * Extrae y decodifica el usuario del token de Cognito (IdToken)
  * Reemplaza a verifyAccessToken() pero para tokens de Cognito
  */
-export const getUserFromToken = (event) => {
+export const getUserFromToken = async (event) => {
   const authHeader =
     event.headers?.authorization || event.headers?.Authorization;
 
@@ -23,11 +25,24 @@ export const getUserFromToken = (event) => {
     throw new Error("Token inválido");
   }
 
+  // Obtener el rol actual desde DynamoDB
+  const result = await docClient.send(
+    new GetCommand({
+      TableName: TABLE_NAME,
+      Key: {
+        PK: `USER#${decoded.sub}`,
+        SK: "METADATA",
+      },
+    }),
+  );
+
+  const roleFromDB = result.Item?.role || "user";
+
   return {
     id: decoded.sub, // Cognito User ID
     email: decoded.email,
     name: decoded.name,
-    role: decoded["custom:role"] || "user",
+    role: roleFromDB, // Rol desde DynamoDB (siempre actualizado)
     groups: decoded["cognito:groups"] || [],
   };
 };
@@ -39,11 +54,9 @@ export const getUserFromToken = (event) => {
 export const requireAuth = (handler) => {
   return async (event) => {
     try {
-      const user = getUserFromToken(event);
-
+      const user = await getUserFromToken(event);
       // Agregar usuario al event para usarlo en el handler
       event.user = user;
-
       return await handler(event);
     } catch (error) {
       console.error("Error de autenticación:", error);
