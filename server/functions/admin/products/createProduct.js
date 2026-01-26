@@ -17,9 +17,6 @@ const createProductHandler = async (event) => {
     const { fields, files } = await parseMultipartFormData(event);
     const { name, description, price, stock, category_id } = fields;
 
-    console.log("📝 Fields received:", fields);
-    console.log("📎 Files received:", files.length);
-
     // Validaciones
     if (!name || !description || !price || !category_id) {
       return badRequest(
@@ -56,7 +53,6 @@ const createProductHandler = async (event) => {
     // Procesar imagen si está presente
     if (files.length > 0) {
       const imageFile = files[0];
-      console.log("📷 Processing image:", imageFile.filename);
 
       try {
         const imageKey = `products/${productId}/${imageFile.filename}`;
@@ -65,9 +61,8 @@ const createProductHandler = async (event) => {
           imageKey,
           imageFile.mimeType,
         );
-        console.log("✅ Image uploaded to S3:", image_url);
       } catch (uploadError) {
-        console.error("❌ Error uploading image to S3:", uploadError);
+        console.error("Error uploading image to S3:", uploadError);
         return serverError("Error al subir la imagen");
       }
     }
@@ -98,8 +93,6 @@ const createProductHandler = async (event) => {
       }),
     );
 
-    console.log("✅ Product created successfully:", productId);
-
     return success(
       {
         success: true,
@@ -120,7 +113,7 @@ const createProductHandler = async (event) => {
       201,
     );
   } catch (error) {
-    console.error("❌ Error en createProduct:", error);
+    console.error("Error en createProduct:", error);
     return serverError("Error al crear producto");
   }
 };
