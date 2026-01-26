@@ -6,8 +6,6 @@ export const getProductsByCategory = async (event) => {
   try {
     const { categoryId } = event.pathParameters;
 
-    console.log(`📦 Fetching products for category: ${categoryId}`);
-
     // Usar GSI1 para consultar productos por categoría
     const result = await docClient.send(
       new QueryCommand({
@@ -21,8 +19,6 @@ export const getProductsByCategory = async (event) => {
         },
       }),
     );
-
-    console.log(`✅ Found ${result.Items.length} active products in category`);
 
     // Ordenar por created_at (más recientes primero)
     const products = result.Items.sort((a, b) => {
@@ -50,7 +46,7 @@ export const getProductsByCategory = async (event) => {
       products: formattedProducts,
     });
   } catch (error) {
-    console.error("❌ Error en getProductsByCategory:", error);
+    console.error("Error en getProductsByCategory:", error);
     return serverError("Error al obtener productos por categoría");
   }
 };
