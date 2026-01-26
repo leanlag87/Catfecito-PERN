@@ -23,8 +23,6 @@ const createCategoryHandler = async (event) => {
     const body = JSON.parse(event.body);
     const { name, description, image_url } = body;
 
-    console.log("📝 Creating category:", { name, description });
-
     // Validación
     if (!name || name.trim() === "") {
       return badRequest("El nombre es requerido");
@@ -92,8 +90,6 @@ const createCategoryHandler = async (event) => {
         }),
       );
 
-      console.log("✅ Category created successfully:", uniqueId);
-
       return success(
         {
           success: true,
@@ -134,8 +130,6 @@ const createCategoryHandler = async (event) => {
         Item: category,
       }),
     );
-
-    console.log("✅ Category created successfully:", categoryId);
 
     return success(
       {
