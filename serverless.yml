@@ -14,6 +14,7 @@ provider:
     COGNITO_USER_POOL_ID: ${env:COGNITO_USER_POOL_ID}
     COGNITO_CLIENT_ID: ${env:COGNITO_CLIENT_ID}
     COGNITO_CLIENT_SECRET: ${env:COGNITO_CLIENT_SECRET, ''}
+    S3_BUCKET: ${self:service}-products-${self:provider.stage}
   iam:
     role:
       statements:
