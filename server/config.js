@@ -19,6 +19,7 @@ const config = {
   // AWS DynamoDB
   AWS_REGION: process.env.AWS_REGION || "sa-east-1",
   DYNAMODB_TABLE: process.env.DYNAMODB_TABLE || "catfecito-backend-dev",
+  S3_BUCKET: process.env.S3_BUCKET || "catfecito-backend-dev",
 
   //Cognito
   COGNITO_USER_POOL_ID: process.env.COGNITO_USER_POOL_ID,
@@ -58,6 +59,9 @@ export const {
   AWS_REGION,
   DYNAMODB_TABLE,
   COGNITO_USER_POOL_ID,
+  COGNITO_CLIENT_ID,
+  COGNITO_CLIENT_SECRET,
+  S3_BUCKET,
   JWT_SECRET,
   JWT_EXPIRES_IN,
   CLIENT_URL,

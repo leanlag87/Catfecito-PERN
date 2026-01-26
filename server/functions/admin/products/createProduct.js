@@ -1,73 +1,15 @@
 import { v4 as uuidv4 } from "uuid";
-import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
-import Busboy from "busboy";
 import { docClient, TABLE_NAME, getTimestamp } from "../../../dynamodb.js";
 import { PutCommand, GetCommand } from "@aws-sdk/lib-dynamodb";
-import config from "../../../config.js";
 import { requireAdmin } from "../../../utils/auth.js";
+import { parseMultipartFormData } from "../../../utils/multipart.js";
+import { uploadToS3 } from "../../../utils/s3.js";
 import {
   success,
   badRequest,
   notFound,
   serverError,
 } from "../../../utils/responses.js";
-
-const s3Client = new S3Client({ region: config.AWS_REGION });
-const BUCKET_NAME = process.env.S3_BUCKET;
-
-// Función helper para parsear multipart/form-data
-const parseMultipartFormData = (event) => {
-  return new Promise((resolve, reject) => {
-    const busboy = Busboy({
-      headers: {
-        "content-type":
-          event.headers["content-type"] || event.headers["Content-Type"],
-      },
-    });
-
-    const fields = {};
-    const files = [];
-
-    busboy.on("file", (fieldname, file, info) => {
-      const { filename, encoding, mimeType } = info;
-      const chunks = [];
-
-      file.on("data", (data) => {
-        chunks.push(data);
-      });
-
-      file.on("end", () => {
-        files.push({
-          fieldname,
-          filename,
-          encoding,
-          mimeType,
-          buffer: Buffer.concat(chunks),
-        });
-      });
-    });
-
-    busboy.on("field", (fieldname, value) => {
-      fields[fieldname] = value;
-    });
-
-    busboy.on("finish", () => {
-      resolve({ fields, files });
-    });
-
-    busboy.on("error", (error) => {
-      reject(error);
-    });
-
-    // Decodificar base64 si es necesario
-    const body = event.isBase64Encoded
-      ? Buffer.from(event.body, "base64")
-      : event.body;
-
-    busboy.write(body);
-    busboy.end();
-  });
-};
 
 const createProductHandler = async (event) => {
   try {
@@ -118,18 +60,11 @@ const createProductHandler = async (event) => {
 
       try {
         const imageKey = `products/${productId}/${imageFile.filename}`;
-
-        await s3Client.send(
-          new PutObjectCommand({
-            Bucket: BUCKET_NAME,
-            Key: imageKey,
-            Body: imageFile.buffer,
-            ContentType: imageFile.mimeType,
-            ACL: "public-read",
-          }),
+        image_url = await uploadToS3(
+          imageFile.buffer,
+          imageKey,
+          imageFile.mimeType,
         );
-
-        image_url = `https://${BUCKET_NAME}.s3.${config.AWS_REGION}.amazonaws.com/${imageKey}`;
         console.log("✅ Image uploaded to S3:", image_url);
       } catch (uploadError) {
         console.error("❌ Error uploading image to S3:", uploadError);
