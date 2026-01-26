@@ -26,7 +26,6 @@ export const getAllCategories = async (event) => {
       id: c.id,
       name: c.name,
       description: c.description,
-      image_url: c.image_url,
       is_active: c.is_active,
       created_at: c.created_at,
       updated_at: c.updated_at,

@@ -30,7 +30,6 @@ export const getCategoryById = async (event) => {
         id: category.id,
         name: category.name,
         description: category.description,
-        image_url: category.image_url,
         is_active: category.is_active,
         created_at: category.created_at,
         updated_at: category.updated_at,
