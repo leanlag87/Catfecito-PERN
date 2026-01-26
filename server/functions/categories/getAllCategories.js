@@ -4,8 +4,6 @@ import { success, serverError } from "../../utils/responses.js";
 
 export const getAllCategories = async (event) => {
   try {
-    console.log("📂 Fetching all active categories...");
-
     // Scan con filtro para categorías activas
     const result = await docClient.send(
       new ScanCommand({
@@ -17,8 +15,6 @@ export const getAllCategories = async (event) => {
         },
       }),
     );
-
-    console.log(`✅ Found ${result.Items.length} active categories`);
 
     // Ordenar por nombre (ascendente)
     const categories = result.Items.sort((a, b) => {
