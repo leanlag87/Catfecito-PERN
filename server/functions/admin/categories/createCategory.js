@@ -69,7 +69,6 @@ const createCategoryHandler = async (event) => {
       id: finalId,
       name: trimmedName,
       description: description?.trim() || null,
-      image_url: image_url || null,
       is_active: true,
       created_at: getTimestamp(),
       updated_at: getTimestamp(),
