@@ -13,9 +13,7 @@ const deleteProductHandler = async (event) => {
   try {
     const { id } = event.pathParameters;
 
-    console.log(`🗑️ Attempting to delete product: ${id}`);
-
-    // 1. Verificar que el producto existe
+    // Verificar que el producto existe
     const productResult = await docClient.send(
       new GetCommand({
         TableName: TABLE_NAME,
@@ -32,7 +30,7 @@ const deleteProductHandler = async (event) => {
 
     const product = productResult.Item;
 
-    // 2. Verificar si el producto está referenciado en órdenes
+    // Verificar si el producto está referenciado en órdenes
     // Buscar ORDER_ITEMS que contengan este producto
     const orderItemsResult = await docClient.send(
       new QueryCommand({
@@ -48,14 +46,8 @@ const deleteProductHandler = async (event) => {
 
     const hasOrderReferences = orderItemsResult.Items.length > 0;
 
-    console.log(
-      `📊 Found ${orderItemsResult.Items.length} order references for product`,
-    );
-
-    // 3. Si tiene referencias en órdenes => SOFT DELETE
+    // Si tiene referencias en órdenes => SOFT DELETE
     if (hasOrderReferences) {
-      console.log("⚠️ Product has order references. Performing soft delete...");
-
       const result = await docClient.send(
         new UpdateCommand({
           TableName: TABLE_NAME,
@@ -89,19 +81,15 @@ const deleteProductHandler = async (event) => {
       );
     }
 
-    // 4. No hay referencias => HARD DELETE
-    console.log("✅ No order references. Performing hard delete...");
-
     // Eliminar imagen de S3 si existe
     if (product.image_url) {
       const imageKey = getS3KeyFromUrl(product.image_url);
       if (imageKey) {
         try {
           await deleteFromS3(imageKey);
-          console.log("🗑️ Image deleted from S3:", imageKey);
         } catch (s3Error) {
-          console.warn("⚠️ Could not delete image from S3:", s3Error.message);
-          // No fallar la operación si no se puede eliminar la imagen
+          console.warn("Could not delete image from S3:", s3Error.message);
+          // No falla la operación si no se puede eliminar la imagen
         }
       }
     }
@@ -116,8 +104,6 @@ const deleteProductHandler = async (event) => {
         },
       }),
     );
-
-    console.log("✅ Product deleted successfully:", id);
 
     return success({
       success: true,
