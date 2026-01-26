@@ -6,8 +6,6 @@ export const getProductById = async (event) => {
   try {
     const { id } = event.pathParameters;
 
-    console.log(`📦 Fetching product with id: ${id}`);
-
     // Obtener producto de DynamoDB
     const result = await docClient.send(
       new GetCommand({
@@ -20,13 +18,11 @@ export const getProductById = async (event) => {
     );
 
     if (!result.Item) {
-      console.log(`❌ Product not found: ${id}`);
+      console.log(`Product not found: ${id}`);
       return notFound("Producto no encontrado");
     }
 
     const product = result.Item;
-
-    console.log(`✅ Product found: ${product.name}`);
 
     // Formatear respuesta
     return success({
