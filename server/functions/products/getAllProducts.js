@@ -4,8 +4,6 @@ import { success, serverError } from "../../utils/responses.js";
 
 export const getAllProducts = async (event) => {
   try {
-    console.log("📦 Fetching all active products...");
-
     // Scan con filtro para productos activos
     const result = await docClient.send(
       new ScanCommand({
@@ -17,8 +15,6 @@ export const getAllProducts = async (event) => {
         },
       }),
     );
-
-    console.log(`✅ Found ${result.Items.length} active products`);
 
     // Ordenar por created_at (más recientes primero)
     const products = result.Items.sort((a, b) => {
@@ -46,7 +42,7 @@ export const getAllProducts = async (event) => {
       products: formattedProducts,
     });
   } catch (error) {
-    console.error("❌ Error en getAllProducts:", error);
+    console.error("Error en getAllProducts:", error);
     return serverError("Error al obtener productos");
   }
 };
