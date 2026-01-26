@@ -50,3 +50,17 @@ updateProduct:
     - httpApi:
         path: /api/admin/products/{id}
         method: PUT
+
+toggleProductStatus:
+  handler: server/functions/admin/products/toggleProductStatus.toggleProductStatus
+  events:
+    - httpApi:
+        path: /api/admin/products/{id}/status
+        method: PATCH
+
+deleteProduct:
+  handler: server/functions/admin/products/deleteProduct.deleteProduct
+  events:
+    - httpApi:
+        path: /api/admin/products/{id}
+        method: DELETE

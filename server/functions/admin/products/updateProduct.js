@@ -22,10 +22,6 @@ const updateProductHandler = async (event) => {
     const { fields, files } = await parseMultipartFormData(event);
     const { name, description, price, stock, category_id } = fields;
 
-    console.log("📝 Updating product:", id);
-    console.log("📝 Fields received:", fields);
-    console.log("📎 Files received:", files.length);
-
     // Validaciones
     if (price && parseFloat(price) < 0) {
       return badRequest("El precio debe ser positivo");
@@ -76,7 +72,6 @@ const updateProductHandler = async (event) => {
     // Procesar nueva imagen si está presente
     if (files.length > 0) {
       const imageFile = files[0];
-      console.log("📷 Processing new image:", imageFile.filename);
 
       try {
         // Eliminar imagen anterior de S3 si existe
@@ -84,7 +79,6 @@ const updateProductHandler = async (event) => {
           const oldImageKey = getS3KeyFromUrl(currentProduct.image_url);
           if (oldImageKey) {
             await deleteFromS3(oldImageKey);
-            console.log("🗑️ Old image deleted from S3:", oldImageKey);
           }
         }
 
@@ -95,9 +89,8 @@ const updateProductHandler = async (event) => {
           imageKey,
           imageFile.mimeType,
         );
-        console.log("✅ New image uploaded to S3:", image_url);
       } catch (uploadError) {
-        console.error("❌ Error processing image:", uploadError);
+        console.error("Error processing image:", uploadError);
         return serverError("Error al procesar la imagen");
       }
     }
@@ -164,8 +157,6 @@ const updateProductHandler = async (event) => {
       }),
     );
 
-    console.log("✅ Product updated successfully:", id);
-
     return success({
       success: true,
       message: "Producto actualizado exitosamente",
@@ -184,7 +175,7 @@ const updateProductHandler = async (event) => {
       },
     });
   } catch (error) {
-    console.error("❌ Error en updateProduct:", error);
+    console.error("Error en updateProduct:", error);
     return serverError("Error al actualizar producto");
   }
 };
