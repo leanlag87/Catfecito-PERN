@@ -22,7 +22,6 @@ export const uploadToS3 = async (buffer, key, contentType = "image/jpeg") => {
       Key: key,
       Body: buffer,
       ContentType: contentType,
-      ACL: "public-read",
     }),
   );
 

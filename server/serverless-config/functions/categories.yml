@@ -1,0 +1,14 @@
+# Funciones públicas de categorías
+getAllCategories:
+  handler: server/functions/categories/getAllCategories.getAllCategories
+  events:
+    - httpApi:
+        path: /api/categories
+        method: GET
+
+getCategoryById:
+  handler: server/functions/categories/getCategoryById.getCategoryById
+  events:
+    - httpApi:
+        path: /api/categories/{id}
+        method: GET

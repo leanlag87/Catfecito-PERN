@@ -42,3 +42,54 @@ createProduct:
     - httpApi:
         path: /api/admin/products
         method: POST
+
+updateProduct:
+  handler: server/functions/admin/products/updateProduct.updateProduct
+  timeout: 30
+  events:
+    - httpApi:
+        path: /api/admin/products/{id}
+        method: PUT
+
+toggleProductStatus:
+  handler: server/functions/admin/products/toggleProductStatus.toggleProductStatus
+  events:
+    - httpApi:
+        path: /api/admin/products/{id}/status
+        method: PATCH
+
+deleteProduct:
+  handler: server/functions/admin/products/deleteProduct.deleteProduct
+  events:
+    - httpApi:
+        path: /api/admin/products/{id}
+        method: DELETE
+
+# ========== ADMIN - CATEGORIES ==========
+createCategory:
+  handler: server/functions/admin/categories/createCategory.createCategory
+  events:
+    - httpApi:
+        path: /api/admin/categories
+        method: POST
+
+updateCategory:
+  handler: server/functions/admin/categories/updateCategory.updateCategory
+  events:
+    - httpApi:
+        path: /api/admin/categories/{id}
+        method: PUT
+
+toggleCategoryStatus:
+  handler: server/functions/admin/categories/toggleCategoryStatus.toggleCategoryStatus
+  events:
+    - httpApi:
+        path: /api/admin/categories/{id}/status
+        method: PATCH
+
+deleteCategory:
+  handler: server/functions/admin/categories/deleteCategory.deleteCategory
+  events:
+    - httpApi:
+        path: /api/admin/categories/{id}
+        method: DELETE
