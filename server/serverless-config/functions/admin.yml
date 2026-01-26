@@ -42,3 +42,11 @@ createProduct:
     - httpApi:
         path: /api/admin/products
         method: POST
+
+updateProduct:
+  handler: server/functions/admin/products/updateProduct.updateProduct
+  timeout: 30
+  events:
+    - httpApi:
+        path: /api/admin/products/{id}
+        method: PUT
