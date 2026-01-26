@@ -7,8 +7,6 @@ const toggleProductStatusHandler = async (event) => {
   try {
     const { id } = event.pathParameters;
 
-    console.log(`🔄 Toggling product status for id: ${id}`);
-
     // Verificar que el producto existe
     const currentProductResult = await docClient.send(
       new GetCommand({
@@ -27,10 +25,6 @@ const toggleProductStatusHandler = async (event) => {
     const currentProduct = currentProductResult.Item;
     const newStatus = !currentProduct.is_active;
 
-    console.log(
-      `📝 Current status: ${currentProduct.is_active}, New status: ${newStatus}`,
-    );
-
     // Actualizar estado del producto
     const result = await docClient.send(
       new UpdateCommand({
@@ -46,10 +40,6 @@ const toggleProductStatusHandler = async (event) => {
         },
         ReturnValues: "ALL_NEW",
       }),
-    );
-
-    console.log(
-      `✅ Product ${newStatus ? "activated" : "deactivated"} successfully`,
     );
 
     return success({
