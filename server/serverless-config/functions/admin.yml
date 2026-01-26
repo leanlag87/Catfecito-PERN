@@ -33,3 +33,12 @@ deleteUser:
     - httpApi:
         path: /api/admin/users/{id}
         method: DELETE
+
+# ========== ADMIN - PRODUCTS ==========
+createProduct:
+  handler: server/functions/admin/products/createProduct.createProduct
+  timeout: 30 # Aumentar timeout para subida de imágenes
+  events:
+    - httpApi:
+        path: /api/admin/products
+        method: POST
