@@ -47,6 +47,8 @@ const createProductHandler = async (event) => {
       return notFound("Categoría no encontrada");
     }
 
+    const category_name = categoryResult.Item.name;
+
     const productId = uuidv4();
     let image_url = null;
 
