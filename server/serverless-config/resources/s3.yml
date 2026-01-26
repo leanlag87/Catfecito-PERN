@@ -6,7 +6,7 @@ Resources:
       PublicAccessBlockConfiguration:
         BlockPublicAcls: false
         BlockPublicPolicy: false
-        IgnorePublicAcls: false
+        IgnorePublicAcls: true
         RestrictPublicBuckets: false
       CorsConfiguration:
         CorsRules:
@@ -27,7 +27,8 @@ Resources:
       Bucket: !Ref ProductImagesBucket
       PolicyDocument:
         Statement:
-          - Effect: Allow
+          - Sid: PublicReadGetObject
+            Effect: Allow
             Principal: "*"
             Action:
               - s3:GetObject
