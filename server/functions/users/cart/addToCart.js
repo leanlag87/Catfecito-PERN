@@ -1,12 +1,12 @@
-import { docClient, TABLE_NAME, getTimestamp } from "../../dynamodb.js";
+import { docClient, TABLE_NAME, getTimestamp } from "../../../dynamodb.js";
 import { GetCommand, PutCommand, UpdateCommand } from "@aws-sdk/lib-dynamodb";
-import { requireAuth } from "../../utils/auth.js";
+import { requireAuth } from "../../../utils/auth.js";
 import {
   success,
   badRequest,
   notFound,
   serverError,
-} from "../../utils/responses.js";
+} from "../../../utils/responses.js";
 
 const addToCartHandler = async (event) => {
   try {
