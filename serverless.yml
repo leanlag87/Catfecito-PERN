@@ -58,6 +58,7 @@ functions:
   - ${file(server/serverless-config/functions/admin.yml)}
   - ${file(server/serverless-config/functions/products.yml)}
   - ${file(server/serverless-config/functions/categories.yml)}
+  - ${file(server/serverless-config/functions/cart.yml)}
 
     # Importar recursos
 resources:
