@@ -1,0 +1,35 @@
+# Funciones de carrito (usuario autenticado)
+addToCart:
+  handler: server/functions/cart/addToCart.addToCart
+  events:
+    - httpApi:
+        path: /api/cart
+        method: POST
+
+getCart:
+  handler: server/functions/cart/getCart.getCart
+  events:
+    - httpApi:
+        path: /api/cart
+        method: GET
+
+updateCartItem:
+  handler: server/functions/cart/updateCartItem.updateCartItem
+  events:
+    - httpApi:
+        path: /api/cart/{product_id}
+        method: PUT
+
+removeFromCart:
+  handler: server/functions/cart/removeFromCart.removeFromCart
+  events:
+    - httpApi:
+        path: /api/cart/{product_id}
+        method: DELETE
+
+clearCart:
+  handler: server/functions/cart/clearCart.clearCart
+  events:
+    - httpApi:
+        path: /api/cart/clear
+        method: DELETE
