@@ -16,16 +16,16 @@ provider:
     COGNITO_CLIENT_SECRET: ${env:COGNITO_CLIENT_SECRET, ''}
     S3_BUCKET: ${self:service}-products-${self:provider.stage}
 
-httpApi:
-  authorizers:
-    jwtAuthorizer:
+  httpApi:
+    authorizers:
+      jwtAuthorizer:
       type: request
       functionName: authorizerFunc
       identitySource: $request.header.Authorization
       enableSimpleResponses: false
       payloadVersion: "2.0"
 
-iam:
+  iam:
   role:
     statements:
       - Effect: Allow

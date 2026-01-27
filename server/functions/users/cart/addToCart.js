@@ -10,7 +10,7 @@ import {
 
 const addToCartHandler = async (event) => {
   try {
-    const userId = event.requestContext.authorizer.lambda.user.id;
+    const userId = event.user.id;
     const body = JSON.parse(event.body);
     const { product_id, quantity } = body;
 
