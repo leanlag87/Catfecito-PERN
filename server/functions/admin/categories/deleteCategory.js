@@ -12,9 +12,7 @@ const deleteCategoryHandler = async (event) => {
   try {
     const { id } = event.pathParameters;
 
-    console.log(`🗑️ Attempting to delete category: ${id}`);
-
-    // 1. Verificar que la categoría existe
+    // Verificar que la categoría existe
     const categoryResult = await docClient.send(
       new GetCommand({
         TableName: TABLE_NAME,
@@ -31,7 +29,7 @@ const deleteCategoryHandler = async (event) => {
 
     const category = categoryResult.Item;
 
-    // 2. Verificar si hay productos asociados a esta categoría
+    // Verificar si hay productos asociados a esta categoría
     const productsResult = await docClient.send(
       new QueryCommand({
         TableName: TABLE_NAME,
@@ -46,16 +44,14 @@ const deleteCategoryHandler = async (event) => {
 
     const productsCount = productsResult.Count || 0;
 
-    console.log(`📊 Found ${productsCount} products associated with category`);
-
-    // 3. Si hay productos asociados, no permitir eliminación
+    // Si hay productos asociados, no permitir eliminación
     if (productsCount > 0) {
       return badRequest(
         `No se puede eliminar la categoría. Tiene ${productsCount} producto(s) asociado(s).`,
       );
     }
 
-    // 4. No hay productos asociados => Eliminar categoría
+    // No hay productos asociados => Eliminar categoría
     await docClient.send(
       new DeleteCommand({
         TableName: TABLE_NAME,
@@ -65,8 +61,6 @@ const deleteCategoryHandler = async (event) => {
         },
       }),
     );
-
-    console.log("✅ Category deleted successfully:", id);
 
     return success({
       success: true,
