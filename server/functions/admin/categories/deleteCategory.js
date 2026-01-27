@@ -71,7 +71,7 @@ const deleteCategoryHandler = async (event) => {
       },
     });
   } catch (error) {
-    console.error("❌ Error en deleteCategory:", error);
+    console.error("Error en deleteCategory:", error);
     return serverError("Error al eliminar categoría");
   }
 };
