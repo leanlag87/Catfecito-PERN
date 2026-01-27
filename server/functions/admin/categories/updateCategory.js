@@ -1,7 +1,7 @@
 import { docClient, TABLE_NAME, getTimestamp } from "../../../dynamodb.js";
 import { GetCommand, UpdateCommand, QueryCommand } from "@aws-sdk/lib-dynamodb";
 import { requireAdmin } from "../../../utils/auth.js";
-import { generateSlug, isNotEmpty } from "../../../utils/helpers.js";
+import { isNotEmpty } from "../../../utils/helpers.js";
 import {
   success,
   badRequest,
@@ -15,9 +15,6 @@ const updateCategoryHandler = async (event) => {
     const { id } = event.pathParameters;
     const body = JSON.parse(event.body);
     const { name, description } = body;
-
-    console.log("📝 Updating category:", id);
-    console.log("📝 Fields received:", { name, description });
 
     // Verificar que la categoría existe
     const currentCategoryResult = await docClient.send(
@@ -128,8 +125,6 @@ const updateCategoryHandler = async (event) => {
         ReturnValues: "ALL_NEW",
       }),
     );
-
-    console.log("✅ Category updated successfully:", id);
 
     return success({
       success: true,
