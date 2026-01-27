@@ -5,6 +5,8 @@ addToCart:
     - httpApi:
         path: /api/cart
         method: POST
+        authorizer:
+          name: jwtAuthorizer
 
 getCart:
   handler: server/functions/users/cart/getCart.getCart
@@ -12,6 +14,8 @@ getCart:
     - httpApi:
         path: /api/cart
         method: GET
+        authorizer:
+          name: jwtAuthorizer
 
 updateCartItem:
   handler: server/functions/users/cart/updateCartItem.updateCartItem
@@ -19,6 +23,8 @@ updateCartItem:
     - httpApi:
         path: /api/cart/{product_id}
         method: PUT
+        authorizer:
+          name: jwtAuthorizer
 
 removeFromCart:
   handler: server/functions/users/cart/removeFromCart.removeFromCart
@@ -26,6 +32,8 @@ removeFromCart:
     - httpApi:
         path: /api/cart/{product_id}
         method: DELETE
+        authorizer:
+          name: jwtAuthorizer
 
 clearCart:
   handler: server/functions/users/cart/clearCart.clearCart
@@ -33,3 +41,5 @@ clearCart:
     - httpApi:
         path: /api/cart/clear
         method: DELETE
+        authorizer:
+          name: jwtAuthorizer

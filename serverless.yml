@@ -15,44 +15,57 @@ provider:
     COGNITO_CLIENT_ID: ${env:COGNITO_CLIENT_ID}
     COGNITO_CLIENT_SECRET: ${env:COGNITO_CLIENT_SECRET, ''}
     S3_BUCKET: ${self:service}-products-${self:provider.stage}
-  iam:
-    role:
-      statements:
-        - Effect: Allow
-          Action:
-            - dynamodb:Query
-            - dynamodb:Scan
-            - dynamodb:GetItem
-            - dynamodb:PutItem
-            - dynamodb:UpdateItem
-            - dynamodb:DeleteItem
-            - dynamodb:BatchGetItem
-            - dynamodb:BatchWriteItem
-          Resource:
-            - "arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.DYNAMODB_TABLE}"
-            - "arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.DYNAMODB_TABLE}/index/*"
 
-        - Effect: Allow
-          Action:
-            - cognito-idp:AdminCreateUser
-            - cognito-idp:AdminSetUserPassword
-            - cognito-idp:AdminInitiateAuth
-            - cognito-idp:AdminRespondToAuthChallenge
-            - cognito-idp:GlobalSignOut
-            - cognito-idp:ChangePassword
-            - cognito-idp:AdminDeleteUser
-          Resource:
-            - "arn:aws:cognito-idp:${self:provider.region}:*:userpool/${env:COGNITO_USER_POOL_ID}"
+httpApi:
+  authorizers:
+    jwtAuthorizer:
+      type: request
+      functionName: authorizerFunc
+      identitySource: $request.header.Authorization
+      enableSimpleResponses: false
+      payloadVersion: "2.0"
 
-        - Effect: Allow
-          Action:
-            - s3:PutObject
-            - s3:GetObject
-            - s3:DeleteObject
-          Resource:
-            - "arn:aws:s3:::${self:provider.environment.S3_BUCKET}/*"
+iam:
+  role:
+    statements:
+      - Effect: Allow
+        Action:
+          - dynamodb:Query
+          - dynamodb:Scan
+          - dynamodb:GetItem
+          - dynamodb:PutItem
+          - dynamodb:UpdateItem
+          - dynamodb:DeleteItem
+          - dynamodb:BatchGetItem
+          - dynamodb:BatchWriteItem
+        Resource:
+          - "arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.DYNAMODB_TABLE}"
+          - "arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.DYNAMODB_TABLE}/index/*"
+
+      - Effect: Allow
+        Action:
+          - cognito-idp:AdminCreateUser
+          - cognito-idp:AdminSetUserPassword
+          - cognito-idp:AdminInitiateAuth
+          - cognito-idp:AdminRespondToAuthChallenge
+          - cognito-idp:GlobalSignOut
+          - cognito-idp:ChangePassword
+          - cognito-idp:AdminDeleteUser
+        Resource:
+          - "arn:aws:cognito-idp:${self:provider.region}:*:userpool/${env:COGNITO_USER_POOL_ID}"
+
+      - Effect: Allow
+        Action:
+          - s3:PutObject
+          - s3:GetObject
+          - s3:DeleteObject
+        Resource:
+          - "arn:aws:s3:::${self:provider.environment.S3_BUCKET}/*"
 
 functions:
+authorizerFunc:
+handler:
+  server/functions/auth/authorizer.handler
   - ${file(server/serverless-config/functions/auth.yml)}
   - ${file(server/serverless-config/functions/users.yml)}
   - ${file(server/serverless-config/functions/admin.yml)}
@@ -60,7 +73,7 @@ functions:
   - ${file(server/serverless-config/functions/categories.yml)}
   - ${file(server/serverless-config/functions/cart.yml)}
 
-    # Importar recursos
+  # Importar recursos
 resources:
   - ${file(server/serverless-config/resources/dynamo.yml)}
   - ${file(server/serverless-config/resources/s3.yml)}
