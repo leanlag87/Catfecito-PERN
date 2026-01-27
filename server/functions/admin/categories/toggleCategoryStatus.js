@@ -7,8 +7,6 @@ const toggleCategoryStatusHandler = async (event) => {
   try {
     const { id } = event.pathParameters;
 
-    console.log(`🔄 Toggling category status for id: ${id}`);
-
     // Verificar que la categoría existe
     const currentCategoryResult = await docClient.send(
       new GetCommand({
@@ -27,10 +25,6 @@ const toggleCategoryStatusHandler = async (event) => {
     const currentCategory = currentCategoryResult.Item;
     const newStatus = !currentCategory.is_active;
 
-    console.log(
-      `📝 Current status: ${currentCategory.is_active}, New status: ${newStatus}`,
-    );
-
     // Actualizar estado de la categoría
     const result = await docClient.send(
       new UpdateCommand({
@@ -46,10 +40,6 @@ const toggleCategoryStatusHandler = async (event) => {
         },
         ReturnValues: "ALL_NEW",
       }),
-    );
-
-    console.log(
-      `✅ Category ${newStatus ? "activated" : "deactivated"} successfully`,
     );
 
     return success({
