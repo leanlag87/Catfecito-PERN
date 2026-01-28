@@ -21,7 +21,8 @@ provider:
       jwtAuthorizer:
         type: request
         functionName: authorizerFunc
-        identitySource: $request.header.Authorization
+        identitySource:
+          - $request.header.Authorization
         enableSimpleResponses: false
         payloadVersion: "2.0"
 
@@ -69,8 +70,7 @@ functions:
   - ${file(server/serverless-config/functions/products.yml)}
   - ${file(server/serverless-config/functions/categories.yml)}
   - ${file(server/serverless-config/functions/cart.yml)}
-  - authorizerFunc:
-      handler: server/functions/auth/authorizer.handler
+  
 
 resources:
   - ${file(server/serverless-config/resources/dynamo.yml)}
