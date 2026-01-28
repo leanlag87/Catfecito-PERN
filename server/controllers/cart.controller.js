@@ -2,6 +2,116 @@ import { pool } from "../db.js";
 
 // FUNCIONES DE CARRITO (Usuario autenticado)
 
+// Agregar producto al carrito
+export async function addToCart(req, res) {
+  const userId = req.user.id;
+  const { product_id, quantity } = req.body;
+
+  // Validaciones
+  if (!product_id) {
+    return res.status(400).json({ message: "El product_id es requerido" });
+  }
+
+  const qty = parseInt(quantity) || 1;
+
+  if (qty <= 0) {
+    return res.status(400).json({ message: "La cantidad debe ser mayor a 0" });
+  }
+
+  try {
+    // Verificar que el producto existe y está activo
+    const product = await pool.query(
+      "SELECT id, name, price, stock, is_active FROM products WHERE id = $1",
+      [product_id],
+    );
+
+    if (product.rowCount === 0) {
+      return res.status(404).json({ message: "Producto no encontrado" });
+    }
+
+    if (!product.rows[0].is_active) {
+      return res
+        .status(400)
+        .json({ message: "El producto no está disponible" });
+    }
+
+    if (product.rows[0].stock < qty) {
+      return res.status(400).json({
+        message: `Stock insuficiente. Disponible: ${product.rows[0].stock}`,
+      });
+    }
+
+    // Verificar si el producto ya está en el carrito
+    const existingItem = await pool.query(
+      "SELECT id, quantity FROM cart_items WHERE user_id = $1 AND product_id = $2",
+      [userId, product_id],
+    );
+
+    let result;
+
+    if (existingItem.rowCount > 0) {
+      // Si ya existe, actualizar cantidad
+      const newQuantity = existingItem.rows[0].quantity + qty;
+
+      // Verificar stock para la nueva cantidad
+      if (product.rows[0].stock < newQuantity) {
+        return res.status(400).json({
+          message: `Stock insuficiente. Disponible: ${product.rows[0].stock}, en carrito: ${existingItem.rows[0].quantity}`,
+        });
+      }
+
+      result = await pool.query(
+        `UPDATE cart_items 
+         SET quantity = $1, updated_at = NOW() 
+         WHERE id = $2 
+         RETURNING id, user_id, product_id, quantity, created_at, updated_at`,
+        [newQuantity, existingItem.rows[0].id],
+      );
+    } else {
+      // Si no existe, crear nuevo item
+      result = await pool.query(
+        `INSERT INTO cart_items (user_id, product_id, quantity) 
+         VALUES ($1, $2, $3) 
+         RETURNING id, user_id, product_id, quantity, created_at, updated_at`,
+        [userId, product_id, qty],
+      );
+    }
+
+    // Obtener información completa del item
+    const cartItem = await pool.query(
+      `SELECT 
+        ci.id,
+        ci.quantity,
+        ci.created_at,
+        ci.updated_at,
+        p.id as product_id,
+        p.name as product_name,
+        p.price as product_price,
+  p.stock as product_stock,
+        p.image_url as product_image,
+        (p.price * ci.quantity) as subtotal
+       FROM cart_items ci
+       INNER JOIN products p ON ci.product_id = p.id
+       WHERE ci.id = $1`,
+      [result.rows[0].id],
+    );
+
+    return res.status(201).json({
+      success: true,
+      message:
+        existingItem.rowCount > 0
+          ? "Cantidad actualizada en el carrito"
+          : "Producto agregado al carrito",
+      item: cartItem.rows[0],
+    });
+  } catch (error) {
+    console.error("Error en addToCart:", error);
+    return res
+      .status(500)
+      .json({ message: "Error al agregar producto al carrito" });
+  }
+}
+
 // Obtener carrito del usuario autenticado
 export async function getCart(req, res) {
   const userId = req.user.id;
@@ -25,13 +135,13 @@ export async function getCart(req, res) {
        INNER JOIN products p ON ci.product_id = p.id
        WHERE ci.user_id = $1
        ORDER BY ci.created_at DESC`,
-      [userId]
+      [userId],
     );
 
     // Calcular total del carrito
     const total = result.rows.reduce(
       (sum, item) => sum + parseFloat(item.subtotal),
-      0
+      0,
     );
 
     return res.status(200).json({
@@ -43,116 +153,6 @@ export async function getCart(req, res) {
   } catch (error) {
     console.error("Error en getCart:", error);
     return res.status(500).json({ message: "Error al obtener el carrito" });
-  }
-}
-
-// Agregar producto al carrito
-export async function addToCart(req, res) {
-  const userId = req.user.id;
-  const { product_id, quantity } = req.body;
-
-  // Validaciones
-  if (!product_id) {
-    return res.status(400).json({ message: "El product_id es requerido" });
-  }
-
-  const qty = parseInt(quantity) || 1;
-
-  if (qty <= 0) {
-    return res.status(400).json({ message: "La cantidad debe ser mayor a 0" });
-  }
-
-  try {
-    // Verificar que el producto existe y está activo
-    const product = await pool.query(
-      "SELECT id, name, price, stock, is_active FROM products WHERE id = $1",
-      [product_id]
-    );
-
-    if (product.rowCount === 0) {
-      return res.status(404).json({ message: "Producto no encontrado" });
-    }
-
-    if (!product.rows[0].is_active) {
-      return res
-        .status(400)
-        .json({ message: "El producto no está disponible" });
-    }
-
-    if (product.rows[0].stock < qty) {
-      return res.status(400).json({
-        message: `Stock insuficiente. Disponible: ${product.rows[0].stock}`,
-      });
-    }
-
-    // Verificar si el producto ya está en el carrito
-    const existingItem = await pool.query(
-      "SELECT id, quantity FROM cart_items WHERE user_id = $1 AND product_id = $2",
-      [userId, product_id]
-    );
-
-    let result;
-
-    if (existingItem.rowCount > 0) {
-      // Si ya existe, actualizar cantidad
-      const newQuantity = existingItem.rows[0].quantity + qty;
-
-      // Verificar stock para la nueva cantidad
-      if (product.rows[0].stock < newQuantity) {
-        return res.status(400).json({
-          message: `Stock insuficiente. Disponible: ${product.rows[0].stock}, en carrito: ${existingItem.rows[0].quantity}`,
-        });
-      }
-
-      result = await pool.query(
-        `UPDATE cart_items 
-         SET quantity = $1, updated_at = NOW() 
-         WHERE id = $2 
-         RETURNING id, user_id, product_id, quantity, created_at, updated_at`,
-        [newQuantity, existingItem.rows[0].id]
-      );
-    } else {
-      // Si no existe, crear nuevo item
-      result = await pool.query(
-        `INSERT INTO cart_items (user_id, product_id, quantity) 
-         VALUES ($1, $2, $3) 
-         RETURNING id, user_id, product_id, quantity, created_at, updated_at`,
-        [userId, product_id, qty]
-      );
-    }
-
-    // Obtener información completa del item
-    const cartItem = await pool.query(
-      `SELECT 
-        ci.id,
-        ci.quantity,
-        ci.created_at,
-        ci.updated_at,
-        p.id as product_id,
-        p.name as product_name,
-        p.price as product_price,
-  p.stock as product_stock,
-        p.image_url as product_image,
-        (p.price * ci.quantity) as subtotal
-       FROM cart_items ci
-       INNER JOIN products p ON ci.product_id = p.id
-       WHERE ci.id = $1`,
-      [result.rows[0].id]
-    );
-
-    return res.status(201).json({
-      success: true,
-      message:
-        existingItem.rowCount > 0
-          ? "Cantidad actualizada en el carrito"
-          : "Producto agregado al carrito",
-      item: cartItem.rows[0],
-    });
-  } catch (error) {
-    console.error("Error en addToCart:", error);
-    return res
-      .status(500)
-      .json({ message: "Error al agregar producto al carrito" });
   }
 }
 
@@ -176,7 +176,7 @@ export async function updateCartItem(req, res) {
        FROM cart_items ci
        INNER JOIN products p ON ci.product_id = p.id
        WHERE ci.id = $1 AND ci.user_id = $2`,
-      [id, userId]
+      [id, userId],
     );
 
     if (cartItem.rowCount === 0) {
@@ -205,7 +205,7 @@ export async function updateCartItem(req, res) {
        SET quantity = $1, updated_at = NOW() 
        WHERE id = $2 
        RETURNING id, user_id, product_id, quantity, created_at, updated_at`,
-      [qty, id]
+      [qty, id],
     );
 
     // Obtener info completa
@@ -223,7 +223,7 @@ export async function updateCartItem(req, res) {
        FROM cart_items ci
        INNER JOIN products p ON ci.product_id = p.id
        WHERE ci.id = $1`,
-      [id]
+      [id],
     );
 
     return res.status(200).json({
@@ -247,7 +247,7 @@ export async function removeFromCart(req, res) {
       `DELETE FROM cart_items 
        WHERE id = $1 AND user_id = $2 
        RETURNING id, product_id`,
-      [id, userId]
+      [id, userId],
     );
 
     if (result.rowCount === 0) {
@@ -274,7 +274,7 @@ export async function clearCart(req, res) {
   try {
     const result = await pool.query(
       "DELETE FROM cart_items WHERE user_id = $1 RETURNING id",
-      [userId]
+      [userId],
     );
 
     return res.status(200).json({

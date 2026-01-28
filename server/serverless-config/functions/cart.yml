@@ -1,0 +1,45 @@
+# Funciones de carrito (usuario autenticado)
+addToCart:
+  handler: server/functions/users/cart/addToCart.addToCart
+  events:
+    - httpApi:
+        path: /api/cart
+        method: POST
+        authorizer:
+          name: jwtAuthorizer
+
+getCart:
+  handler: server/functions/users/cart/getCart.getCart
+  events:
+    - httpApi:
+        path: /api/cart
+        method: GET
+        authorizer:
+          name: jwtAuthorizer
+
+updateCartItem:
+  handler: server/functions/users/cart/updateCartItem.updateCartItem
+  events:
+    - httpApi:
+        path: /api/cart/{product_id}
+        method: PUT
+        authorizer:
+          name: jwtAuthorizer
+
+removeFromCart:
+  handler: server/functions/users/cart/removeFromCart.removeFromCart
+  events:
+    - httpApi:
+        path: /api/cart/{product_id}
+        method: DELETE
+        authorizer:
+          name: jwtAuthorizer
+
+clearCart:
+  handler: server/functions/users/cart/clearCart.clearCart
+  events:
+    - httpApi:
+        path: /api/cart/clear
+        method: DELETE
+        authorizer:
+          name: jwtAuthorizer
