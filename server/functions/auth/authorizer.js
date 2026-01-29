@@ -1,5 +1,5 @@
 import jwt from "jsonwebtoken";
-import { docClient, TABLE_NAME } from "../../../dynamodb.js";
+import { docClient, TABLE_NAME } from "../../dynamodb.js";
 import { GetCommand } from "@aws-sdk/lib-dynamodb";
 
 /**
