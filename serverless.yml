@@ -17,14 +17,7 @@ provider:
     S3_BUCKET: ${self:service}-products-${self:provider.stage}
 
   httpApi:
-    authorizers:
-      jwtAuthorizer:
-        type: request
-        functionName: authorizerFunc
-        identitySource:
-          - $request.header.Authorization
-        enableSimpleResponses: false
-        payloadVersion: "2.0"
+    authorizers: ${file(server/serverless-config/provider/httpApi.yml)}
 
   iam:
     role:
