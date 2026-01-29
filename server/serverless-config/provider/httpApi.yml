@@ -1,0 +1,7 @@
+
+      jwtAuthorizer:
+        type: request
+        functionName: authorizerFunc
+        identitySource: $request.header.Authorization
+        enableSimpleResponses: false
+        payloadVersion: "2.0"

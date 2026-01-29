@@ -1,11 +1,18 @@
 # Funciones de autenticación
+
+# Lambda Authorizer (valida JWT en endpoints protegidos)
+authorizerFunc:
+      handler: server/functions/auth/authorizer.handler
+
+# Funciones de autenticación
 register:
   handler: server/functions/auth/register.createUser
   events:
     - httpApi:
         path: /api/auth/register
         method: POST
-
+        
+# Login de usuario
 login:
   handler: server/functions/auth/login.loginUser
   events:
