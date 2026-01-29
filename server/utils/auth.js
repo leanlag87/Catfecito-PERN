@@ -1,10 +1,10 @@
 import { unauthorized, forbidden } from "./responses.js";
 
 /**
- * Extrae y decodifica el usuario del token de Cognito (IdToken)
- * Reemplaza a verifyAccessToken() pero para tokens de Cognito
+ * Middleware para verificar autenticación
+ * Lee el usuario desde el contexto del Lambda Authorizer
  */
-export const getUserFromToken = async (event) => {
+export const requireAuth = (handler) => {
   return async (event) => {
     try {
       // El authorizer ya validó el token y puso el usuario en el contexto
