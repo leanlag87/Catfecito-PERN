@@ -19,42 +19,9 @@ provider:
   httpApi:
     authorizers: ${file(server/serverless-config/provider/httpApi.yml)}
 
-  iam:
-    role:
-      statements:
-        - Effect: Allow
-          Action:
-            - dynamodb:Query
-            - dynamodb:Scan
-            - dynamodb:GetItem
-            - dynamodb:PutItem
-            - dynamodb:UpdateItem
-            - dynamodb:DeleteItem
-            - dynamodb:BatchGetItem
-            - dynamodb:BatchWriteItem
-          Resource:
-            - "arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.DYNAMODB_TABLE}"
-            - "arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.DYNAMODB_TABLE}/index/*"
-
-        - Effect: Allow
-          Action:
-            - cognito-idp:AdminCreateUser
-            - cognito-idp:AdminSetUserPassword
-            - cognito-idp:AdminInitiateAuth
-            - cognito-idp:AdminRespondToAuthChallenge
-            - cognito-idp:GlobalSignOut
-            - cognito-idp:ChangePassword
-            - cognito-idp:AdminDeleteUser
-          Resource:
-            - "arn:aws:cognito-idp:${self:provider.region}:*:userpool/${env:COGNITO_USER_POOL_ID}"
-
-        - Effect: Allow
-          Action:
-            - s3:PutObject
-            - s3:GetObject
-            - s3:DeleteObject
-          Resource:
-            - "arn:aws:s3:::${self:provider.environment.S3_BUCKET}/*"
+  iam: 
+    role: ${file(server/serverless-config/provider/iam.yml)}
+    
 
 functions:
   - ${file(server/serverless-config/functions/auth.yml)}
