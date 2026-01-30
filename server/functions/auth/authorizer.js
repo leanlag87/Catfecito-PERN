@@ -3,15 +3,12 @@ import { docClient, TABLE_NAME } from "../../dynamodb.js";
 import { GetCommand } from "@aws-sdk/lib-dynamodb";
 
 export const handler = async (event) => {
-  console.log("🔐 Authorizer invoked");
-
   try {
     // Extraer token
     const authHeader =
       event.headers?.authorization || event.headers?.Authorization;
 
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
-      console.log("❌ No token provided");
       throw new Error("Unauthorized");
     }
 
@@ -21,16 +18,12 @@ export const handler = async (event) => {
     const decoded = jwt.decode(token);
 
     if (!decoded || !decoded.sub) {
-      console.log("❌ Token inválido o sin sub");
       throw new Error("Unauthorized");
     }
 
     // Verificar decoded.sub O decoded.id
     const userId = decoded.sub;
     const email = decoded.email || decoded["cognito:username"];
-
-    console.log("✅ Token válido para usuario:", userId);
-    console.log("📋 Token completo:", JSON.stringify(decoded));
 
     // Consultar rol actualizado desde DynamoDB
     const result = await docClient.send(
@@ -44,13 +37,10 @@ export const handler = async (event) => {
     );
 
     if (!result.Item) {
-      console.log("❌ Usuario no encontrado en DynamoDB");
       throw new Error("Unauthorized");
     }
 
     const user = result.Item;
-
-    console.log(`👤 Usuario: ${email} | Rol: ${user.role}`);
 
     // Retornar política con contexto
     return generatePolicy(userId, "Allow", event.routeArn, {
@@ -60,14 +50,13 @@ export const handler = async (event) => {
       role: user.role || "user",
     });
   } catch (error) {
-    console.error("❌ Authorizer error:", error.message);
+    console.error("Authorizer error:", error.message);
     throw new Error("Unauthorized");
   }
 };
 
-/**
- * Genera política de autorización
- */
+//Genera política de autorización
+
 function generatePolicy(principalId, effect, resource, context = {}) {
   const authResponse = {
     principalId: principalId,
@@ -90,8 +79,6 @@ function generatePolicy(principalId, effect, resource, context = {}) {
   if (Object.keys(context).length > 0) {
     authResponse.context = context;
   }
-
-  console.log("✅ Política generada:", JSON.stringify(authResponse));
 
   return authResponse;
 }
