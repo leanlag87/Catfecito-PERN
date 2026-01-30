@@ -2,14 +2,11 @@ import jwt from "jsonwebtoken";
 import { docClient, TABLE_NAME } from "../../dynamodb.js";
 import { GetCommand } from "@aws-sdk/lib-dynamodb";
 
-/**
- * Lambda Authorizer optimizado
- */
 export const handler = async (event) => {
   console.log("🔐 Authorizer invoked");
 
   try {
-    // 1. Extraer token
+    // Extraer token
     const authHeader =
       event.headers?.authorization || event.headers?.Authorization;
 
@@ -20,34 +17,46 @@ export const handler = async (event) => {
 
     const token = authHeader.split(" ")[1];
 
-    // 2. Verificar firma del JWT (IMPORTANTE para seguridad)
+    // Verificar firma del JWT (IMPORTANTE para seguridad)
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-    console.log("✅ Token válido para usuario:", decoded.id);
+    // Verificar decoded.sub O decoded.id
+    const userId = decoded.sub || decoded.id;
 
-    // 3. Consultar rol actualizado desde DynamoDB
-    // (Solo si necesitas roles actualizados en tiempo real)
+    console.log("✅ Token válido para usuario:", userId);
+    console.log("📋 Token completo:", JSON.stringify(decoded));
+
+    // Consultar rol actualizado desde DynamoDB
     const result = await docClient.send(
       new GetCommand({
         TableName: TABLE_NAME,
         Key: {
-          PK: `USER#${decoded.id}`,
+          PK: `USER#${userId}`,
           SK: "METADATA",
         },
       }),
     );
 
     const roleFromDB = result.Item?.role || decoded.role || "user";
+    console.log(`👤 Usuario: ${decoded.email} | Rol: ${roleFromDB}`);
 
-    // 4. Retornar política con contexto
-    return generatePolicy(decoded.id, "Allow", event.routeArn, {
-      id: decoded.id,
+    // Retornar política con contexto
+    return generatePolicy(userId, "Allow", event.routeArn, {
+      id: userId,
       email: decoded.email,
       name: decoded.name || "",
       role: roleFromDB,
     });
   } catch (error) {
     console.error("❌ Authorizer error:", error.message);
+
+    // JWT expirado o inválido
+    if (error.name === "TokenExpiredError") {
+      console.log("⏰ Token expirado");
+    } else if (error.name === "JsonWebTokenError") {
+      console.log("🔒 Token inválido");
+    }
+
     throw new Error("Unauthorized");
   }
 };
@@ -77,6 +86,8 @@ function generatePolicy(principalId, effect, resource, context = {}) {
   if (Object.keys(context).length > 0) {
     authResponse.context = context;
   }
+
+  console.log("✅ Política generada:", JSON.stringify(authResponse));
 
   return authResponse;
 }
