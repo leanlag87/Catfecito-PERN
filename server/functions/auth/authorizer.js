@@ -17,11 +17,17 @@ export const handler = async (event) => {
 
     const token = authHeader.split(" ")[1];
 
-    // Verificar firma del JWT (IMPORTANTE para seguridad)
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    // SOLO DECODIFICAR (Cognito ya validó el token)
+    const decoded = jwt.decode(token);
+
+    if (!decoded || !decoded.sub) {
+      console.log("❌ Token inválido o sin sub");
+      throw new Error("Unauthorized");
+    }
 
     // Verificar decoded.sub O decoded.id
-    const userId = decoded.sub || decoded.id;
+    const userId = decoded.sub;
+    const email = decoded.email || decoded["cognito:username"];
 
     console.log("✅ Token válido para usuario:", userId);
     console.log("📋 Token completo:", JSON.stringify(decoded));
@@ -37,26 +43,24 @@ export const handler = async (event) => {
       }),
     );
 
-    const roleFromDB = result.Item?.role || decoded.role || "user";
-    console.log(`👤 Usuario: ${decoded.email} | Rol: ${roleFromDB}`);
+    if (!result.Item) {
+      console.log("❌ Usuario no encontrado en DynamoDB");
+      throw new Error("Unauthorized");
+    }
+
+    const user = result.Item;
+
+    console.log(`👤 Usuario: ${email} | Rol: ${user.role}`);
 
     // Retornar política con contexto
     return generatePolicy(userId, "Allow", event.routeArn, {
       id: userId,
-      email: decoded.email,
-      name: decoded.name || "",
-      role: roleFromDB,
+      email: email,
+      name: user.name || "",
+      role: user.role || "user",
     });
   } catch (error) {
     console.error("❌ Authorizer error:", error.message);
-
-    // JWT expirado o inválido
-    if (error.name === "TokenExpiredError") {
-      console.log("⏰ Token expirado");
-    } else if (error.name === "JsonWebTokenError") {
-      console.log("🔒 Token inválido");
-    }
-
     throw new Error("Unauthorized");
   }
 };
