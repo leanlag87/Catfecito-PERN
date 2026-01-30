@@ -14,9 +14,6 @@ const addToCartHandler = async (event) => {
     const body = JSON.parse(event.body);
     const { product_id, quantity } = body;
 
-    console.log("🛒 Adding to cart:", { userId, product_id, quantity });
-
-    // Validaciones
     if (!product_id) {
       return badRequest("El product_id es requerido");
     }
@@ -127,8 +124,6 @@ const addToCartHandler = async (event) => {
     // Calcular subtotal
     const subtotal = cartItem.product_price * cartItem.quantity;
 
-    console.log(`✅ Cart item ${isUpdate ? "updated" : "created"}`);
-
     return success(
       {
         success: true,
@@ -151,7 +146,7 @@ const addToCartHandler = async (event) => {
       201,
     );
   } catch (error) {
-    console.error("❌ Error en addToCart:", error);
+    console.error("Error en addToCart:", error);
     return serverError("Error al agregar producto al carrito");
   }
 };
