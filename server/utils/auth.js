@@ -21,15 +21,12 @@ export const requireAuth = (handler) => {
         name: authContext.name,
         role: authContext.role,
       };
-
-      console.log(`🔓 Usuario autenticado: ${user.email} (${user.role})`);
-
       // Agregar usuario al event para usarlo en el handler
       event.user = user;
 
       return await handler(event);
     } catch (error) {
-      console.error("❌ Auth error:", error);
+      console.error("Auth error:", error);
       return unauthorized("Token inválido");
     }
   };
@@ -42,11 +39,8 @@ export const requireAuth = (handler) => {
 export const requireAdmin = (handler) => {
   return requireAuth(async (event) => {
     if (event.user.role !== "admin") {
-      console.log(`⛔ Acceso denegado: ${event.user.email} no es admin`);
       return forbidden("Se requiere rol de administrador");
     }
-
-    console.log(`✅ Admin verificado: ${event.user.email}`);
     return await handler(event);
   });
 };
