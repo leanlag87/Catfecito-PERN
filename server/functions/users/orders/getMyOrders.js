@@ -7,8 +7,6 @@ const getMyOrdersHandler = async (event) => {
   try {
     const userId = event.user.id;
 
-    console.log("📋 Getting orders for user:", userId);
-
     //Obtener índice de órdenes del usuario
     const result = await docClient.send(
       new QueryCommand({
@@ -28,8 +26,6 @@ const getMyOrdersHandler = async (event) => {
         orders: [],
       });
     }
-
-    console.log(`📦 Found ${result.Items.length} orders`);
 
     // Obtener metadata completa de cada orden en batch
     const orderKeys = result.Items.map((item) => ({
@@ -92,8 +88,6 @@ const getMyOrdersHandler = async (event) => {
     ordersWithItemCount.sort(
       (a, b) => new Date(b.created_at) - new Date(a.created_at),
     );
-
-    console.log(`✅ Retrieved ${ordersWithItemCount.length} orders`);
 
     return success({
       success: true,
