@@ -16,8 +16,6 @@ const cancelOrderHandler = async (event) => {
     const isAdmin = userRole === "admin";
     const orderId = event.pathParameters?.id;
 
-    console.log("🚫 Cancelling order:", { userId, orderId, isAdmin });
-
     // Obtener la orden
     const orderResult = await docClient.send(
       new GetCommand({
@@ -88,8 +86,6 @@ const cancelOrderHandler = async (event) => {
       }),
     );
 
-    console.log(`✅ Order cancelled: ${orderId}`);
-
     return success({
       success: true,
       message: "Orden cancelada exitosamente",
@@ -113,7 +109,7 @@ const cancelOrderHandler = async (event) => {
       },
     });
   } catch (error) {
-    console.error("❌ Error en cancelOrder:", error);
+    console.error("Error en cancelOrder:", error);
     return serverError("Error al cancelar la orden");
   }
 };
