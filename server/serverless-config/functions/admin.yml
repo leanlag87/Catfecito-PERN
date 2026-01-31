@@ -93,3 +93,31 @@ deleteCategory:
     - httpApi:
         path: /api/admin/categories/{id}
         method: DELETE
+
+# ========== ADMIN - ORDERS ==========
+getAllOrders:
+  handler: server/functions/admin/orders/getAllOrders.getAllOrders
+  events:
+    - httpApi:
+        path: /api/admin/orders
+        method: GET
+        authorizer:
+          name: jwtAuthorizer
+
+getOrderByIdAdmin:
+  handler: server/functions/admin/orders/getOrderByIdAdmin.getOrderByIdAdmin
+  events:
+    - httpApi:
+        path: /api/admin/orders/{id}
+        method: GET
+        authorizer:
+          name: jwtAuthorizer
+
+updateOrderStatus:
+  handler: server/functions/admin/orders/updateOrderStatus.updateOrderStatus
+  events:
+    - httpApi:
+        path: /api/admin/orders/{id}/status
+        method: PUT
+        authorizer:
+          name: jwtAuthorizer
