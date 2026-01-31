@@ -25,8 +25,6 @@ const createOrderHandler = async (event) => {
       shipping_phone,
     } = body;
 
-    console.log("📦 Creating order for user:", userId);
-
     // Validación de campos requeridos
     if (
       !shipping_first_name ||
@@ -57,8 +55,6 @@ const createOrderHandler = async (event) => {
     if (!cartResult.Items || cartResult.Items.length === 0) {
       return badRequest("El carrito está vacío");
     }
-
-    console.log(`🛒 Found ${cartResult.Items.length} items in cart`);
 
     // Obtener información de productos en batch
     const productIds = cartResult.Items.map((item) => item.product_id);
@@ -208,8 +204,6 @@ const createOrderHandler = async (event) => {
       }),
     );
 
-    console.log(`✅ Order created: ${orderId}, total: $${total.toFixed(2)}`);
-
     // Retornar orden completa
     return success(
       {
@@ -238,7 +232,7 @@ const createOrderHandler = async (event) => {
       201,
     );
   } catch (error) {
-    console.error("❌ Error en createOrder:", error);
+    console.error("Error en createOrder:", error);
     return serverError("Error al crear la orden");
   }
 };
