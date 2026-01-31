@@ -8,9 +8,7 @@ const removeCartItemHandler = async (event) => {
     const userId = event.user.id;
     const productId = event.pathParameters?.product_id;
 
-    console.log("🗑️ Removing cart item:", { userId, productId });
-
-    // 1. Verificar que el item existe en el carrito
+    // Verificar que el item existe en el carrito
     const cartItemResult = await docClient.send(
       new GetCommand({
         TableName: TABLE_NAME,
@@ -25,7 +23,7 @@ const removeCartItemHandler = async (event) => {
       return notFound("Item no encontrado en tu carrito");
     }
 
-    // 2. Eliminar el item
+    // Eliminar el item
     await docClient.send(
       new DeleteCommand({
         TableName: TABLE_NAME,
@@ -36,8 +34,6 @@ const removeCartItemHandler = async (event) => {
       }),
     );
 
-    console.log("✅ Cart item removed");
-
     return success({
       success: true,
       message: "Producto eliminado del carrito",
@@ -46,7 +42,7 @@ const removeCartItemHandler = async (event) => {
       },
     });
   } catch (error) {
-    console.error("❌ Error en removeCartItem:", error);
+    console.error("Error en removeCartItem:", error);
     return serverError("Error al eliminar item");
   }
 };
