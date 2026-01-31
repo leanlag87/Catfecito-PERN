@@ -30,6 +30,7 @@ functions:
   - ${file(server/serverless-config/functions/products.yml)}
   - ${file(server/serverless-config/functions/categories.yml)}
   - ${file(server/serverless-config/functions/cart.yml)}
+  - ${file(server/serverless-config/functions/orders.yml)}
   
 
 resources:

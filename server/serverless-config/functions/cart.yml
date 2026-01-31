@@ -26,8 +26,8 @@ updateCartItem:
         authorizer:
           name: jwtAuthorizer
 
-removeFromCart:
-  handler: server/functions/users/cart/removeFromCart.removeFromCart
+removeCartItem:
+  handler: server/functions/users/cart/removeCartItem.removeCartItem
   events:
     - httpApi:
         path: /api/cart/{product_id}

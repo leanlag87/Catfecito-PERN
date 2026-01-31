@@ -1,0 +1,36 @@
+# Funciones de órdenes (usuario autenticado)
+createOrder:
+  handler: server/functions/users/orders/createOrder.createOrder
+  events:
+    - httpApi:
+        path: /api/orders
+        method: POST
+        authorizer:
+          name: jwtAuthorizer
+
+getMyOrders:
+  handler: server/functions/users/orders/getMyOrders.getMyOrders
+  events:
+    - httpApi:
+        path: /api/orders
+        method: GET
+        authorizer:
+          name: jwtAuthorizer
+
+getOrderById:
+  handler: server/functions/users/orders/getOrderById.getOrderById
+  events:
+    - httpApi:
+        path: /api/orders/{id}
+        method: GET
+        authorizer:
+          name: jwtAuthorizer
+
+cancelOrder:
+  handler: server/functions/users/orders/cancelOrder.cancelOrder
+  events:
+    - httpApi:
+        path: /api/orders/{id}/cancel
+        method: POST
+        authorizer:
+          name: jwtAuthorizer
