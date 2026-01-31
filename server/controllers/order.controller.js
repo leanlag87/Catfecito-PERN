@@ -5,7 +5,7 @@ import { pool } from "../db.js";
 // Crear orden desde el carrito
 export async function createOrder(req, res) {
   const userId = req.user.id;
-  const { 
+  const {
     shipping_first_name,
     shipping_last_name,
     shipping_country,
@@ -14,14 +14,22 @@ export async function createOrder(req, res) {
     shipping_city,
     shipping_state,
     shipping_zip,
-    shipping_phone
+    shipping_phone,
   } = req.body;
 
   // Validación de campos requeridos
-  if (!shipping_first_name || !shipping_last_name || !shipping_country || 
-      !shipping_address || !shipping_city || !shipping_state || !shipping_zip) {
+  if (
+    !shipping_first_name ||
+    !shipping_last_name ||
+    !shipping_country ||
+    !shipping_address ||
+    !shipping_city ||
+    !shipping_state ||
+    !shipping_zip
+  ) {
     return res.status(400).json({
-      message: "Todos los campos de dirección son requeridos (excepto address2 y phone)",
+      message:
+        "Todos los campos de dirección son requeridos (excepto address2 y phone)",
     });
   }
 
@@ -30,7 +38,7 @@ export async function createOrder(req, res) {
   try {
     await client.query("BEGIN");
 
-    // 1. Obtener items del carrito
+    // Obtener items del carrito
     const cartItems = await client.query(
       `SELECT 
         ci.id as cart_item_id,
@@ -44,7 +52,7 @@ export async function createOrder(req, res) {
        FROM cart_items ci
        INNER JOIN products p ON ci.product_id = p.id
        WHERE ci.user_id = $1`,
-      [userId]
+      [userId],
     );
 
     if (cartItems.rowCount === 0) {
@@ -54,7 +62,7 @@ export async function createOrder(req, res) {
       });
     }
 
-    // 2. Validar stock y productos activos
+    // Validar stock y productos activos
     for (const item of cartItems.rows) {
       if (!item.is_active) {
         await client.query("ROLLBACK");
@@ -71,13 +79,13 @@ export async function createOrder(req, res) {
       }
     }
 
-    // 3. Calcular total
+    // Calcular total
     const total = cartItems.rows.reduce(
       (sum, item) => sum + parseFloat(item.subtotal),
-      0
+      0,
     );
 
-    // 4. Crear orden
+    // Crear orden
     const orderResult = await client.query(
       `INSERT INTO orders (
         user_id, total, status, payment_status,
@@ -92,7 +100,7 @@ export async function createOrder(req, res) {
                  shipping_state, shipping_zip, shipping_phone,
                  created_at, updated_at`,
       [
-        userId, 
+        userId,
         total.toFixed(2),
         shipping_first_name,
         shipping_last_name,
@@ -102,36 +110,24 @@ export async function createOrder(req, res) {
         shipping_city,
         shipping_state,
         shipping_zip,
-        shipping_phone || null
-      ]
+        shipping_phone || null,
+      ],
     );
 
     const orderId = orderResult.rows[0].id;
 
-    // 5. Crear items de la orden (SIN decrementar stock todavía)
+    // Crear items de la orden (SIN decrementar stock todavía)
     // El stock se decrementará cuando el pago sea confirmado en el webhook
     for (const item of cartItems.rows) {
       // Insertar item en order_items
       await client.query(
         `INSERT INTO order_items (order_id, product_id, quantity, price, subtotal) 
          VALUES ($1, $2, $3, $4, $5)`,
-        [orderId, item.product_id, item.quantity, item.price, item.subtotal]
+        [orderId, item.product_id, item.quantity, item.price, item.subtotal],
       );
-
-      // NO decrementar stock aquí - se hará cuando el pago sea aprobado
-      // await client.query(
-      //   `UPDATE products 
-      //    SET stock = stock - $1, updated_at = NOW() 
-      //    WHERE id = $2`,
-      //   [item.quantity, item.product_id]
-      // );
     }
 
-    // 6. NO vaciar carrito aquí - se vaciará cuando el pago sea confirmado
-    // await client.query("DELETE FROM cart_items WHERE user_id = $1", [userId]);
-    // NOTA: El carrito se vaciará en el webhook cuando payment_status === 'approved'
-
-    // 7. Obtener orden completa con items
+    // Obtener orden completa con items
     const orderWithItems = await client.query(
       `SELECT 
         o.id,
@@ -166,7 +162,7 @@ export async function createOrder(req, res) {
        INNER JOIN products p ON oi.product_id = p.id
        WHERE o.id = $1
        GROUP BY o.id`,
-      [orderId]
+      [orderId],
     );
 
     await client.query("COMMIT");
@@ -213,7 +209,7 @@ export async function getMyOrders(req, res) {
       WHERE o.user_id = $1
       GROUP BY o.id
       ORDER BY o.created_at DESC`,
-      [userId]
+      [userId],
     );
 
     return res.status(200).json({
@@ -268,8 +264,8 @@ export async function getOrderById(req, res) {
        INNER JOIN order_items oi ON o.id = oi.order_id
        INNER JOIN products p ON oi.product_id = p.id
        WHERE o.id = $1 AND o.user_id = $2
-       GROUP BY o.id, u.email` ,                      
-      [id, userId]
+       GROUP BY o.id, u.email`,
+      [id, userId],
     );
 
     if (result.rowCount === 0) {
@@ -316,7 +312,7 @@ export async function getAllOrders(req, res) {
        INNER JOIN users u ON o.user_id = u.id
        LEFT JOIN order_items oi ON o.id = oi.order_id
        GROUP BY o.id, u.name, u.email
-       ORDER BY o.created_at DESC`
+       ORDER BY o.created_at DESC`,
     );
 
     return res.status(200).json({
@@ -372,7 +368,7 @@ export async function getOrderByIdAdmin(req, res) {
        INNER JOIN products p ON oi.product_id = p.id
        WHERE o.id = $1
        GROUP BY o.id, u.name, u.email`,
-      [id]
+      [id],
     );
 
     if (result.rowCount === 0) {
@@ -415,7 +411,7 @@ export async function updateOrderStatus(req, res) {
        SET status = $1, updated_at = NOW() 
        WHERE id = $2 
        RETURNING id, user_id, total, status, payment_status, created_at, updated_at`,
-      [status, id]
+      [status, id],
     );
 
     if (result.rowCount === 0) {
@@ -440,19 +436,35 @@ export async function cancelOrder(req, res) {
   const { id } = req.params;
 
   try {
-    const q = await pool.query("SELECT id, user_id, status, payment_status FROM orders WHERE id = $1", [id]);
-    if (q.rowCount === 0) return res.status(404).json({ success: false, message: "Orden no encontrada" });
+    const q = await pool.query(
+      "SELECT id, user_id, status, payment_status FROM orders WHERE id = $1",
+      [id],
+    );
+    if (q.rowCount === 0)
+      return res
+        .status(404)
+        .json({ success: false, message: "Orden no encontrada" });
 
     const order = q.rows[0];
 
     // permiso: dueño o admin
     if (!isAdmin && order.user_id !== userId) {
-      return res.status(403).json({ success: false, message: "No autorizado para cancelar esta orden" });
+      return res
+        .status(403)
+        .json({
+          success: false,
+          message: "No autorizado para cancelar esta orden",
+        });
     }
 
     // no permitir cancelar si ya está pagada/aprobada
     if (order.status === "paid" || order.payment_status === "approved") {
-      return res.status(400).json({ success: false, message: "No se puede cancelar una orden ya pagada" });
+      return res
+        .status(400)
+        .json({
+          success: false,
+          message: "No se puede cancelar una orden ya pagada",
+        });
     }
 
     const upd = await pool.query(
@@ -462,12 +474,14 @@ export async function cancelOrder(req, res) {
            updated_at = NOW()
        WHERE id = $1
        RETURNING *`,
-      [id]
+      [id],
     );
 
     return res.status(200).json({ success: true, order: upd.rows[0] });
   } catch (error) {
     console.error("Error en cancelOrder:", error);
-    return res.status(500).json({ success: false, message: "Error al cancelar la orden" });
+    return res
+      .status(500)
+      .json({ success: false, message: "Error al cancelar la orden" });
   }
 }
