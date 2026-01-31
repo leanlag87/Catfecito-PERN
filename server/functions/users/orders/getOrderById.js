@@ -12,8 +12,6 @@ const getOrderByIdHandler = async (event) => {
     const userId = event.user.id;
     const orderId = event.pathParameters?.id;
 
-    console.log("📄 Getting order:", { userId, orderId });
-
     // Verificar que la orden existe y pertenece al usuario
     const orderIndexResult = await docClient.send(
       new GetCommand({
@@ -122,8 +120,6 @@ const getOrderByIdHandler = async (event) => {
         image_url: product?.image_url || null,
       };
     });
-
-    console.log(`✅ Order retrieved: ${orderId}, items: ${items.length}`);
 
     return success({
       success: true,
