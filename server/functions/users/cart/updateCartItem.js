@@ -1,4 +1,3 @@
-import { v4 as uuidv4 } from "uuid";
 import { docClient, TABLE_NAME, getTimestamp } from "../../../dynamodb.js";
 import { GetCommand, UpdateCommand } from "@aws-sdk/lib-dynamodb";
 import { requireAuth } from "../../../utils/auth.js";
@@ -16,9 +15,6 @@ const updateCartItemHandler = async (event) => {
     const body = JSON.parse(event.body);
     const { quantity } = body;
 
-    console.log("🔄 Updating cart item:", { userId, productId, quantity });
-
-    // Validaciones
     if (!quantity || parseInt(quantity) <= 0) {
       return badRequest("La cantidad debe ser mayor a 0");
     }
@@ -86,8 +82,6 @@ const updateCartItemHandler = async (event) => {
     // Calcular subtotal
     const subtotal = parseFloat(product.price) * qty;
 
-    console.log("✅ Cart item updated");
-
     return success({
       success: true,
       message: "Cantidad actualizada",
@@ -103,7 +97,7 @@ const updateCartItemHandler = async (event) => {
       },
     });
   } catch (error) {
-    console.error("❌ Error en updateCartItem:", error);
+    console.error("Error en updateCartItem:", error);
     return serverError("Error al actualizar item");
   }
 };
