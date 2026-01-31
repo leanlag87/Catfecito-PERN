@@ -7,8 +7,6 @@ const clearCartHandler = async (event) => {
   try {
     const userId = event.user.id;
 
-    console.log("🧹 Clearing cart for user:", userId);
-
     // Obtener todos los items del carrito
     const result = await docClient.send(
       new QueryCommand({
@@ -29,8 +27,6 @@ const clearCartHandler = async (event) => {
         deletedCount: 0,
       });
     }
-
-    console.log(`📦 Found ${result.Items.length} items to delete`);
 
     // Eliminar items en batch (máximo 25 por batch)
     const deleteRequests = result.Items.map((item) => ({
@@ -59,15 +55,13 @@ const clearCartHandler = async (event) => {
       );
     }
 
-    console.log(`✅ Cart cleared: ${result.Items.length} items deleted`);
-
     return success({
       success: true,
       message: "Carrito vaciado exitosamente",
       deletedCount: result.Items.length,
     });
   } catch (error) {
-    console.error("❌ Error en clearCart:", error);
+    console.error("Error en clearCart:", error);
     return serverError("Error al vaciar el carrito");
   }
 };
