@@ -7,8 +7,6 @@ const getCartHandler = async (event) => {
   try {
     const userId = event.user.id;
 
-    console.log("🛒 Getting cart for user:", userId);
-
     // Obtener todos los items del carrito del usuario
     const cartResult = await docClient.send(
       new QueryCommand({
@@ -29,8 +27,6 @@ const getCartHandler = async (event) => {
         items: [],
       });
     }
-
-    console.log(`📦 Found ${cartResult.Items.length} cart items`);
 
     // Obtener información de los productos en batch
     const productIds = cartResult.Items.map((item) => item.product_id);
@@ -64,7 +60,6 @@ const getCartHandler = async (event) => {
       const product = productsMap[cartItem.product_id];
 
       if (!product) {
-        console.warn(`⚠️ Producto no encontrado: ${cartItem.product_id}`);
         return null;
       }
 
@@ -92,10 +87,6 @@ const getCartHandler = async (event) => {
       0,
     );
 
-    console.log(
-      `✅ Cart retrieved: ${items.length} items, total: $${total.toFixed(2)}`,
-    );
-
     return success({
       success: true,
       count: items.length,
@@ -103,7 +94,7 @@ const getCartHandler = async (event) => {
       items: items,
     });
   } catch (error) {
-    console.error("❌ Error en getCart:", error);
+    console.error("Error en getCart:", error);
     return serverError("Error al obtener el carrito");
   }
 };
