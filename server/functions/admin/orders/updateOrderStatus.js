@@ -23,8 +23,6 @@ const updateOrderStatusHandler = async (event) => {
       "cancelled",
     ];
 
-    console.log("🔄 Updating order status:", { orderId, status });
-
     // Validar estado
     if (!status || !validStatuses.includes(status)) {
       return badRequest(
@@ -87,8 +85,6 @@ const updateOrderStatusHandler = async (event) => {
         },
       }),
     );
-
-    console.log(`✅ Order status updated: ${orderId} -> ${status}`);
 
     return success({
       success: true,
