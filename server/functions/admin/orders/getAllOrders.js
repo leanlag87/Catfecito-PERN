@@ -5,8 +5,6 @@ import { success, serverError } from "../../../utils/responses.js";
 
 const getAllOrdersHandler = async (event) => {
   try {
-    console.log("📋 Getting all orders (admin)");
-
     // Scanea todas las órdenes (METADATA only)
     const result = await docClient.send(
       new ScanCommand({
@@ -26,8 +24,6 @@ const getAllOrdersHandler = async (event) => {
         orders: [],
       });
     }
-
-    console.log(`📦 Found ${result.Items.length} orders`);
 
     // Obtener información de usuarios en batch
     const userIds = [...new Set(result.Items.map((order) => order.user_id))];
@@ -100,8 +96,6 @@ const getAllOrdersHandler = async (event) => {
     ordersWithDetails.sort(
       (a, b) => new Date(b.created_at) - new Date(a.created_at),
     );
-
-    console.log(`✅ Retrieved ${ordersWithDetails.length} orders`);
 
     return success({
       success: true,
