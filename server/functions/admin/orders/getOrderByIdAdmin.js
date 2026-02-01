@@ -11,8 +11,6 @@ const getOrderByIdAdminHandler = async (event) => {
   try {
     const orderId = event.pathParameters?.id;
 
-    console.log("📄 Getting order (admin):", orderId);
-
     //  Obtener metadata de la orden
     const orderResult = await docClient.send(
       new GetCommand({
@@ -120,10 +118,6 @@ const getOrderByIdAdminHandler = async (event) => {
         image_url: product?.image_url || null,
       };
     });
-
-    console.log(
-      `✅ Order retrieved (admin): ${orderId}, items: ${items.length}`,
-    );
 
     return success({
       success: true,
