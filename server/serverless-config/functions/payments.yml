@@ -1,0 +1,28 @@
+# Funciones de pagos
+createPreference:
+  handler: server/functions/payments/createPreference.createPreference
+  timeout: 30  # MercadoPago puede tardar
+  events:
+    - httpApi:
+        path: /api/payments/preference
+        method: POST
+        authorizer:
+          name: jwtAuthorizer
+
+webhook:
+  handler: server/functions/payments/webhook.webhook
+  timeout: 30
+  events:
+    - httpApi:
+        path: /api/payments/webhook
+        method: POST
+        # SIN AUTHORIZER (MercadoPago llama directamente)
+
+getPaymentStatus:
+  handler: server/functions/payments/getPaymentStatus.getPaymentStatus
+  events:
+    - httpApi:
+        path: /api/payments/status/{order_id}
+        method: GET
+        authorizer:
+          name: jwtAuthorizer

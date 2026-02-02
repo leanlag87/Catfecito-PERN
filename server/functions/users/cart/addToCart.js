@@ -152,14 +152,3 @@ const addToCartHandler = async (event) => {
 };
 
 export const addToCart = requireAuth(addToCartHandler);
-
-/**
- * Cosas para hacer mañana:
- * Ver si se puede "unificar" el archivo auth.js con authorizer.js
- * Ver si es necesario usar la libreria JWT ya que estoy usando cognito.
- * ver para que se esta usando JWT, a lo mejor no es necesario usarlo.
- *
- * Ver si puedo comenzar con la separacion de "responsabilidades"
- * es decir, separar la logica de negocio de la logica de infraestructura (dynamodb, api gateway, etc)
- *
- */
