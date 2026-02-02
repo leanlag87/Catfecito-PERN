@@ -17,10 +17,7 @@ provider:
     S3_BUCKET: ${self:service}-products-${self:provider.stage}
     MP_ACCESS_TOKEN: ${env:MP_ACCESS_TOKEN}
     CURRENCY_ID: ${env:CURRENCY_ID, 'ARS'}
-
-    # URL de API Gateway (se construye automáticamente)
-    API_URL: 
-      Fn::Sub: 'https://${HttpApi}.execute-api.${AWS::Region}.amazonaws.com'
+    API_URL: ${env:API_URL}
 
   httpApi:
     authorizers: ${file(server/serverless-config/provider/httpApi.yml)}

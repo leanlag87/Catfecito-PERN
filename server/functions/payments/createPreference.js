@@ -22,7 +22,17 @@ const createPreferenceHandler = async (event) => {
     const body = JSON.parse(event.body);
     const { order_id } = body;
 
-    console.log("💳 Creating payment preference:", { userId, order_id });
+    // Construir URL del backend desde el evento de API Gateway
+    const domain = event.requestContext?.domainName;
+    const stage = event.requestContext?.stage || "";
+    const backendUrl = `https://${domain}${stage ? "/" + stage : ""}`;
+
+    console.log("💳 Creating payment preference:", {
+      userId,
+      order_id,
+      backendUrl,
+      webhook: `${backendUrl}/api/payments/webhook`,
+    });
 
     // Validación
     if (!order_id) {
@@ -120,9 +130,6 @@ const createPreferenceHandler = async (event) => {
         currency_id: CURRENCY_ID,
       };
     });
-
-    // Configurar preferencia de pago
-    const backendUrl = process.env.API_URL;
 
     const preferenceData = {
       items: items,
