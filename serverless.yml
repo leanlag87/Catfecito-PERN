@@ -17,7 +17,6 @@ provider:
     S3_BUCKET: ${self:service}-products-${self:provider.stage}
     MP_ACCESS_TOKEN: ${env:MP_ACCESS_TOKEN}
     CURRENCY_ID: ${env:CURRENCY_ID, 'ARS'}
-    API_URL: ${env:API_URL}
 
   httpApi:
     authorizers: ${file(server/serverless-config/provider/httpApi.yml)}
@@ -40,9 +39,5 @@ functions:
 resources:
   - ${file(server/serverless-config/resources/dynamo.yml)}
   - ${file(server/serverless-config/resources/s3.yml)}
-  - Outputs:
-      HttpApiUrl:
-        Description: "URL de API Gateway HTTP API"
-        Value:
-          Fn::Sub: 'https://${HttpApi}.execute-api.${AWS::Region}.amazonaws.com'
+  
 

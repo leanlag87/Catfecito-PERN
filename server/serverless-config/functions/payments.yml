@@ -1,7 +1,7 @@
 # Funciones de pagos
 createPreference:
   handler: server/functions/payments/createPreference.createPreference
-  timeout: 30  # MercadoPago puede tardar
+  timeout: 29  # MercadoPago puede tardar
   events:
     - httpApi:
         path: /api/payments/preference
@@ -11,7 +11,7 @@ createPreference:
 
 webhook:
   handler: server/functions/payments/webhook.webhook
-  timeout: 30
+  timeout: 29
   events:
     - httpApi:
         path: /api/payments/webhook
