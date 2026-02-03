@@ -17,7 +17,6 @@ provider:
     S3_BUCKET: ${self:service}-products-${self:provider.stage}
     MP_ACCESS_TOKEN: ${env:MP_ACCESS_TOKEN}
     CURRENCY_ID: ${env:CURRENCY_ID, 'ARS'}
-    API_URL: ${env:API_URL}
 
   httpApi:
     authorizers: ${file(server/serverless-config/provider/httpApi.yml)}
