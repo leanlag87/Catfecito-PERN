@@ -39,9 +39,5 @@ functions:
 resources:
   - ${file(server/serverless-config/resources/dynamo.yml)}
   - ${file(server/serverless-config/resources/s3.yml)}
-  - Outputs:
-      HttpApiUrl:
-        Description: "URL de API Gateway HTTP API"
-        Value:
-          Fn::Sub: 'https://${HttpApi}.execute-api.${AWS::Region}.amazonaws.com'
+  
 
