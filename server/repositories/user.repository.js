@@ -1,9 +1,11 @@
 import { docClient, TABLE_NAME, getTimestamp } from "../dynamodb.js";
 import { QueryCommand, GetCommand, PutCommand } from "@aws-sdk/lib-dynamodb";
 
+//Clase que contendra metodos personalizados para manejar usuarios en DynamoDB
 class UserRepository {
-  //Buscar usuario por email usando GSI
+  //Metodos personalizados para manejar usuarios en DynamoDB
 
+  //Buscar usuario por email usando GSI
   async findByEmail(email) {
     const result = await docClient.send(
       new QueryCommand({
@@ -20,7 +22,6 @@ class UserRepository {
   }
 
   //Buscar usuario por ID
-
   async findById(userId) {
     const result = await docClient.send(
       new GetCommand({
@@ -64,7 +65,6 @@ class UserRepository {
   }
 
   //Crear nuevo usuario en DynamoDB
-
   async create(userData) {
     const { cognitoUserId, name, email, role = "user" } = userData;
     const now = getTimestamp();
@@ -102,7 +102,6 @@ class UserRepository {
   }
 
   //Verificar si un email ya existe
-
   async emailExists(email) {
     const user = await this.findByEmail(email);
     return user !== null;
