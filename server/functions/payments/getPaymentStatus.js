@@ -8,8 +8,6 @@ const getPaymentStatusHandler = async (event) => {
     const userId = event.user.id;
     const orderId = event.pathParameters?.order_id;
 
-    console.log("📊 Getting payment status:", { userId, orderId });
-
     // Verificar que la orden existe y pertenece al usuario
     const orderIndexResult = await docClient.send(
       new GetCommand({
@@ -41,8 +39,6 @@ const getPaymentStatusHandler = async (event) => {
     }
 
     const order = orderResult.Item;
-
-    console.log(`✅ Payment status retrieved for order: ${orderId}`);
 
     return success({
       success: true,
