@@ -27,14 +27,7 @@ const createPreferenceHandler = async (event) => {
     const stage = event.requestContext?.stage || "";
     const backendUrl = `https://${domain}${stage ? "/" + stage : ""}`;
 
-    console.log("💳 Creating payment preference:", {
-      userId,
-      order_id,
-      backendUrl,
-      webhook: `${backendUrl}/api/payments/webhook`,
-    });
-
-    // Validación
+    //Comprueba si el order_id existe
     if (!order_id) {
       return badRequest("El order_id es requerido");
     }
@@ -146,18 +139,8 @@ const createPreferenceHandler = async (event) => {
       },
     };
 
-    console.log(
-      "🔵 Enviando preferencia a MercadoPago:",
-      JSON.stringify(preferenceData, null, 2),
-    );
-
     // Crear preferencia en MercadoPago
     const result = await preference.create({ body: preferenceData });
-
-    console.log(
-      "✅ Respuesta de MercadoPago:",
-      JSON.stringify(result, null, 2),
-    );
 
     // SDK puede devolver distintas formas según versión
     const prefId = result?.id || result?.body?.id;
@@ -187,8 +170,6 @@ const createPreferenceHandler = async (event) => {
       }),
     );
 
-    console.log(`✅ Preferencia creada: ${prefId} para orden ${order_id}`);
-
     // Devolver link de pago
     return success({
       success: true,
@@ -201,13 +182,6 @@ const createPreferenceHandler = async (event) => {
     });
   } catch (error) {
     console.error("Error en createPreference:");
-    console.error("Message:", error?.message);
-    console.error(
-      "Response data:",
-      JSON.stringify(error?.response?.data, null, 2),
-    );
-    console.error("Stack:", error?.stack);
-
     return serverError("Error al crear preferencia de pago", {
       error: error?.response?.data || error?.message,
       details: error?.cause?.message || error?.cause,
