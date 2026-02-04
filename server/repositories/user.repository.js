@@ -35,6 +35,34 @@ class UserRepository {
     return result.Item || null;
   }
 
+  //Obtener perfil de usuario por ID
+  async getProfile(userId) {
+    const user = await this.findById(userId);
+
+    if (!user) {
+      return null;
+    }
+
+    // Mapear todos los campos del perfil
+    return {
+      id: userId,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+      is_active: user.is_active,
+      created_at: user.created_at,
+      updated_at: user.updated_at,
+      // Campos de dirección opcionales
+      default_country: user.default_country || null,
+      default_address: user.default_address || null,
+      default_address2: user.default_address2 || null,
+      default_city: user.default_city || null,
+      default_state: user.default_state || null,
+      default_zip: user.default_zip || null,
+      default_phone: user.default_phone || null,
+    };
+  }
+
   //Crear nuevo usuario en DynamoDB
 
   async create(userData) {
