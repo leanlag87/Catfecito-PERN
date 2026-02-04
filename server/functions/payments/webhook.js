@@ -13,8 +13,6 @@ const webhookHandler = async (event) => {
     const body = JSON.parse(event.body);
     const { type, data } = body;
 
-    console.log("📩 Webhook recibido:", { type, data });
-
     // Procesamos sólo notificaciones de payment
     if (type !== "payment") {
       return success({ success: true });
@@ -22,20 +20,17 @@ const webhookHandler = async (event) => {
 
     const paymentId = data?.id;
     if (!paymentId) {
-      console.warn("Webhook de payment sin id");
       return success({ success: true });
     }
 
     // Obtener información del pago de MercadoPago
     const paymentRaw = await payment.get({ id: paymentId });
     const paymentInfo = paymentRaw?.body || paymentRaw;
-    console.log("💳 Información del pago (normalizada):", paymentInfo);
 
     const externalReference = paymentInfo?.external_reference?.toString(); // order_id
     const status = paymentInfo?.status; // approved, rejected, pending, etc.
 
     if (!externalReference) {
-      console.warn("Pago sin external_reference:", paymentId);
       return success({ success: true });
     }
 
@@ -51,7 +46,6 @@ const webhookHandler = async (event) => {
     );
 
     if (!orderResult.Item) {
-      console.warn(`Orden ${externalReference} no encontrada (webhook)`);
       return success({ success: true });
     }
 
@@ -59,9 +53,6 @@ const webhookHandler = async (event) => {
 
     // Idempotencia: si ya está aprobada/paid no hacemos nada
     if (order.payment_status === "approved" || order.status === "paid") {
-      console.log(
-        `Orden ${externalReference} ya procesada (status=${order.status}, payment_status=${order.payment_status})`,
-      );
       return success({ success: true });
     }
 
@@ -163,9 +154,6 @@ const webhookHandler = async (event) => {
       // Eliminar items del carrito (máximo 100 operaciones en TransactWrite)
       for (const cartItem of cartItems) {
         if (transactItems.length >= 100) {
-          console.warn(
-            "⚠️ Se alcanzó el límite de 100 items en transacción, algunos items del carrito no se eliminarán",
-          );
           break;
         }
 
@@ -185,10 +173,6 @@ const webhookHandler = async (event) => {
         new TransactWriteCommand({
           TransactItems: transactItems,
         }),
-      );
-
-      console.log(
-        `✅ Orden ${externalReference} marcada como pagada, stock decrementado y carrito vaciado`,
       );
     } else if (status === "rejected") {
       // Solo actualizar la orden como rechazada
@@ -222,8 +206,6 @@ const webhookHandler = async (event) => {
           },
         }),
       );
-
-      console.log(`❌ Pago rechazado para orden ${externalReference}`);
     } else {
       // Otros estados (pending, in_process, etc.)
       await docClient.send(
@@ -256,15 +238,11 @@ const webhookHandler = async (event) => {
           },
         }),
       );
-
-      console.log(`ℹ️ Pago estado '${status}' para orden ${externalReference}`);
     }
 
     return success({ success: true });
   } catch (error) {
     console.error("Error en webhook:", error);
-    console.error("Error details:", JSON.stringify(error, null, 2));
-
     // MercadoPago espera 200 incluso si hay error
     return success({
       success: false,
