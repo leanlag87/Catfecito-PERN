@@ -2,9 +2,11 @@ import {
   CognitoIdentityProviderClient,
   AdminCreateUserCommand,
   AdminSetUserPasswordCommand,
+  InitiateAuthCommand,
 } from "@aws-sdk/client-cognito-identity-provider";
 import config from "../config.js";
 import { userRepository } from "../repositories/user.repository.js";
+import { buildAuthParams } from "../utils/cognitoHelpers.js";
 
 const cognitoClient = new CognitoIdentityProviderClient({
   region: config.AWS_REGION,
@@ -80,6 +82,56 @@ class AuthService {
     });
 
     return user;
+  }
+
+  async login(email, password) {
+    try {
+      // Preparar parámetros de autenticación
+      const authParams = buildAuthParams(
+        email,
+        password,
+        config.COGNITO_CLIENT_ID,
+        config.COGNITO_CLIENT_SECRET,
+      );
+
+      // Autenticar con Cognito
+      const authResponse = await cognitoClient.send(
+        new InitiateAuthCommand({
+          AuthFlow: "USER_PASSWORD_AUTH",
+          ClientId: config.COGNITO_CLIENT_ID,
+          AuthParameters: authParams,
+        }),
+      );
+
+      // Extraer tokens
+      const { IdToken, AccessToken, RefreshToken } =
+        authResponse.AuthenticationResult;
+
+      return {
+        token: IdToken,
+        accessToken: AccessToken,
+        refreshToken: RefreshToken,
+      };
+    } catch (error) {
+      // Mapear errores de Cognito a errores de negocio
+      if (
+        error.name === "NotAuthorizedException" ||
+        error.name === "UserNotFoundException"
+      ) {
+        const customError = new Error("Credenciales inválidas");
+        customError.name = "InvalidCredentialsError";
+        throw customError;
+      }
+
+      if (error.name === "UserNotConfirmedException") {
+        const customError = new Error("Usuario no confirmado");
+        customError.name = "UserNotConfirmedError";
+        throw customError;
+      }
+
+      // Re-lanzar otros errores
+      throw error;
+    }
   }
 }
 
