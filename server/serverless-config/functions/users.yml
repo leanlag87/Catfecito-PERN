@@ -6,6 +6,8 @@ getProfile:
     - httpApi:
         path: /api/users/profile
         method: GET
+        authorizer:
+          name: jwtAuthorizer
 
 updateProfile:
   handler: server/functions/users/profile/updateProfile.updateProfile
@@ -13,6 +15,8 @@ updateProfile:
     - httpApi:
         path: /api/users/profile
         method: PUT
+        authorizer:
+          name: jwtAuthorizer
 
 updateAddress:
   handler: server/functions/users/profile/updateAddress.updateAddress
@@ -20,6 +24,8 @@ updateAddress:
     - httpApi:
         path: /api/users/address
         method: PUT
+        authorizer:
+          name: jwtAuthorizer
 
 changePassword:
   handler: server/functions/users/profile/changePassword.changePassword
@@ -27,3 +33,5 @@ changePassword:
     - httpApi:
         path: /api/users/password
         method: PUT
+        authorizer:
+          name: jwtAuthorizer
