@@ -106,6 +106,56 @@ class UserRepository {
     const user = await this.findByEmail(email);
     return user !== null;
   }
+
+  async updateProfile(userId, updateData) {
+    const { name, email } = updateData;
+
+    // Construir expresión de actualización dinámica
+    let updateExpression = "SET updated_at = :updated_at";
+    const expressionAttributeValues = {
+      ":updated_at": getTimestamp(),
+    };
+    const expressionAttributeNames = {};
+
+    if (name) {
+      updateExpression += ", #name = :name";
+      expressionAttributeNames["#name"] = "name";
+      expressionAttributeValues[":name"] = name;
+    }
+
+    if (email) {
+      updateExpression += ", email = :email, GSI1PK = :gsi1pk";
+      expressionAttributeValues[":email"] = email.toLowerCase();
+      expressionAttributeValues[":gsi1pk"] =
+        `USER#EMAIL#${email.toLowerCase()}`;
+    }
+
+    const result = await docClient.send(
+      new UpdateCommand({
+        TableName: TABLE_NAME,
+        Key: {
+          PK: `USER#${userId}`,
+          SK: "METADATA",
+        },
+        UpdateExpression: updateExpression,
+        ExpressionAttributeValues: expressionAttributeValues,
+        ...(Object.keys(expressionAttributeNames).length > 0 && {
+          ExpressionAttributeNames: expressionAttributeNames,
+        }),
+        ReturnValues: "ALL_NEW",
+      }),
+    );
+
+    return {
+      id: userId,
+      name: result.Attributes.name,
+      email: result.Attributes.email,
+      role: result.Attributes.role,
+      is_active: result.Attributes.is_active,
+      created_at: result.Attributes.created_at,
+      updated_at: result.Attributes.updated_at,
+    };
+  }
 }
 
 export const userRepository = new UserRepository();
