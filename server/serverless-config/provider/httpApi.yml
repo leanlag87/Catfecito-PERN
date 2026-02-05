@@ -8,8 +8,8 @@
         type: request
         payloadVersion: "2.0"
         functionArn: 
-        Fn::GetAtt:
-          - AuthorizerFuncLambdaFunction
-          - Arn
+          Fn::GetAtt:
+            - AuthorizerFuncLambdaFunction
+            - Arn
         identitySource: $request.header.Authorization
         enableSimpleResponses: false
