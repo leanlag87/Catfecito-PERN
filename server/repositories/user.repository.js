@@ -1,5 +1,10 @@
 import { docClient, TABLE_NAME, getTimestamp } from "../dynamodb.js";
-import { QueryCommand, GetCommand, PutCommand } from "@aws-sdk/lib-dynamodb";
+import {
+  QueryCommand,
+  GetCommand,
+  PutCommand,
+  UpdateCommand,
+} from "@aws-sdk/lib-dynamodb";
 
 //Clase que contendra metodos personalizados para manejar usuarios en DynamoDB
 class UserRepository {
