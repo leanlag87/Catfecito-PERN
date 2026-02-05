@@ -1,10 +1,5 @@
-
+# Se encarga de definir el authorizer JWT para la API HTTP
       jwtAuthorizer:
-        # type: request
-        # functionName: authorizerFunc
-        # identitySource: $request.header.Authorization
-        # enableSimpleResponses: false
-        # payloadVersion: "2.0"
         type: request
         payloadVersion: "2.0"
         functionArn: 
