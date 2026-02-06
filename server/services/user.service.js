@@ -43,6 +43,25 @@ class UserService {
 
     return updatedUser;
   }
+
+  async updateAddress(userId, addressData) {
+    // Validar que al menos un campo esté presente
+    const hasAddressData = Object.values(addressData).some(
+      (value) => value !== undefined,
+    );
+
+    if (!hasAddressData) {
+      const error = new Error(
+        "Debes proporcionar al menos un campo de dirección para actualizar",
+      );
+      error.name = "ValidationError";
+      throw error;
+    }
+
+    const updatedUser = await userRepository.updateAddress(userId, addressData);
+
+    return updatedUser;
+  }
 }
 
 export const userService = new UserService();
