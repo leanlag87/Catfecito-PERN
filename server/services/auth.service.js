@@ -3,6 +3,7 @@ import {
   AdminCreateUserCommand,
   AdminSetUserPasswordCommand,
   InitiateAuthCommand,
+  ChangePasswordCommand,
 } from "@aws-sdk/client-cognito-identity-provider";
 import config from "../config.js";
 import { userRepository } from "../repositories/user.repository.js";
@@ -130,6 +131,58 @@ class AuthService {
       }
 
       // Re-lanzar otros errores
+      throw error;
+    }
+  }
+
+  async changePassword(accessToken, currentPassword, newPassword) {
+    // Validaciones de negocio
+    if (newPassword.length < 8) {
+      const error = new Error(
+        "La nueva contraseña debe tener al menos 8 caracteres",
+      );
+      error.name = "InvalidPasswordError";
+      throw error;
+    }
+
+    if (currentPassword === newPassword) {
+      const error = new Error(
+        "La nueva contraseña debe ser diferente a la actual",
+      );
+      error.name = "SamePasswordError";
+      throw error;
+    }
+
+    try {
+      await cognitoClient.send(
+        new ChangePasswordCommand({
+          AccessToken: accessToken,
+          PreviousPassword: currentPassword,
+          ProposedPassword: newPassword,
+        }),
+      );
+    } catch (error) {
+      // Mapear errores de Cognito
+      if (error.name === "NotAuthorizedException") {
+        const customError = new Error("La contraseña actual es incorrecta");
+        customError.name = "WrongPasswordError";
+        throw customError;
+      }
+
+      if (error.name === "InvalidPasswordException") {
+        const customError = new Error(
+          "La nueva contraseña no cumple con los requisitos de seguridad",
+        );
+        customError.name = "InvalidPasswordError";
+        throw customError;
+      }
+
+      if (error.name === "LimitExceededException") {
+        const customError = new Error("Demasiados intentos. Intenta más tarde");
+        customError.name = "RateLimitError";
+        throw customError;
+      }
+
       throw error;
     }
   }
