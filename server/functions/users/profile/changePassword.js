@@ -1,8 +1,3 @@
-import {
-  CognitoIdentityProviderClient,
-  ChangePasswordCommand,
-} from "@aws-sdk/client-cognito-identity-provider";
-import config from "../../../config.js";
 import { requireAuth } from "../../../utils/auth.js";
 import { parseBody, validateRequired } from "../../../utils/validators.js";
 import {
@@ -11,10 +6,7 @@ import {
   unauthorized,
   serverError,
 } from "../../../utils/responses.js";
-
-const cognitoClient = new CognitoIdentityProviderClient({
-  region: config.AWS_REGION,
-});
+import { authService } from "../../../services/auth.service.js";
 
 const changePasswordHandler = async (event) => {
   try {
@@ -24,29 +16,13 @@ const changePasswordHandler = async (event) => {
     // Validar campos requeridos
     validateRequired(body, ["currentPassword", "newPassword"]);
 
-    // Validar longitud de la nueva contraseña
-    if (newPassword.length < 8) {
-      return badRequest("La nueva contraseña debe tener al menos 8 caracteres");
-    }
-
-    // Validar que la nueva contraseña sea diferente
-    if (currentPassword === newPassword) {
-      return badRequest("La nueva contraseña debe ser diferente a la actual");
-    }
-
     // Obtener el access token del header
     const authHeader =
       event.headers?.authorization || event.headers?.Authorization;
     const accessToken = authHeader.split(" ")[1];
 
-    // Cambiar contraseña en Cognito
-    await cognitoClient.send(
-      new ChangePasswordCommand({
-        AccessToken: accessToken,
-        PreviousPassword: currentPassword,
-        ProposedPassword: newPassword,
-      }),
-    );
+    // Delegar al servicio
+    await authService.changePassword(accessToken, currentPassword, newPassword);
 
     return success({
       success: true,
@@ -55,24 +31,33 @@ const changePasswordHandler = async (event) => {
   } catch (error) {
     console.error("Error en changePassword:", error);
 
-    // Manejar errores específicos de Cognito
-    if (error.name === "NotAuthorizedException") {
-      return unauthorized("La contraseña actual es incorrecta");
+    // Manejo de errores específicos
+    if (error.message === "Body inválido") {
+      return badRequest(error.message);
     }
 
-    if (error.name === "InvalidPasswordException") {
-      return badRequest(
-        "La nueva contraseña no cumple con los requisitos de seguridad",
-      );
+    if (error.message.startsWith("Campos requeridos")) {
+      return badRequest(error.message);
     }
 
-    if (error.name === "LimitExceededException") {
-      return badRequest("Demasiados intentos. Intenta más tarde");
+    if (error.name === "InvalidPasswordError") {
+      return badRequest(error.message);
+    }
+
+    if (error.name === "SamePasswordError") {
+      return badRequest(error.message);
+    }
+
+    if (error.name === "WrongPasswordError") {
+      return unauthorized(error.message);
+    }
+
+    if (error.name === "RateLimitError") {
+      return badRequest(error.message);
     }
 
     return serverError("Error al cambiar la contraseña");
   }
 };
 
-// Exportar con middleware de autenticación
 export const changePassword = requireAuth(changePasswordHandler);
