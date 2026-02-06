@@ -161,6 +161,86 @@ class UserRepository {
       updated_at: result.Attributes.updated_at,
     };
   }
+
+  async updateAddress(userId, addressData) {
+    const {
+      default_country,
+      default_address,
+      default_address2,
+      default_city,
+      default_state,
+      default_zip,
+      default_phone,
+    } = addressData;
+
+    // Construir expresión de actualización dinámica
+    let updateExpression = "SET updated_at = :updated_at";
+    const expressionAttributeValues = {
+      ":updated_at": getTimestamp(),
+    };
+
+    // Agregar campos de dirección (permitir undefined para no actualizar, null para limpiar)
+    if (default_country !== undefined) {
+      updateExpression += ", default_country = :country";
+      expressionAttributeValues[":country"] = default_country;
+    }
+
+    if (default_address !== undefined) {
+      updateExpression += ", default_address = :address";
+      expressionAttributeValues[":address"] = default_address;
+    }
+
+    if (default_address2 !== undefined) {
+      updateExpression += ", default_address2 = :address2";
+      expressionAttributeValues[":address2"] = default_address2;
+    }
+
+    if (default_city !== undefined) {
+      updateExpression += ", default_city = :city";
+      expressionAttributeValues[":city"] = default_city;
+    }
+
+    if (default_state !== undefined) {
+      updateExpression += ", default_state = :state";
+      expressionAttributeValues[":state"] = default_state;
+    }
+
+    if (default_zip !== undefined) {
+      updateExpression += ", default_zip = :zip";
+      expressionAttributeValues[":zip"] = default_zip;
+    }
+
+    if (default_phone !== undefined) {
+      updateExpression += ", default_phone = :phone";
+      expressionAttributeValues[":phone"] = default_phone;
+    }
+
+    const result = await docClient.send(
+      new UpdateCommand({
+        TableName: TABLE_NAME,
+        Key: {
+          PK: `USER#${userId}`,
+          SK: "METADATA",
+        },
+        UpdateExpression: updateExpression,
+        ExpressionAttributeValues: expressionAttributeValues,
+        ReturnValues: "ALL_NEW",
+      }),
+    );
+
+    return {
+      id: userId,
+      name: result.Attributes.name,
+      email: result.Attributes.email,
+      default_country: result.Attributes.default_country || null,
+      default_address: result.Attributes.default_address || null,
+      default_address2: result.Attributes.default_address2 || null,
+      default_city: result.Attributes.default_city || null,
+      default_state: result.Attributes.default_state || null,
+      default_zip: result.Attributes.default_zip || null,
+      default_phone: result.Attributes.default_phone || null,
+    };
+  }
 }
 
 export const userRepository = new UserRepository();
