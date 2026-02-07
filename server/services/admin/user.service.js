@@ -1,0 +1,119 @@
+import { userRepository } from "../../repositories/user.repository.js";
+import { authService } from "../auth.service.js";
+
+class AdminUserService {
+  //Obtener todos los usuarios
+  async getAllUsers() {
+    const users = await userRepository.findAll();
+
+    return {
+      count: users.length,
+      users,
+    };
+  }
+
+  async getUserById(userId) {
+    const user = await userRepository.findById(userId);
+
+    if (!user) {
+      const error = new Error("Usuario no encontrado");
+      error.name = "UserNotFoundError";
+      throw error;
+    }
+
+    return {
+      id: userId,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+      is_active: user.is_active,
+      created_at: user.created_at,
+      updated_at: user.updated_at,
+    };
+  }
+
+  async updateUserRole(adminId, userId, newRole) {
+    // Validar rol
+    if (!["user", "admin"].includes(newRole)) {
+      const error = new Error("Rol inválido. Debe ser 'user' o 'admin'");
+      error.name = "ValidationError";
+      throw error;
+    }
+
+    // Evitar que el único admin se quite su propio rol
+    if (newRole === "user" && adminId === userId) {
+      const adminCount = await userRepository.countAdmins();
+
+      if (adminCount === 1) {
+        const error = new Error(
+          "No puedes quitar el rol de admin al único administrador",
+        );
+        error.name = "LastAdminError";
+        throw error;
+      }
+    }
+
+    // Actualizar rol
+    const updatedUser = await userRepository.updateRole(userId, newRole);
+
+    if (!updatedUser) {
+      const error = new Error("Usuario no encontrado");
+      error.name = "UserNotFoundError";
+      throw error;
+    }
+
+    return updatedUser;
+  }
+
+  async toggleUserStatus(adminId, userId) {
+    // Evitar que el admin se desactive a sí mismo
+    if (adminId === userId) {
+      const error = new Error("No puedes desactivar tu propia cuenta");
+      error.name = "SelfActionError";
+      throw error;
+    }
+
+    // Cambiar estado
+    const updatedUser = await userRepository.toggleStatus(userId);
+
+    if (!updatedUser) {
+      const error = new Error("Usuario no encontrado");
+      error.name = "UserNotFoundError";
+      throw error;
+    }
+
+    return updatedUser;
+  }
+
+  async deleteUser(adminId, userId) {
+    // Evitar que el admin se elimine a sí mismo
+    if (adminId === userId) {
+      const error = new Error("No puedes eliminar tu propia cuenta");
+      error.name = "SelfActionError";
+      throw error;
+    }
+
+    // Obtener datos del usuario antes de eliminar
+    const user = await userRepository.findById(userId);
+
+    if (!user) {
+      const error = new Error("Usuario no encontrado");
+      error.name = "UserNotFoundError";
+      throw error;
+    }
+
+    // Eliminar de Cognito
+    await authService.deleteUserFromCognito(user.email);
+
+    // Eliminar de DynamoDB
+    await userRepository.delete(userId);
+
+    return {
+      id: userId,
+      name: user.name,
+      email: user.email,
+    };
+  }
+}
+
+export const adminUserService = new AdminUserService();

@@ -4,6 +4,7 @@ import {
   AdminSetUserPasswordCommand,
   InitiateAuthCommand,
   ChangePasswordCommand,
+  AdminDeleteUserCommand,
 } from "@aws-sdk/client-cognito-identity-provider";
 import config from "../config.js";
 import { userRepository } from "../repositories/user.repository.js";
@@ -135,6 +136,8 @@ class AuthService {
     }
   }
 
+  //Añado este metodo aqui ya interactúa directamente con Cognito y no con Dynamo
+  //No usa repositorio porque no hay interacción con DynamoDB, solo con Cognito
   async changePassword(accessToken, currentPassword, newPassword) {
     // Validaciones de negocio
     if (newPassword.length < 8) {
@@ -183,6 +186,28 @@ class AuthService {
         throw customError;
       }
 
+      throw error;
+    }
+  }
+
+  async deleteUserFromCognito(email) {
+    try {
+      await cognitoClient.send(
+        new AdminDeleteUserCommand({
+          UserPoolId: config.COGNITO_USER_POOL_ID,
+          Username: email,
+        }),
+      );
+    } catch (error) {
+      // Si el usuario no existe en Cognito, no es un error crítico
+      if (error.name === "UserNotFoundException") {
+        console.warn(
+          `Usuario ${email} no encontrado en Cognito (puede haber sido eliminado previamente)`,
+        );
+        return;
+      }
+
+      // Re-lanzar otros errores
       throw error;
     }
   }

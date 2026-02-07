@@ -4,6 +4,8 @@ import {
   GetCommand,
   PutCommand,
   UpdateCommand,
+  ScanCommand,
+  DeleteCommand,
 } from "@aws-sdk/lib-dynamodb";
 
 //Clase que contendra metodos personalizados para manejar usuarios en DynamoDB
@@ -240,6 +242,137 @@ class UserRepository {
       default_zip: result.Attributes.default_zip || null,
       default_phone: result.Attributes.default_phone || null,
     };
+  }
+
+  //Obtener todos los usuarios (para admin)
+  async findAll() {
+    const result = await docClient.send(
+      new ScanCommand({
+        TableName: TABLE_NAME,
+        FilterExpression: "SK = :metadata AND begins_with(PK, :userPrefix)",
+        ExpressionAttributeValues: {
+          ":metadata": "METADATA",
+          ":userPrefix": "USER#",
+        },
+      }),
+    );
+
+    // Mapear y ordenar por fecha de creación (más reciente primero)
+    return (result.Items || [])
+      .map((item) => ({
+        id: item.PK.replace("USER#", ""),
+        name: item.name,
+        email: item.email,
+        role: item.role,
+        is_active: item.is_active,
+        created_at: item.created_at,
+        updated_at: item.updated_at,
+      }))
+      .sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+  }
+
+  async countAdmins() {
+    const result = await docClient.send(
+      new ScanCommand({
+        TableName: TABLE_NAME,
+        FilterExpression: "#role = :adminRole AND SK = :metadata",
+        ExpressionAttributeNames: {
+          "#role": "role",
+        },
+        ExpressionAttributeValues: {
+          ":adminRole": "admin",
+          ":metadata": "METADATA",
+        },
+        Select: "COUNT",
+      }),
+    );
+
+    return result.Count || 0;
+  }
+
+  async updateRole(userId, newRole) {
+    const result = await docClient.send(
+      new UpdateCommand({
+        TableName: TABLE_NAME,
+        Key: {
+          PK: `USER#${userId}`,
+          SK: "METADATA",
+        },
+        UpdateExpression: "SET #role = :role, updated_at = :updated_at",
+        ExpressionAttributeNames: {
+          "#role": "role",
+        },
+        ExpressionAttributeValues: {
+          ":role": newRole,
+          ":updated_at": getTimestamp(),
+        },
+        ReturnValues: "ALL_NEW",
+      }),
+    );
+
+    if (!result.Attributes) {
+      return null;
+    }
+
+    return {
+      id: userId,
+      name: result.Attributes.name,
+      email: result.Attributes.email,
+      role: result.Attributes.role,
+      is_active: result.Attributes.is_active,
+      created_at: result.Attributes.created_at,
+      updated_at: result.Attributes.updated_at,
+    };
+  }
+
+  async toggleStatus(userId) {
+    // Obtener estado actual
+    const user = await this.findById(userId);
+
+    if (!user) {
+      return null;
+    }
+
+    const newStatus = !user.is_active;
+
+    // Actualizar estado
+    const result = await docClient.send(
+      new UpdateCommand({
+        TableName: TABLE_NAME,
+        Key: {
+          PK: `USER#${userId}`,
+          SK: "METADATA",
+        },
+        UpdateExpression: "SET is_active = :status, updated_at = :updated_at",
+        ExpressionAttributeValues: {
+          ":status": newStatus,
+          ":updated_at": getTimestamp(),
+        },
+        ReturnValues: "ALL_NEW",
+      }),
+    );
+
+    return {
+      id: userId,
+      name: result.Attributes.name,
+      email: result.Attributes.email,
+      role: result.Attributes.role,
+      is_active: result.Attributes.is_active,
+      created_at: result.Attributes.created_at,
+      updated_at: result.Attributes.updated_at,
+    };
+  }
+
+  async delete(userId) {
+    await docClient.send(
+      new DeleteCommand({
+        TableName: TABLE_NAME,
+        Key: {
+          PK: `USER#${userId}`,
+          SK: "METADATA",
+        },
+      }),
+    );
   }
 }
 
