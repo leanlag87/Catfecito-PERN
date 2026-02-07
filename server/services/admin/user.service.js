@@ -63,6 +63,26 @@ class AdminUserService {
 
     return updatedUser;
   }
+
+  async toggleUserStatus(adminId, userId) {
+    // Evitar que el admin se desactive a sí mismo
+    if (adminId === userId) {
+      const error = new Error("No puedes desactivar tu propia cuenta");
+      error.name = "SelfActionError";
+      throw error;
+    }
+
+    // Cambiar estado
+    const updatedUser = await userRepository.toggleStatus(userId);
+
+    if (!updatedUser) {
+      const error = new Error("Usuario no encontrado");
+      error.name = "UserNotFoundError";
+      throw error;
+    }
+
+    return updatedUser;
+  }
 }
 
 export const adminUserService = new AdminUserService();
