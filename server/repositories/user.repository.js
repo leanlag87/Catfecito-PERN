@@ -5,6 +5,7 @@ import {
   PutCommand,
   UpdateCommand,
   ScanCommand,
+  DeleteCommand,
 } from "@aws-sdk/lib-dynamodb";
 
 //Clase que contendra metodos personalizados para manejar usuarios en DynamoDB
@@ -360,6 +361,18 @@ class UserRepository {
       created_at: result.Attributes.created_at,
       updated_at: result.Attributes.updated_at,
     };
+  }
+
+  async delete(userId) {
+    await docClient.send(
+      new DeleteCommand({
+        TableName: TABLE_NAME,
+        Key: {
+          PK: `USER#${userId}`,
+          SK: "METADATA",
+        },
+      }),
+    );
   }
 }
 
