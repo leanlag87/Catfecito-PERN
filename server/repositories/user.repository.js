@@ -269,6 +269,60 @@ class UserRepository {
       }))
       .sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
   }
+
+  async countAdmins() {
+    const result = await docClient.send(
+      new ScanCommand({
+        TableName: TABLE_NAME,
+        FilterExpression: "#role = :adminRole AND SK = :metadata",
+        ExpressionAttributeNames: {
+          "#role": "role",
+        },
+        ExpressionAttributeValues: {
+          ":adminRole": "admin",
+          ":metadata": "METADATA",
+        },
+        Select: "COUNT",
+      }),
+    );
+
+    return result.Count || 0;
+  }
+
+  async updateRole(userId, newRole) {
+    const result = await docClient.send(
+      new UpdateCommand({
+        TableName: TABLE_NAME,
+        Key: {
+          PK: `USER#${userId}`,
+          SK: "METADATA",
+        },
+        UpdateExpression: "SET #role = :role, updated_at = :updated_at",
+        ExpressionAttributeNames: {
+          "#role": "role",
+        },
+        ExpressionAttributeValues: {
+          ":role": newRole,
+          ":updated_at": getTimestamp(),
+        },
+        ReturnValues: "ALL_NEW",
+      }),
+    );
+
+    if (!result.Attributes) {
+      return null;
+    }
+
+    return {
+      id: userId,
+      name: result.Attributes.name,
+      email: result.Attributes.email,
+      role: result.Attributes.role,
+      is_active: result.Attributes.is_active,
+      created_at: result.Attributes.created_at,
+      updated_at: result.Attributes.updated_at,
+    };
+  }
 }
 
 export const userRepository = new UserRepository();
