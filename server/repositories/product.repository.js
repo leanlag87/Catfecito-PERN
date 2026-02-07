@@ -10,7 +10,6 @@ import {
 
 class ProductRepository {
   // Crear producto
-
   async create(productData) {
     const productId = uuidv4();
     const {
@@ -252,6 +251,37 @@ class ProductRepository {
       is_active: result.Attributes.is_active,
       updated_at: result.Attributes.updated_at,
     };
+  }
+
+  // Obtener todos los productos activos
+  async findAll() {
+    const result = await docClient.send(
+      new ScanCommand({
+        TableName: TABLE_NAME,
+        FilterExpression: "entityType = :entityType AND is_active = :isActive",
+        ExpressionAttributeValues: {
+          ":entityType": "PRODUCT",
+          ":isActive": true,
+        },
+      }),
+    );
+
+    // Ordenar por fecha de creación (más recientes primero)
+    return (result.Items || [])
+      .map((p) => ({
+        id: p.id,
+        name: p.name,
+        description: p.description,
+        price: p.price,
+        stock: p.stock,
+        image_url: p.image_url,
+        is_active: p.is_active,
+        created_at: p.created_at,
+        updated_at: p.updated_at,
+        category_id: p.category_id,
+        category_name: p.category_name,
+      }))
+      .sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
   }
 }
 
