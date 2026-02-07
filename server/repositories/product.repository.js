@@ -218,6 +218,41 @@ class ProductRepository {
       }),
     );
   }
+
+  async toggleStatus(productId) {
+    // Obtener estado actual
+    const product = await this.findById(productId);
+
+    if (!product) {
+      return null;
+    }
+
+    const newStatus = !product.is_active;
+
+    // Actualizar estado
+    const result = await docClient.send(
+      new UpdateCommand({
+        TableName: TABLE_NAME,
+        Key: {
+          PK: `PRODUCT#${productId}`,
+          SK: "METADATA",
+        },
+        UpdateExpression: "SET is_active = :isActive, updated_at = :updatedAt",
+        ExpressionAttributeValues: {
+          ":isActive": newStatus,
+          ":updatedAt": getTimestamp(),
+        },
+        ReturnValues: "ALL_NEW",
+      }),
+    );
+
+    return {
+      id: result.Attributes.id,
+      name: result.Attributes.name,
+      is_active: result.Attributes.is_active,
+      updated_at: result.Attributes.updated_at,
+    };
+  }
 }
 
 export const productRepository = new ProductRepository();
