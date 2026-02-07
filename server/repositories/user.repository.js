@@ -323,6 +323,44 @@ class UserRepository {
       updated_at: result.Attributes.updated_at,
     };
   }
+
+  async toggleStatus(userId) {
+    // Obtener estado actual
+    const user = await this.findById(userId);
+
+    if (!user) {
+      return null;
+    }
+
+    const newStatus = !user.is_active;
+
+    // Actualizar estado
+    const result = await docClient.send(
+      new UpdateCommand({
+        TableName: TABLE_NAME,
+        Key: {
+          PK: `USER#${userId}`,
+          SK: "METADATA",
+        },
+        UpdateExpression: "SET is_active = :status, updated_at = :updated_at",
+        ExpressionAttributeValues: {
+          ":status": newStatus,
+          ":updated_at": getTimestamp(),
+        },
+        ReturnValues: "ALL_NEW",
+      }),
+    );
+
+    return {
+      id: userId,
+      name: result.Attributes.name,
+      email: result.Attributes.email,
+      role: result.Attributes.role,
+      is_active: result.Attributes.is_active,
+      created_at: result.Attributes.created_at,
+      updated_at: result.Attributes.updated_at,
+    };
+  }
 }
 
 export const userRepository = new UserRepository();
