@@ -135,6 +135,8 @@ class AuthService {
     }
   }
 
+  //Añado este metodo aqui ya interactúa directamente con Cognito y no con Dynamo
+  //No usa repositorio porque no hay interacción con DynamoDB, solo con Cognito
   async changePassword(accessToken, currentPassword, newPassword) {
     // Validaciones de negocio
     if (newPassword.length < 8) {
