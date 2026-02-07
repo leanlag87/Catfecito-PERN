@@ -1,6 +1,12 @@
 import { v4 as uuidv4 } from "uuid";
 import { docClient, TABLE_NAME, getTimestamp } from "../dynamodb.js";
-import { PutCommand, GetCommand, UpdateCommand } from "@aws-sdk/lib-dynamodb";
+import {
+  PutCommand,
+  GetCommand,
+  UpdateCommand,
+  DeleteCommand,
+  QueryCommand,
+} from "@aws-sdk/lib-dynamodb";
 
 class ProductRepository {
   // Crear producto
@@ -156,6 +162,61 @@ class ProductRepository {
       created_at: result.Attributes.created_at,
       updated_at: result.Attributes.updated_at,
     };
+  }
+
+  async hasOrderReferences(productId) {
+    const result = await docClient.send(
+      new QueryCommand({
+        TableName: TABLE_NAME,
+        IndexName: "GSI1",
+        KeyConditionExpression: "GSI1PK = :productPK",
+        ExpressionAttributeValues: {
+          ":productPK": `PRODUCT#${productId}`,
+        },
+        ProjectionExpression: "PK, SK",
+        Limit: 1, // Solo necesitamos saber si existe al menos uno
+      }),
+    );
+
+    return result.Items && result.Items.length > 0;
+  }
+
+  // Desactivar producto
+  async softDelete(productId) {
+    const result = await docClient.send(
+      new UpdateCommand({
+        TableName: TABLE_NAME,
+        Key: {
+          PK: `PRODUCT#${productId}`,
+          SK: "METADATA",
+        },
+        UpdateExpression: "SET is_active = :isActive, updated_at = :updatedAt",
+        ExpressionAttributeValues: {
+          ":isActive": false,
+          ":updatedAt": getTimestamp(),
+        },
+        ReturnValues: "ALL_NEW",
+      }),
+    );
+
+    return {
+      id: result.Attributes.id,
+      name: result.Attributes.name,
+      is_active: result.Attributes.is_active,
+    };
+  }
+
+  // Eliminar producto de DynamoDB
+  async delete(productId) {
+    await docClient.send(
+      new DeleteCommand({
+        TableName: TABLE_NAME,
+        Key: {
+          PK: `PRODUCT#${productId}`,
+          SK: "METADATA",
+        },
+      }),
+    );
   }
 }
 
