@@ -153,6 +153,58 @@ class AdminProductService {
 
     return product;
   }
+
+  async deleteProduct(productId) {
+    // Verificar que el producto existe
+    const product = await productRepository.findById(productId);
+
+    if (!product) {
+      const error = new Error("Producto no encontrado");
+      error.name = "ProductNotFoundError";
+      throw error;
+    }
+
+    // Verificar si está referenciado en órdenes
+    const hasOrderReferences =
+      await productRepository.hasOrderReferences(productId);
+
+    // Si tiene referencias => SOFT DELETE
+    if (hasOrderReferences) {
+      const updatedProduct = await productRepository.softDelete(productId);
+
+      return {
+        softDeleted: true,
+        message:
+          "Producto referenciado por órdenes. Se desactivó en lugar de eliminar para preservar historial.",
+        product: updatedProduct,
+      };
+    }
+
+    // Eliminar imagen de S3 si existe
+    if (product.image_url) {
+      const imageKey = getS3KeyFromUrl(product.image_url);
+      if (imageKey) {
+        try {
+          await deleteFromS3(imageKey);
+        } catch (s3Error) {
+          console.warn("Could not delete image from S3:", s3Error.message);
+          // No falla la operación si no se puede eliminar la imagen
+        }
+      }
+    }
+
+    // Hard delete de DynamoDB
+    await productRepository.delete(productId);
+
+    return {
+      softDeleted: false,
+      message: "Producto eliminado correctamente",
+      product: {
+        id: product.id,
+        name: product.name,
+      },
+    };
+  }
 }
 
 export const adminProductService = new AdminProductService();
