@@ -1,5 +1,5 @@
 import { docClient, TABLE_NAME, getTimestamp } from "../dynamodb.js";
-import { GetCommand } from "@aws-sdk/lib-dynamodb";
+import { GetCommand, QueryCommand, PutCommand } from "@aws-sdk/lib-dynamodb";
 
 class CategoryRepository {
   //Buscar categoría por ID
