@@ -205,6 +205,18 @@ class AdminProductService {
       },
     };
   }
+
+  async toggleProductStatus(productId) {
+    const updatedProduct = await productRepository.toggleStatus(productId);
+
+    if (!updatedProduct) {
+      const error = new Error("Producto no encontrado");
+      error.name = "ProductNotFoundError";
+      throw error;
+    }
+
+    return updatedProduct;
+  }
 }
 
 export const adminProductService = new AdminProductService();
