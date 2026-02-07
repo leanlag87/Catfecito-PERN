@@ -4,6 +4,7 @@ import {
   GetCommand,
   PutCommand,
   UpdateCommand,
+  ScanCommand,
 } from "@aws-sdk/lib-dynamodb";
 
 //Clase que contendra metodos personalizados para manejar usuarios en DynamoDB
@@ -240,6 +241,33 @@ class UserRepository {
       default_zip: result.Attributes.default_zip || null,
       default_phone: result.Attributes.default_phone || null,
     };
+  }
+
+  //Obtener todos los usuarios (para admin)
+  async findAll() {
+    const result = await docClient.send(
+      new ScanCommand({
+        TableName: TABLE_NAME,
+        FilterExpression: "SK = :metadata AND begins_with(PK, :userPrefix)",
+        ExpressionAttributeValues: {
+          ":metadata": "METADATA",
+          ":userPrefix": "USER#",
+        },
+      }),
+    );
+
+    // Mapear y ordenar por fecha de creación (más reciente primero)
+    return (result.Items || [])
+      .map((item) => ({
+        id: item.PK.replace("USER#", ""),
+        name: item.name,
+        email: item.email,
+        role: item.role,
+        is_active: item.is_active,
+        created_at: item.created_at,
+        updated_at: item.updated_at,
+      }))
+      .sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
   }
 }
 
