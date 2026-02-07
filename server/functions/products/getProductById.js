@@ -1,48 +1,24 @@
-import { docClient, TABLE_NAME } from "../../dynamodb.js";
-import { GetCommand } from "@aws-sdk/lib-dynamodb";
 import { success, notFound, serverError } from "../../utils/responses.js";
+import { productService } from "../../services/product.service.js";
 
 export const getProductById = async (event) => {
   try {
     const { id } = event.pathParameters;
 
-    // Obtener producto de DynamoDB
-    const result = await docClient.send(
-      new GetCommand({
-        TableName: TABLE_NAME,
-        Key: {
-          PK: `PRODUCT#${id}`,
-          SK: "METADATA",
-        },
-      }),
-    );
+    // Delegar al servicio
+    const product = await productService.getProductById(id);
 
-    if (!result.Item) {
-      console.log(`Product not found: ${id}`);
-      return notFound("Producto no encontrado");
-    }
-
-    const product = result.Item;
-
-    // Formatear respuesta
     return success({
       success: true,
-      product: {
-        id: product.id,
-        name: product.name,
-        description: product.description,
-        price: product.price,
-        stock: product.stock,
-        image_url: product.image_url,
-        is_active: product.is_active,
-        created_at: product.created_at,
-        updated_at: product.updated_at,
-        category_id: product.category_id,
-        category_name: product.category_name,
-      },
+      product,
     });
   } catch (error) {
-    console.error("❌ Error en getProductById:", error);
+    console.error("Error en getProductById:", error);
+
+    if (error.name === "ProductNotFoundError") {
+      return notFound(error.message);
+    }
+
     return serverError("Error al obtener producto");
   }
 };
