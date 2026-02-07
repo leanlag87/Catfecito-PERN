@@ -34,6 +34,15 @@ class ProductService {
       category_name: product.category_name,
     };
   }
+
+  async getProductsByCategory(categoryId) {
+    const products = await productRepository.findByCategory(categoryId);
+
+    return {
+      count: products.length,
+      products,
+    };
+  }
 }
 
 export const productService = new ProductService();
