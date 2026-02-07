@@ -1,5 +1,3 @@
-import { docClient, TABLE_NAME, getTimestamp } from "../../../dynamodb.js";
-import { UpdateCommand, ScanCommand } from "@aws-sdk/lib-dynamodb";
 import { requireAdmin } from "../../../utils/auth.js";
 import { parseBody } from "../../../utils/validators.js";
 import {
@@ -8,6 +6,7 @@ import {
   notFound,
   serverError,
 } from "../../../utils/responses.js";
+import { adminUserService } from "../../../services/admin/user.service.js";
 
 const updateUserRoleHandler = async (event) => {
   try {
@@ -16,65 +15,12 @@ const updateUserRoleHandler = async (event) => {
     const body = parseBody(event);
     const { role } = body;
 
-    // Validar rol
-    if (!["user", "admin"].includes(role)) {
-      return badRequest("Rol inválido. Debe ser 'user' o 'admin'");
-    }
-
-    // Evitar que el único admin se quite su propio rol
-    if (role === "user" && adminUser.id === id) {
-      const scanResult = await docClient.send(
-        new ScanCommand({
-          TableName: TABLE_NAME,
-          FilterExpression: "#role = :adminRole AND SK = :metadata",
-          ExpressionAttributeNames: {
-            "#role": "role",
-          },
-          ExpressionAttributeValues: {
-            ":adminRole": "admin",
-            ":metadata": "METADATA",
-          },
-        }),
-      );
-
-      if (scanResult.Items.length === 1) {
-        return badRequest(
-          "No puedes quitar el rol de admin al único administrador",
-        );
-      }
-    }
-
-    // Actualizar rol del usuario
-    const result = await docClient.send(
-      new UpdateCommand({
-        TableName: TABLE_NAME,
-        Key: {
-          PK: `USER#${id}`,
-          SK: "METADATA",
-        },
-        UpdateExpression: "SET #role = :role, updated_at = :updated_at",
-        ExpressionAttributeNames: {
-          "#role": "role",
-        },
-        ExpressionAttributeValues: {
-          ":role": role,
-          ":updated_at": getTimestamp(),
-        },
-        ReturnValues: "ALL_NEW",
-      }),
+    // Delegar al servicio
+    const updatedUser = await adminUserService.updateUserRole(
+      adminUser.id,
+      id,
+      role,
     );
-
-    if (!result.Attributes) {
-      return notFound("Usuario no encontrado");
-    }
-
-    const updatedUser = {
-      id: id,
-      name: result.Attributes.name,
-      email: result.Attributes.email,
-      role: result.Attributes.role,
-      is_active: result.Attributes.is_active,
-    };
 
     return success({
       success: true,
@@ -83,6 +29,23 @@ const updateUserRoleHandler = async (event) => {
     });
   } catch (error) {
     console.error("Error en updateUserRole:", error);
+
+    if (error.message === "Body inválido") {
+      return badRequest(error.message);
+    }
+
+    if (error.name === "ValidationError") {
+      return badRequest(error.message);
+    }
+
+    if (error.name === "LastAdminError") {
+      return badRequest(error.message);
+    }
+
+    if (error.name === "UserNotFoundError") {
+      return notFound(error.message);
+    }
+
     return serverError("Error al actualizar rol");
   }
 };
