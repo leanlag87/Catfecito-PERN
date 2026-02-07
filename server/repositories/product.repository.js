@@ -283,6 +283,38 @@ class ProductRepository {
       }))
       .sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
   }
+
+  async findByCategory(categoryId) {
+    const result = await docClient.send(
+      new QueryCommand({
+        TableName: TABLE_NAME,
+        IndexName: "GSI1",
+        KeyConditionExpression: "GSI1PK = :categoryPK",
+        FilterExpression: "is_active = :isActive",
+        ExpressionAttributeValues: {
+          ":categoryPK": `CATEGORY#${categoryId}`,
+          ":isActive": true,
+        },
+      }),
+    );
+
+    // Ordenar por fecha de creación (más recientes primero)
+    return (result.Items || [])
+      .map((p) => ({
+        id: p.id,
+        name: p.name,
+        description: p.description,
+        price: p.price,
+        stock: p.stock,
+        image_url: p.image_url,
+        is_active: p.is_active,
+        created_at: p.created_at,
+        updated_at: p.updated_at,
+        category_id: p.category_id,
+        category_name: p.category_name,
+      }))
+      .sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+  }
 }
 
 export const productRepository = new ProductRepository();
