@@ -10,6 +10,26 @@ class AdminUserService {
       users,
     };
   }
+
+  async getUserById(userId) {
+    const user = await userRepository.findById(userId);
+
+    if (!user) {
+      const error = new Error("Usuario no encontrado");
+      error.name = "UserNotFoundError";
+      throw error;
+    }
+
+    return {
+      id: userId,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+      is_active: user.is_active,
+      created_at: user.created_at,
+      updated_at: user.updated_at,
+    };
+  }
 }
 
 export const adminUserService = new AdminUserService();
