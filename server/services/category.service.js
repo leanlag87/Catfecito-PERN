@@ -9,6 +9,18 @@ class CategoryService {
       categories,
     };
   }
+
+  async getCategoryById(categoryId) {
+    const category = await categoryRepository.findById(categoryId);
+
+    if (!category) {
+      const error = new Error("Categoría no encontrada");
+      error.name = "CategoryNotFoundError";
+      throw error;
+    }
+
+    return category;
+  }
 }
 
 export const categoryService = new CategoryService();
