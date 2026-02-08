@@ -106,6 +106,18 @@ class AdminCategoryService {
 
     return updatedCategory;
   }
+
+  async toggleCategoryStatus(categoryId) {
+    const updatedCategory = await categoryRepository.toggleStatus(categoryId);
+
+    if (!updatedCategory) {
+      const error = new Error("Categoría no encontrada");
+      error.name = "CategoryNotFoundError";
+      throw error;
+    }
+
+    return updatedCategory;
+  }
 }
 
 export const adminCategoryService = new AdminCategoryService();
