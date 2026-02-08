@@ -1,5 +1,10 @@
 import { docClient, TABLE_NAME, getTimestamp } from "../dynamodb.js";
-import { GetCommand, QueryCommand, PutCommand } from "@aws-sdk/lib-dynamodb";
+import {
+  GetCommand,
+  QueryCommand,
+  PutCommand,
+  UpdateCommand,
+} from "@aws-sdk/lib-dynamodb";
 
 class CategoryRepository {
   //Buscar categoría por ID
@@ -93,6 +98,55 @@ class CategoryRepository {
       is_active: category.is_active,
       created_at: category.created_at,
       updated_at: category.updated_at,
+    };
+  }
+
+  async update(categoryId, updateData) {
+    const { name, description } = updateData;
+
+    // Construir expresión de actualización dinámica
+    const updateExpressions = [];
+    const expressionAttributeNames = {};
+    const expressionAttributeValues = { ":updated_at": getTimestamp() };
+
+    if (name !== undefined) {
+      updateExpressions.push("#name = :name");
+      updateExpressions.push("GSI2SK = :gsi2sk");
+      expressionAttributeNames["#name"] = "name";
+      expressionAttributeValues[":name"] = name;
+      expressionAttributeValues[":gsi2sk"] = `NAME#${name.toLowerCase()}`;
+    }
+
+    if (description !== undefined) {
+      updateExpressions.push("description = :description");
+      expressionAttributeValues[":description"] = description;
+    }
+
+    updateExpressions.push("updated_at = :updated_at");
+
+    const result = await docClient.send(
+      new UpdateCommand({
+        TableName: TABLE_NAME,
+        Key: {
+          PK: `CATEGORY#${categoryId}`,
+          SK: "METADATA",
+        },
+        UpdateExpression: `SET ${updateExpressions.join(", ")}`,
+        ...(Object.keys(expressionAttributeNames).length > 0 && {
+          ExpressionAttributeNames: expressionAttributeNames,
+        }),
+        ExpressionAttributeValues: expressionAttributeValues,
+        ReturnValues: "ALL_NEW",
+      }),
+    );
+
+    return {
+      id: result.Attributes.id,
+      name: result.Attributes.name,
+      description: result.Attributes.description,
+      is_active: result.Attributes.is_active,
+      created_at: result.Attributes.created_at,
+      updated_at: result.Attributes.updated_at,
     };
   }
 }
