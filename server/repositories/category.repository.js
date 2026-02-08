@@ -5,6 +5,7 @@ import {
   PutCommand,
   UpdateCommand,
   DeleteCommand,
+  ScanCommand,
 } from "@aws-sdk/lib-dynamodb";
 
 class CategoryRepository {
@@ -214,6 +215,31 @@ class CategoryRepository {
         },
       }),
     );
+  }
+
+  async findAll() {
+    const result = await docClient.send(
+      new ScanCommand({
+        TableName: TABLE_NAME,
+        FilterExpression: "entityType = :entityType AND is_active = :isActive",
+        ExpressionAttributeValues: {
+          ":entityType": "CATEGORY",
+          ":isActive": true,
+        },
+      }),
+    );
+
+    // Ordenar por nombre (ascendente)
+    return (result.Items || [])
+      .map((c) => ({
+        id: c.id,
+        name: c.name,
+        description: c.description,
+        is_active: c.is_active,
+        created_at: c.created_at,
+        updated_at: c.updated_at,
+      }))
+      .sort((a, b) => a.name.localeCompare(b.name));
   }
 }
 
