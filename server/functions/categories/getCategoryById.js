@@ -1,42 +1,24 @@
-import { docClient, TABLE_NAME } from "../../dynamodb.js";
-import { GetCommand } from "@aws-sdk/lib-dynamodb";
 import { success, notFound, serverError } from "../../utils/responses.js";
+import { categoryService } from "../../services/category.service.js";
 
 export const getCategoryById = async (event) => {
   try {
     const { id } = event.pathParameters;
 
-    // Obtener categoría de DynamoDB
-    const result = await docClient.send(
-      new GetCommand({
-        TableName: TABLE_NAME,
-        Key: {
-          PK: `CATEGORY#${id}`,
-          SK: "METADATA",
-        },
-      }),
-    );
+    // Delegar al servicio
+    const category = await categoryService.getCategoryById(id);
 
-    if (!result.Item) {
-      return notFound("Categoría no encontrada");
-    }
-
-    const category = result.Item;
-
-    // Formatear respuesta
     return success({
       success: true,
-      category: {
-        id: category.id,
-        name: category.name,
-        description: category.description,
-        is_active: category.is_active,
-        created_at: category.created_at,
-        updated_at: category.updated_at,
-      },
+      category,
     });
   } catch (error) {
-    console.error("❌ Error en getCategoryById:", error);
+    console.error("Error en getCategoryById:", error);
+
+    if (error.name === "CategoryNotFoundError") {
+      return notFound(error.message);
+    }
+
     return serverError("Error al obtener categoría");
   }
 };
