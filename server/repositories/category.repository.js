@@ -149,6 +149,42 @@ class CategoryRepository {
       updated_at: result.Attributes.updated_at,
     };
   }
+
+  async toggleStatus(categoryId) {
+    // Obtener estado actual
+    const category = await this.findById(categoryId);
+
+    if (!category) {
+      return null;
+    }
+
+    const newStatus = !category.is_active;
+
+    // Actualizar estado
+    const result = await docClient.send(
+      new UpdateCommand({
+        TableName: TABLE_NAME,
+        Key: {
+          PK: `CATEGORY#${categoryId}`,
+          SK: "METADATA",
+        },
+        UpdateExpression: "SET is_active = :isActive, updated_at = :updatedAt",
+        ExpressionAttributeValues: {
+          ":isActive": newStatus,
+          ":updatedAt": getTimestamp(),
+        },
+        ReturnValues: "ALL_NEW",
+      }),
+    );
+
+    return {
+      id: result.Attributes.id,
+      name: result.Attributes.name,
+      description: result.Attributes.description,
+      is_active: result.Attributes.is_active,
+      updated_at: result.Attributes.updated_at,
+    };
+  }
 }
 
 export const categoryRepository = new CategoryRepository();
