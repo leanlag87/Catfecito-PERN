@@ -43,6 +43,69 @@ class AdminCategoryService {
 
     return category;
   }
+
+  async updateCategory(categoryId, updateData) {
+    const { name, description } = updateData;
+
+    // Obtener categoría actual
+    const currentCategory = await categoryRepository.findById(categoryId);
+
+    if (!currentCategory) {
+      const error = new Error("Categoría no encontrada");
+      error.name = "CategoryNotFoundError";
+      throw error;
+    }
+
+    let trimmedName = currentCategory.name;
+    let trimmedDescription = currentCategory.description;
+    let hasChanges = false;
+
+    // Validar y preparar nombre si se está actualizando
+    if (name !== undefined) {
+      if (!name || !name.trim()) {
+        const error = new Error("El nombre no puede estar vacío");
+        error.name = "ValidationError";
+        throw error;
+      }
+
+      trimmedName = name.trim();
+
+      // Verificar duplicados si el nombre cambió
+      if (trimmedName !== currentCategory.name) {
+        const existingByName = await categoryRepository.findByName(trimmedName);
+
+        if (existingByName && existingByName.id !== categoryId) {
+          const error = new Error("Ya existe una categoría con ese nombre");
+          error.name = "CategoryExistsError";
+          throw error;
+        }
+
+        hasChanges = true;
+      }
+    }
+
+    // Preparar descripción si se está actualizando
+    if (description !== undefined) {
+      trimmedDescription = description?.trim() || null;
+
+      if (trimmedDescription !== currentCategory.description) {
+        hasChanges = true;
+      }
+    }
+
+    // Si no hay cambios, retornar categoría actual
+    if (!hasChanges) {
+      return currentCategory;
+    }
+
+    // Actualizar categoría
+    const updatedCategory = await categoryRepository.update(categoryId, {
+      ...(name !== undefined && { name: trimmedName }),
+      ...(description !== undefined && { description: trimmedDescription }),
+    });
+
+    return updatedCategory;
+  }
 }
 
 export const adminCategoryService = new AdminCategoryService();
