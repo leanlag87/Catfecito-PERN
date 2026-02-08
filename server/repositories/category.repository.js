@@ -4,6 +4,7 @@ import {
   QueryCommand,
   PutCommand,
   UpdateCommand,
+  DeleteCommand,
 } from "@aws-sdk/lib-dynamodb";
 
 class CategoryRepository {
@@ -184,6 +185,35 @@ class CategoryRepository {
       is_active: result.Attributes.is_active,
       updated_at: result.Attributes.updated_at,
     };
+  }
+
+  // Contar productos asociados a una categoría
+  async countProducts(categoryId) {
+    const result = await docClient.send(
+      new QueryCommand({
+        TableName: TABLE_NAME,
+        IndexName: "GSI1",
+        KeyConditionExpression: "GSI1PK = :categoryPK",
+        ExpressionAttributeValues: {
+          ":categoryPK": `CATEGORY#${categoryId}`,
+        },
+        Select: "COUNT",
+      }),
+    );
+
+    return result.Count || 0;
+  }
+
+  async delete(categoryId) {
+    await docClient.send(
+      new DeleteCommand({
+        TableName: TABLE_NAME,
+        Key: {
+          PK: `CATEGORY#${categoryId}`,
+          SK: "METADATA",
+        },
+      }),
+    );
   }
 }
 
