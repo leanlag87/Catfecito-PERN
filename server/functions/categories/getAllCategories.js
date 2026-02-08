@@ -1,43 +1,17 @@
-import { docClient, TABLE_NAME } from "../../dynamodb.js";
-import { ScanCommand } from "@aws-sdk/lib-dynamodb";
 import { success, serverError } from "../../utils/responses.js";
+import { categoryService } from "../../services/category.service.js";
 
 export const getAllCategories = async (event) => {
   try {
-    // Scan con filtro para categorías activas
-    const result = await docClient.send(
-      new ScanCommand({
-        TableName: TABLE_NAME,
-        FilterExpression: "entityType = :entityType AND is_active = :isActive",
-        ExpressionAttributeValues: {
-          ":entityType": "CATEGORY",
-          ":isActive": true,
-        },
-      }),
-    );
-
-    // Ordenar por nombre (ascendente)
-    const categories = result.Items.sort((a, b) => {
-      return a.name.localeCompare(b.name);
-    });
-
-    // Formatear respuesta
-    const formattedCategories = categories.map((c) => ({
-      id: c.id,
-      name: c.name,
-      description: c.description,
-      is_active: c.is_active,
-      created_at: c.created_at,
-      updated_at: c.updated_at,
-    }));
+    // Delegar al servicio
+    const result = await categoryService.getAllCategories();
 
     return success({
       success: true,
-      count: formattedCategories.length,
-      categories: formattedCategories,
+      ...result,
     });
   } catch (error) {
-    console.error("❌ Error en getAllCategories:", error);
+    console.error("Error en getAllCategories:", error);
     return serverError("Error al obtener categorías");
   }
 };
