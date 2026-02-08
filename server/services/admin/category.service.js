@@ -118,6 +118,36 @@ class AdminCategoryService {
 
     return updatedCategory;
   }
+
+  async deleteCategory(categoryId) {
+    // Verificar que la categoría existe
+    const category = await categoryRepository.findById(categoryId);
+
+    if (!category) {
+      const error = new Error("Categoría no encontrada");
+      error.name = "CategoryNotFoundError";
+      throw error;
+    }
+
+    // Verificar si hay productos asociados
+    const productsCount = await categoryRepository.countProducts(categoryId);
+
+    if (productsCount > 0) {
+      const error = new Error(
+        `No se puede eliminar la categoría. Tiene ${productsCount} producto(s) asociado(s).`,
+      );
+      error.name = "CategoryHasProductsError";
+      throw error;
+    }
+
+    // Eliminar categoría
+    await categoryRepository.delete(categoryId);
+
+    return {
+      id: category.id,
+      name: category.name,
+    };
+  }
 }
 
 export const adminCategoryService = new AdminCategoryService();
