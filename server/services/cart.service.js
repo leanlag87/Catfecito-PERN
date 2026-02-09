@@ -238,6 +238,26 @@ class CartService {
       product_name: cartItem.product_name,
     };
   }
+
+  async clearCart(userId) {
+    // Obtener todos los items del carrito
+    const cartItems = await cartRepository.findAllKeysByUser(userId);
+
+    if (cartItems.length === 0) {
+      return {
+        deletedCount: 0,
+        message: "El carrito ya está vacío",
+      };
+    }
+
+    // Eliminar todos los items
+    const deletedCount = await cartRepository.deleteBatch(cartItems);
+
+    return {
+      deletedCount,
+      message: "Carrito vaciado exitosamente",
+    };
+  }
 }
 
 export const cartService = new CartService();
