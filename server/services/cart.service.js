@@ -155,6 +155,70 @@ class CartService {
       items,
     };
   }
+
+  async updateCartItem(userId, productId, quantity) {
+    // Validaciones
+    const qty = parseInt(quantity);
+
+    if (isNaN(qty) || qty <= 0) {
+      const error = new Error("La cantidad debe ser mayor a 0");
+      error.name = "ValidationError";
+      throw error;
+    }
+
+    // Verificar que el item existe en el carrito
+    const cartItem = await cartRepository.findItem(userId, productId);
+
+    if (!cartItem) {
+      const error = new Error("Item no encontrado en tu carrito");
+      error.name = "CartItemNotFoundError";
+      throw error;
+    }
+
+    // Verificar que el producto sigue activo y tiene stock
+    const product = await productRepository.findById(productId);
+
+    if (!product) {
+      const error = new Error("Producto no encontrado");
+      error.name = "ProductNotFoundError";
+      throw error;
+    }
+
+    if (!product.is_active) {
+      const error = new Error("El producto ya no está disponible");
+      error.name = "ProductNotAvailableError";
+      throw error;
+    }
+
+    if (product.stock < qty) {
+      const error = new Error(
+        `Stock insuficiente. Disponible: ${product.stock}`,
+      );
+      error.name = "InsufficientStockError";
+      throw error;
+    }
+
+    // Actualizar cantidad
+    const updatedItem = await cartRepository.updateItemQuantity(
+      userId,
+      productId,
+      qty,
+    );
+
+    // Calcular subtotal
+    const subtotal = parseFloat(product.price) * qty;
+
+    return {
+      quantity: updatedItem.quantity,
+      updated_at: updatedItem.updated_at,
+      product_id: productId,
+      product_name: product.name,
+      product_price: product.price,
+      product_stock: product.stock,
+      product_image: product.image_url,
+      subtotal: subtotal.toFixed(2),
+    };
+  }
 }
 
 export const cartService = new CartService();
