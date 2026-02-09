@@ -1,5 +1,11 @@
 import { docClient, TABLE_NAME, getTimestamp } from "../dynamodb.js";
-import { GetCommand, PutCommand, UpdateCommand } from "@aws-sdk/lib-dynamodb";
+import {
+  GetCommand,
+  PutCommand,
+  UpdateCommand,
+  QueryCommand,
+  BatchGetCommand,
+} from "@aws-sdk/lib-dynamodb";
 
 class CartRepository {
   async findItem(userId, productId) {
@@ -61,6 +67,46 @@ class CartRepository {
     );
 
     return result.Attributes;
+  }
+
+  //Obtener todos los items del carrito de un usuario
+  async findAllByUser(userId) {
+    const result = await docClient.send(
+      new QueryCommand({
+        TableName: TABLE_NAME,
+        KeyConditionExpression: "PK = :pk AND begins_with(SK, :sk)",
+        ExpressionAttributeValues: {
+          ":pk": `USER#${userId}`,
+          ":sk": "CART#",
+        },
+      }),
+    );
+
+    return result.Items || [];
+  }
+
+  //Obtener productos en batch por sus IDs
+  async findProductsBatch(productIds) {
+    if (productIds.length === 0) {
+      return [];
+    }
+
+    const productKeys = productIds.map((id) => ({
+      PK: `PRODUCT#${id}`,
+      SK: "METADATA",
+    }));
+
+    const result = await docClient.send(
+      new BatchGetCommand({
+        RequestItems: {
+          [TABLE_NAME]: {
+            Keys: productKeys,
+          },
+        },
+      }),
+    );
+
+    return result.Responses[TABLE_NAME] || [];
   }
 }
 
