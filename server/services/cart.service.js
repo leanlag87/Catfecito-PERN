@@ -219,6 +219,25 @@ class CartService {
       subtotal: subtotal.toFixed(2),
     };
   }
+
+  async removeCartItem(userId, productId) {
+    // Verificar que el item existe en el carrito
+    const cartItem = await cartRepository.findItem(userId, productId);
+
+    if (!cartItem) {
+      const error = new Error("Item no encontrado en tu carrito");
+      error.name = "CartItemNotFoundError";
+      throw error;
+    }
+
+    // Eliminar item
+    await cartRepository.deleteItem(userId, productId);
+
+    return {
+      product_id: productId,
+      product_name: cartItem.product_name,
+    };
+  }
 }
 
 export const cartService = new CartService();
