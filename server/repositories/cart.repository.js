@@ -5,6 +5,7 @@ import {
   UpdateCommand,
   QueryCommand,
   BatchGetCommand,
+  DeleteCommand,
 } from "@aws-sdk/lib-dynamodb";
 
 class CartRepository {
@@ -107,6 +108,18 @@ class CartRepository {
     );
 
     return result.Responses[TABLE_NAME] || [];
+  }
+
+  async deleteItem(userId, productId) {
+    await docClient.send(
+      new DeleteCommand({
+        TableName: TABLE_NAME,
+        Key: {
+          PK: `USER#${userId}`,
+          SK: `CART#${productId}`,
+        },
+      }),
+    );
   }
 }
 
