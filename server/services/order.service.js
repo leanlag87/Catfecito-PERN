@@ -267,6 +267,58 @@ class OrderService {
       items,
     };
   }
+
+  async cancelOrder(userId, orderId, isAdmin = false) {
+    // Obtener la orden
+    const order = await orderRepository.findById(orderId);
+
+    if (!order) {
+      const error = new Error("Orden no encontrada");
+      error.name = "OrderNotFoundError";
+      throw error;
+    }
+
+    // Verificar permisos: dueño o admin
+    if (!isAdmin && order.user_id !== userId) {
+      const error = new Error("No autorizado para cancelar esta orden");
+      error.name = "ForbiddenError";
+      throw error;
+    }
+
+    // Validar que no esté pagada/aprobada
+    if (order.status === "paid" || order.payment_status === "approved") {
+      const error = new Error("No se puede cancelar una orden ya pagada");
+      error.name = "ValidationError";
+      throw error;
+    }
+
+    // Actualizar estado a cancelled
+    const timestamp = await orderRepository.updateStatus(
+      orderId,
+      order.user_id,
+      "cancelled",
+      "cancelled",
+    );
+
+    return {
+      id: orderId,
+      user_id: order.user_id,
+      total: order.total,
+      status: "cancelled",
+      payment_status: "cancelled",
+      shipping_first_name: order.shipping_first_name,
+      shipping_last_name: order.shipping_last_name,
+      shipping_country: order.shipping_country,
+      shipping_address: order.shipping_address,
+      shipping_address2: order.shipping_address2,
+      shipping_city: order.shipping_city,
+      shipping_state: order.shipping_state,
+      shipping_zip: order.shipping_zip,
+      shipping_phone: order.shipping_phone,
+      created_at: order.created_at,
+      updated_at: timestamp,
+    };
+  }
 }
 
 export const orderService = new OrderService();
