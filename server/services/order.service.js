@@ -119,6 +119,61 @@ class OrderService {
 
     return order;
   }
+
+  async getMyOrders(userId) {
+    // Obtener índice de órdenes del usuario
+    const orderIndex = await orderRepository.findOrderIndexByUser(userId);
+
+    if (orderIndex.length === 0) {
+      return {
+        count: 0,
+        orders: [],
+      };
+    }
+
+    // Extraer order IDs
+    const orderIds = orderIndex.map((item) => item.SK.replace("ORDER#", ""));
+
+    // Obtener metadata completa de cada orden en batch
+    const orders = await orderRepository.findOrdersBatch(orderIds);
+
+    // Contar items de cada orden
+    const ordersWithItemCount = await Promise.all(
+      orders.map(async (order) => {
+        const orderId = order.id;
+        const itemsCount = await orderRepository.countOrderItems(orderId);
+
+        return {
+          id: orderId,
+          total: order.total,
+          status: order.status,
+          payment_status: order.payment_status,
+          shipping_first_name: order.shipping_first_name,
+          shipping_last_name: order.shipping_last_name,
+          shipping_country: order.shipping_country,
+          shipping_address: order.shipping_address,
+          shipping_address2: order.shipping_address2,
+          shipping_city: order.shipping_city,
+          shipping_state: order.shipping_state,
+          shipping_zip: order.shipping_zip,
+          shipping_phone: order.shipping_phone,
+          created_at: order.created_at,
+          updated_at: order.updated_at,
+          items_count: itemsCount,
+        };
+      }),
+    );
+
+    // Ordenar por fecha (más reciente primero)
+    ordersWithItemCount.sort(
+      (a, b) => new Date(b.created_at) - new Date(a.created_at),
+    );
+
+    return {
+      count: ordersWithItemCount.length,
+      orders: ordersWithItemCount,
+    };
+  }
 }
 
 export const orderService = new OrderService();
