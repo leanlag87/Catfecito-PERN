@@ -138,6 +138,23 @@ class OrderRepository {
       items: orderItems,
     };
   }
+
+  //Obtener indice de ordenes del usuario
+  async countOrderItems(orderId) {
+    const result = await docClient.send(
+      new QueryCommand({
+        TableName: TABLE_NAME,
+        KeyConditionExpression: "PK = :pk AND begins_with(SK, :sk)",
+        ExpressionAttributeValues: {
+          ":pk": `ORDER#${orderId}`,
+          ":sk": "ITEM#",
+        },
+        Select: "COUNT",
+      }),
+    );
+
+    return result.Count || 0;
+  }
 }
 
 export const orderRepository = new OrderRepository();
