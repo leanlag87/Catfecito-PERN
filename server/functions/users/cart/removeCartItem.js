@@ -1,48 +1,27 @@
-import { docClient, TABLE_NAME } from "../../../dynamodb.js";
-import { DeleteCommand, GetCommand } from "@aws-sdk/lib-dynamodb";
 import { requireAuth } from "../../../utils/auth.js";
 import { success, notFound, serverError } from "../../../utils/responses.js";
+import { cartService } from "../../../services/cart.service.js";
 
 const removeCartItemHandler = async (event) => {
   try {
     const userId = event.user.id;
-    const productId = event.pathParameters?.product_id;
+    const { product_id } = event.pathParameters;
 
-    // Verificar que el item existe en el carrito
-    const cartItemResult = await docClient.send(
-      new GetCommand({
-        TableName: TABLE_NAME,
-        Key: {
-          PK: `USER#${userId}`,
-          SK: `CART#${productId}`,
-        },
-      }),
-    );
-
-    if (!cartItemResult.Item) {
-      return notFound("Item no encontrado en tu carrito");
-    }
-
-    // Eliminar el item
-    await docClient.send(
-      new DeleteCommand({
-        TableName: TABLE_NAME,
-        Key: {
-          PK: `USER#${userId}`,
-          SK: `CART#${productId}`,
-        },
-      }),
-    );
+    // Delegar al servicio
+    const item = await cartService.removeCartItem(userId, product_id);
 
     return success({
       success: true,
       message: "Producto eliminado del carrito",
-      item: {
-        product_id: productId,
-      },
+      item,
     });
   } catch (error) {
     console.error("Error en removeCartItem:", error);
+
+    if (error.name === "CartItemNotFoundError") {
+      return notFound(error.message);
+    }
+
     return serverError("Error al eliminar item");
   }
 };

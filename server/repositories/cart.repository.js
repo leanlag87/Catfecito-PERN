@@ -1,5 +1,13 @@
 import { docClient, TABLE_NAME, getTimestamp } from "../dynamodb.js";
-import { GetCommand, PutCommand, UpdateCommand } from "@aws-sdk/lib-dynamodb";
+import {
+  GetCommand,
+  PutCommand,
+  UpdateCommand,
+  QueryCommand,
+  BatchGetCommand,
+  DeleteCommand,
+  BatchWriteCommand,
+} from "@aws-sdk/lib-dynamodb";
 
 class CartRepository {
   async findItem(userId, productId) {
@@ -61,6 +69,110 @@ class CartRepository {
     );
 
     return result.Attributes;
+  }
+
+  //Obtener todos los items del carrito de un usuario
+  async findAllByUser(userId) {
+    const result = await docClient.send(
+      new QueryCommand({
+        TableName: TABLE_NAME,
+        KeyConditionExpression: "PK = :pk AND begins_with(SK, :sk)",
+        ExpressionAttributeValues: {
+          ":pk": `USER#${userId}`,
+          ":sk": "CART#",
+        },
+      }),
+    );
+
+    return result.Items || [];
+  }
+
+  //Obtener productos en batch por sus IDs
+  async findProductsBatch(productIds) {
+    if (productIds.length === 0) {
+      return [];
+    }
+
+    const productKeys = productIds.map((id) => ({
+      PK: `PRODUCT#${id}`,
+      SK: "METADATA",
+    }));
+
+    const result = await docClient.send(
+      new BatchGetCommand({
+        RequestItems: {
+          [TABLE_NAME]: {
+            Keys: productKeys,
+          },
+        },
+      }),
+    );
+
+    return result.Responses[TABLE_NAME] || [];
+  }
+
+  async deleteItem(userId, productId) {
+    await docClient.send(
+      new DeleteCommand({
+        TableName: TABLE_NAME,
+        Key: {
+          PK: `USER#${userId}`,
+          SK: `CART#${productId}`,
+        },
+      }),
+    );
+  }
+
+  //Obtener todas las keys del carrito, en este caso solo el PK y SK para eliminar en batch
+  async findAllKeysByUser(userId) {
+    const result = await docClient.send(
+      new QueryCommand({
+        TableName: TABLE_NAME,
+        KeyConditionExpression: "PK = :pk AND begins_with(SK, :sk)",
+        ExpressionAttributeValues: {
+          ":pk": `USER#${userId}`,
+          ":sk": "CART#",
+        },
+        ProjectionExpression: "PK, SK",
+      }),
+    );
+
+    return result.Items || [];
+  }
+
+  //Eliminar items en batch por sus keys
+  async deleteBatch(items) {
+    if (items.length === 0) {
+      return 0;
+    }
+
+    const deleteRequests = items.map((item) => ({
+      DeleteRequest: {
+        Key: {
+          PK: item.PK,
+          SK: item.SK,
+        },
+      },
+    }));
+
+    // Dividir en batches de 25 (límite de DynamoDB)
+    const batches = [];
+    for (let i = 0; i < deleteRequests.length; i += 25) {
+      batches.push(deleteRequests.slice(i, i + 25));
+    }
+
+    // Ejecutar batches
+    for (const batch of batches) {
+      await docClient.send(
+        new BatchWriteCommand({
+          RequestItems: {
+            [TABLE_NAME]: batch,
+          },
+        }),
+      );
+    }
+
+    return items.length;
   }
 }
 

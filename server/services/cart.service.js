@@ -3,7 +3,6 @@ import { productRepository } from "../repositories/product.repository.js";
 
 class CartService {
   async addToCart(userId, productId, quantity = 1) {
-    // Validaciones
     const qty = parseInt(quantity);
 
     if (isNaN(qty) || qty <= 0) {
@@ -88,6 +87,175 @@ class CartService {
         created_at: cartItem.created_at,
         updated_at: cartItem.updated_at,
       },
+    };
+  }
+
+  async getCart(userId) {
+    // Obtener items del carrito
+    const cartItems = await cartRepository.findAllByUser(userId);
+
+    if (cartItems.length === 0) {
+      return {
+        count: 0,
+        total: "0.00",
+        items: [],
+      };
+    }
+
+    // Obtener información de productos en batch
+    const productIds = cartItems.map((item) => item.product_id);
+    const products = await cartRepository.findProductsBatch(productIds);
+
+    // Crear mapa de productos
+    const productsMap = {};
+    products.forEach((product) => {
+      const productId = product.PK.replace("PRODUCT#", "");
+      productsMap[productId] = product;
+    });
+
+    // Combinar información y calcular subtotales
+    const items = cartItems
+      .map((cartItem) => {
+        const product = productsMap[cartItem.product_id];
+
+        // Si el producto no existe, omitir item
+        if (!product) {
+          return null;
+        }
+
+        const subtotal =
+          parseFloat(product.price) * parseInt(cartItem.quantity);
+
+        return {
+          id: cartItem.SK.replace("CART#", ""),
+          quantity: cartItem.quantity,
+          created_at: cartItem.created_at,
+          updated_at: cartItem.updated_at,
+          product_id: cartItem.product_id,
+          product_name: product.name,
+          product_description: product.description,
+          product_price: product.price,
+          product_stock: product.stock,
+          product_image: product.image_url,
+          product_is_active: product.is_active,
+          subtotal: subtotal.toFixed(2),
+        };
+      })
+      .filter(Boolean); // Eliminar nulls
+
+    // Calcular total del carrito
+    const total = items.reduce(
+      (sum, item) => sum + parseFloat(item.subtotal),
+      0,
+    );
+
+    return {
+      count: items.length,
+      total: total.toFixed(2),
+      items,
+    };
+  }
+
+  async updateCartItem(userId, productId, quantity) {
+    // Validaciones
+    const qty = parseInt(quantity);
+
+    if (isNaN(qty) || qty <= 0) {
+      const error = new Error("La cantidad debe ser mayor a 0");
+      error.name = "ValidationError";
+      throw error;
+    }
+
+    // Verificar que el item existe en el carrito
+    const cartItem = await cartRepository.findItem(userId, productId);
+
+    if (!cartItem) {
+      const error = new Error("Item no encontrado en tu carrito");
+      error.name = "CartItemNotFoundError";
+      throw error;
+    }
+
+    // Verificar que el producto sigue activo y tiene stock
+    const product = await productRepository.findById(productId);
+
+    if (!product) {
+      const error = new Error("Producto no encontrado");
+      error.name = "ProductNotFoundError";
+      throw error;
+    }
+
+    if (!product.is_active) {
+      const error = new Error("El producto ya no está disponible");
+      error.name = "ProductNotAvailableError";
+      throw error;
+    }
+
+    if (product.stock < qty) {
+      const error = new Error(
+        `Stock insuficiente. Disponible: ${product.stock}`,
+      );
+      error.name = "InsufficientStockError";
+      throw error;
+    }
+
+    // Actualizar cantidad
+    const updatedItem = await cartRepository.updateItemQuantity(
+      userId,
+      productId,
+      qty,
+    );
+
+    // Calcular subtotal
+    const subtotal = parseFloat(product.price) * qty;
+
+    return {
+      quantity: updatedItem.quantity,
+      updated_at: updatedItem.updated_at,
+      product_id: productId,
+      product_name: product.name,
+      product_price: product.price,
+      product_stock: product.stock,
+      product_image: product.image_url,
+      subtotal: subtotal.toFixed(2),
+    };
+  }
+
+  async removeCartItem(userId, productId) {
+    // Verificar que el item existe en el carrito
+    const cartItem = await cartRepository.findItem(userId, productId);
+
+    if (!cartItem) {
+      const error = new Error("Item no encontrado en tu carrito");
+      error.name = "CartItemNotFoundError";
+      throw error;
+    }
+
+    // Eliminar item
+    await cartRepository.deleteItem(userId, productId);
+
+    return {
+      product_id: productId,
+      product_name: cartItem.product_name,
+    };
+  }
+
+  async clearCart(userId) {
+    // Obtener todos los items del carrito
+    const cartItems = await cartRepository.findAllKeysByUser(userId);
+
+    if (cartItems.length === 0) {
+      return {
+        deletedCount: 0,
+        message: "El carrito ya está vacío",
+      };
+    }
+
+    // Eliminar todos los items
+    const deletedCount = await cartRepository.deleteBatch(cartItems);
+
+    return {
+      deletedCount,
+      message: "Carrito vaciado exitosamente",
     };
   }
 }
