@@ -201,6 +201,53 @@ class OrderRepository {
 
     return result.Items || [];
   }
+
+  async updateStatus(orderId, userId, status, paymentStatus) {
+    const timestamp = getTimestamp();
+
+    // Actualizar ORDER#METADATA
+    await docClient.send(
+      new UpdateCommand({
+        TableName: TABLE_NAME,
+        Key: {
+          PK: `ORDER#${orderId}`,
+          SK: "METADATA",
+        },
+        UpdateExpression:
+          "SET #status = :status, payment_status = :paymentStatus, updated_at = :updated",
+        ExpressionAttributeNames: {
+          "#status": "status",
+        },
+        ExpressionAttributeValues: {
+          ":status": status,
+          ":paymentStatus": paymentStatus,
+          ":updated": timestamp,
+        },
+      }),
+    );
+
+    // Actualizar índice USER#ORDER
+    await docClient.send(
+      new UpdateCommand({
+        TableName: TABLE_NAME,
+        Key: {
+          PK: `USER#${userId}`,
+          SK: `ORDER#${orderId}`,
+        },
+        UpdateExpression:
+          "SET #status = :status, payment_status = :paymentStatus",
+        ExpressionAttributeNames: {
+          "#status": "status",
+        },
+        ExpressionAttributeValues: {
+          ":status": status,
+          ":paymentStatus": paymentStatus,
+        },
+      }),
+    );
+
+    return timestamp;
+  }
 }
 
 export const orderRepository = new OrderRepository();
