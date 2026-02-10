@@ -155,6 +155,52 @@ class OrderRepository {
 
     return result.Count || 0;
   }
+
+  //Verificar que la orden pertenece al usuario
+  async verifyOwnership(userId, orderId) {
+    const result = await docClient.send(
+      new GetCommand({
+        TableName: TABLE_NAME,
+        Key: {
+          PK: `USER#${userId}`,
+          SK: `ORDER#${orderId}`,
+        },
+      }),
+    );
+
+    return result.Item !== undefined;
+  }
+
+  //Obtener metadata de la orden
+  async findById(orderId) {
+    const result = await docClient.send(
+      new GetCommand({
+        TableName: TABLE_NAME,
+        Key: {
+          PK: `ORDER#${orderId}`,
+          SK: "METADATA",
+        },
+      }),
+    );
+
+    return result.Item || null;
+  }
+
+  //Obtener items de la orden
+  async findOrderItems(orderId) {
+    const result = await docClient.send(
+      new QueryCommand({
+        TableName: TABLE_NAME,
+        KeyConditionExpression: "PK = :pk AND begins_with(SK, :sk)",
+        ExpressionAttributeValues: {
+          ":pk": `ORDER#${orderId}`,
+          ":sk": "ITEM#",
+        },
+      }),
+    );
+
+    return result.Items || [];
+  }
 }
 
 export const orderRepository = new OrderRepository();
