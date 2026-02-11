@@ -157,6 +157,73 @@ class AdminOrderService {
       items,
     };
   }
+
+  async updateOrderStatus(orderId, newStatus) {
+    const validStatuses = [
+      "pending",
+      "paid",
+      "processing",
+      "shipped",
+      "delivered",
+      "cancelled",
+    ];
+
+    // Validar estado
+    if (!newStatus || !validStatuses.includes(newStatus)) {
+      const error = new Error(
+        `Estado inválido. Válidos: ${validStatuses.join(", ")}`,
+      );
+      error.name = "ValidationError";
+      throw error;
+    }
+
+    // Verificar que la orden existe
+    const order = await orderRepository.findById(orderId);
+
+    if (!order) {
+      const error = new Error("Orden no encontrada");
+      error.name = "OrderNotFoundError";
+      throw error;
+    }
+
+    // Determinar payment_status según el status
+    let paymentStatus = order.payment_status;
+
+    if (newStatus === "paid") {
+      paymentStatus = "approved";
+    } else if (newStatus === "cancelled") {
+      paymentStatus = "cancelled";
+    } else if (newStatus === "pending") {
+      paymentStatus = "pending";
+    }
+
+    // Actualizar estado
+    const timestamp = await orderRepository.updateStatus(
+      orderId,
+      order.user_id,
+      newStatus,
+      paymentStatus,
+    );
+
+    return {
+      id: orderId,
+      user_id: order.user_id,
+      total: order.total,
+      status: newStatus,
+      payment_status: paymentStatus,
+      shipping_first_name: order.shipping_first_name,
+      shipping_last_name: order.shipping_last_name,
+      shipping_country: order.shipping_country,
+      shipping_address: order.shipping_address,
+      shipping_address2: order.shipping_address2,
+      shipping_city: order.shipping_city,
+      shipping_state: order.shipping_state,
+      shipping_zip: order.shipping_zip,
+      shipping_phone: order.shipping_phone,
+      created_at: order.created_at,
+      updated_at: timestamp,
+    };
+  }
 }
 
 export const adminOrderService = new AdminOrderService();
