@@ -286,6 +286,28 @@ class OrderRepository {
 
     return result.Responses[TABLE_NAME] || [];
   }
+
+  //Guardar "payment_id" en la orden
+  async savePaymentId(orderId, paymentId) {
+    const timestamp = getTimestamp();
+
+    await docClient.send(
+      new UpdateCommand({
+        TableName: TABLE_NAME,
+        Key: {
+          PK: `ORDER#${orderId}`,
+          SK: "METADATA",
+        },
+        UpdateExpression: "SET payment_id = :paymentId, updated_at = :updated",
+        ExpressionAttributeValues: {
+          ":paymentId": paymentId,
+          ":updated": timestamp,
+        },
+      }),
+    );
+
+    return timestamp;
+  }
 }
 
 export const orderRepository = new OrderRepository();
