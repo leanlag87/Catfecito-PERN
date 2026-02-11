@@ -248,6 +248,44 @@ class OrderRepository {
 
     return timestamp;
   }
+
+  async findAll() {
+    const result = await docClient.send(
+      new ScanCommand({
+        TableName: TABLE_NAME,
+        FilterExpression: "begins_with(PK, :pk) AND SK = :sk",
+        ExpressionAttributeValues: {
+          ":pk": "ORDER#",
+          ":sk": "METADATA",
+        },
+      }),
+    );
+
+    return result.Items || [];
+  }
+
+  async findUsersBatch(userIds) {
+    if (userIds.length === 0) {
+      return [];
+    }
+
+    const userKeys = userIds.map((id) => ({
+      PK: `USER#${id}`,
+      SK: "METADATA",
+    }));
+
+    const result = await docClient.send(
+      new BatchGetCommand({
+        RequestItems: {
+          [TABLE_NAME]: {
+            Keys: userKeys,
+          },
+        },
+      }),
+    );
+
+    return result.Responses[TABLE_NAME] || [];
+  }
 }
 
 export const orderRepository = new OrderRepository();
