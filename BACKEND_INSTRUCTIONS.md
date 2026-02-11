@@ -1,341 +1,446 @@
-# Backend — Instrucciones para levantar el proyecto (CatFecito)
+# Backend Serverless - Instrucciones de Deploy (CatFecito)
 
-Sigue estos pasos para instalar, configurar y ejecutar el backend en desarrollo.
+Esta es la **versión 2.0** del backend, migrada de Express.js/PostgreSQL a **AWS Lambda + DynamoDB**.
+
+> **Nota histórica**: Si buscas la versión original PERN, consulta `LEGACY_BACKEND_INSTRUCTIONS.md` o el branch `legacy/pern-stack`.
+
+## 🎯 Arquitectura Actual
+
+```
+AWS Lambda Functions (Node.js 20.x)
+       ↓
+   API Gateway
+       ↓
+   DynamoDB (Base de datos NoSQL)
+       ↓
+   S3 (Imágenes de productos)
+```
+
+**Patrón de diseño**: Repository → Service → Handler (3 capas)
 
 ## Requisitos
 
-- Node.js >= 18
+- Node.js >= 20.x
 - npm o yarn
-- PostgreSQL (local o remoto)
-- Terminal (PowerShell para Windows, Terminal/Bash para macOS/Linux)
+- AWS CLI configurado
+- Serverless Framework (`npm install -g serverless`)
+- Cuenta de AWS con permisos suficientes
+- Cuenta de MercadoPago (para pagos)
 
-## 1) Variables de entorno
+## 1) Configurar AWS Credentials
 
-Crea un archivo `.env` en `server/` con este contenido (ajusta según tu entorno):
+```bash
+# Instalar AWS CLI
+# Windows: https://aws.amazon.com/cli/
+# macOS: brew install awscli
+# Linux: sudo apt install awscli
 
+# Configurar credenciales
+aws configure
 ```
-PORT=5000
-DB_HOST=localhost
-DB_PORT=5432
-DB_NAME=catfecito_pern
-DB_USER=postgres
-DB_PASSWORD=tu_password_postgres
-JWT_SECRET=tu_secreto_jwt_superseguro
+
+Ingresa:
+
+- AWS Access Key ID
+- AWS Secret Access Key
+- Default region name (ej: `us-east-1`)
+- Default output format: `json`
+
+## 2) Variables de entorno
+
+Crea un archivo `.env` en `server/` con este contenido:
+
+```env
+# AWS
+AWS_REGION=us-east-1
+DYNAMODB_TABLE=catfecito-serverless-dev
+
+# JWT
+JWT_SECRET=tu_secreto_jwt_superseguro_minimo_32_caracteres
 JWT_EXPIRES_IN=7d
+
+# URLs
 CLIENT_URL=http://localhost:5173
-BACKEND_URL=http://localhost:5000
-MP_ACCESS_TOKEN=
-MP_PUBLIC_KEY=
-MP_WEBHOOK_SECRET=
+BACKEND_URL=https://tu-api-id.execute-api.us-east-1.amazonaws.com/dev
+
+# MercadoPago
+MP_ACCESS_TOKEN=tu_mercadopago_access_token
+MP_PUBLIC_KEY=tu_mercadopago_public_key
+CURRENCY_ID=ARS
+
+# Bcrypt
 BCRYPT_ROUNDS=10
 ```
 
-Guárdalo como `server/.env`.
+**Importante**: Cambiarás `BACKEND_URL` después del primer deploy.
 
-## 2) Instalar dependencias
-
-### Windows (PowerShell):
-
-```powershell
-cd server; npm install
-```
-
-### macOS/Linux (Terminal/Bash):
+## 3) Instalar dependencias
 
 ```bash
-cd server && npm install
+cd server
+npm install
 ```
 
-## 3) Crear la base de datos e inicializar esquema
-
-### Windows (PowerShell):
-
-1. Crea la base de datos usando psql (o tu cliente favorito):
-
-```powershell
-# Con psql (ejecutar desde PowerShell)
-psql -U postgres -c "CREATE DATABASE catfecito_pern;"
-
-# Si tu usuario/puerto difieren, añade -h <host> -p <port> -U <user>
-```
-
-2. Ejecuta el script de inicialización (`server/database/init.sql`):
-
-```powershell
-psql -U postgres -d catfecito_pern -f .\server\database\init.sql
-```
-
-### macOS/Linux (Terminal/Bash):
-
-1. Crea la base de datos usando psql:
+## 4) Desplegar en AWS
 
 ```bash
-# Con psql
-psql -U postgres -c "CREATE DATABASE catfecito_pern;"
+# Deploy completo (primera vez)
+serverless deploy
 
-# Si tu usuario/puerto difieren, añade -h <host> -p <port> -U <user>
+# Deploy de una sola función (más rápido)
+serverless deploy function -f nombreFuncion
 ```
 
-2. Ejecuta el script de inicialización (`server/database/init.sql`):
+El output mostrará:
+
+```
+endpoints:
+  POST - https://xxxxx.execute-api.us-east-1.amazonaws.com/dev/api/auth/register
+  POST - https://xxxxx.execute-api.us-east-1.amazonaws.com/dev/api/auth/login
+  ...
+
+functions:
+  register: catfecito-serverless-dev-register
+  login: catfecito-serverless-dev-login
+  ...
+```
+
+**Copia la URL base** (ej: `https://xxxxx.execute-api.us-east-1.amazonaws.com/dev`) y actualiza `BACKEND_URL` en `.env`.
+
+## 5) Estructura de DynamoDB
+
+La tabla usa **Single Table Design**:
+
+```
+PK (Partition Key) | SK (Sort Key)       | Entidad
+-------------------|---------------------|----------
+USER#<uuid>        | METADATA            | Usuario
+PRODUCT#<uuid>     | METADATA            | Producto
+CATEGORY#<slug>    | METADATA            | Categoría
+ORDER#<uuid>       | METADATA            | Orden
+ORDER#<uuid>       | ITEM#<product_id>   | Item de orden
+USER#<uuid>        | CART#<product_id>   | Item de carrito
+USER#<uuid>        | ORDER#<order_id>    | Índice de órdenes
+```
+
+**GSI1**: `GSI1PK` + `GSI1SK` (para queries inversas)  
+**GSI2**: `GSI2PK` + `GSI2SK` (para búsquedas por nombre)
+
+## 6) Endpoints principales
+
+### Auth
 
 ```bash
-psql -U postgres -d catfecito_pern -f ./server/database/init.sql
+# Registro
+POST /api/auth/register
+Body: { "name": "Juan", "email": "juan@mail.com", "password": "Pass123" }
+
+# Login
+POST /api/auth/login
+Body: { "email": "juan@mail.com", "password": "Pass123" }
+
+# Verificar token
+GET /api/auth/verify
+Headers: Authorization: Bearer <token>
 ```
 
-Esto crea tablas, tipos ENUM, índices y algunas semillas de categorías.
-
-## 4) Ejecutar el servidor en desarrollo
-
-### Windows (PowerShell):
-
-```powershell
-cd server; npm run dev
-```
-
-### macOS/Linux (Terminal/Bash):
+### Products (público)
 
 ```bash
-cd server && npm run dev
+GET /api/products
+GET /api/products/{id}
+GET /api/products/category/{category_id}
 ```
 
-El backend por defecto corre en http://localhost:5000 (puedes cambiarlo en `.env`).
-
-## 5) Endpoints útiles
-
-- Registro: POST /api/auth/register (body: { name, email, password })
-- Login: POST /api/auth/login (body: { email, password })
-- Perfil: GET /api/users/profile (requiere Authorization: Bearer <token>)
-
-Rutas administrativas (requieren token de un usuario con role='admin'):
-
-- GET /api/users
-- PUT /api/users/:id/role (body: { role: 'admin' | 'user' })
-- PATCH /api/users/:id/status
-
-> Las rutas están en `server/src/router` y los controladores en `server/src/controllers`.
-
-## 6) Cómo crear el primer usuario administrador
-
-Opción A — Usando el panel web y query manual
-
-1. Regístrate como usuario desde la página web (formulario de registro).
-2. Ingresa a tu herramienta de administración de base de datos (ej. pgAdmin, DBeaver, Azure Data Studio, etc.).
-3. Ejecuta el siguiente query para promover el usuario a admin (reemplaza el email si usaste otro):
-   ```sql
-   UPDATE users SET role = 'admin' WHERE lower(email) = lower('admin@ejemplo.local');
-   ```
-   Esto convierte el usuario registrado en administrador.
-
-Opción B —
-
-1. Registra un usuario usando la API:
-
-**Windows (PowerShell / Invoke-RestMethod):**
-
-```powershell
-$body = @{ name = 'Admin Inicial'; email = 'admin@ejemplo.local'; password = 'AdminPass123' } | ConvertTo-Json
-Invoke-RestMethod -Method Post -Uri http://localhost:5000/api/auth/register -Body $body -ContentType 'application/json'
-```
-
-**macOS/Linux (Terminal / curl):**
+### Admin (requiere token de admin)
 
 ```bash
-curl -X POST http://localhost:5000/api/auth/register \
+GET    /api/admin/products
+POST   /api/admin/products
+PUT    /api/admin/products/{id}
+DELETE /api/admin/products/{id}
+PATCH  /api/admin/products/{id}/status
+
+GET    /api/admin/categories
+POST   /api/admin/categories
+PUT    /api/admin/categories/{id}
+...
+```
+
+### Cart (requiere token de usuario)
+
+```bash
+GET    /api/users/cart
+POST   /api/users/cart
+PUT    /api/users/cart/{product_id}
+DELETE /api/users/cart/{product_id}
+DELETE /api/users/cart
+```
+
+### Orders
+
+```bash
+POST   /api/users/orders
+GET    /api/users/orders
+GET    /api/users/orders/{id}
+PATCH  /api/users/orders/{id}/cancel
+
+# Admin
+GET    /api/admin/orders
+GET    /api/admin/orders/{id}
+PATCH  /api/admin/orders/{id}/status
+```
+
+### Payments
+
+```bash
+POST /api/payments/create-preference
+Body: { "order_id": "uuid-order" }
+
+GET  /api/payments/status/{order_id}
+POST /api/payments/webhook (usado por MercadoPago)
+```
+
+## 7) Crear el primer usuario administrador
+
+### Opción A: Registrar y promover manualmente
+
+1. Registra un usuario desde la API:
+
+```bash
+# curl (macOS/Linux)
+curl -X POST https://tu-api.execute-api.us-east-1.amazonaws.com/dev/api/auth/register \
   -H "Content-Type: application/json" \
-  -d '{"name":"Admin Inicial","email":"admin@ejemplo.local","password":"AdminPass123"}'
+  -d '{"name":"Admin","email":"admin@ejemplo.com","password":"AdminPass123"}'
+
+# PowerShell (Windows)
+$body = @{name='Admin';email='admin@ejemplo.com';password='AdminPass123'} | ConvertTo-Json
+Invoke-RestMethod -Method Post -Uri https://tu-api.execute-api.us-east-1.amazonaws.com/dev/api/auth/register -Body $body -ContentType 'application/json'
 ```
 
-2. Conéctate a la DB y convierte al usuario en admin:
+2. Ve a **AWS Console → DynamoDB → Tables → tu-tabla → Items**
 
-**Windows (PowerShell):**
+3. Busca el item con:
+   - `PK` = `USER#<uuid>`
+   - `SK` = `METADATA`
+   - `email` = `admin@ejemplo.com`
 
-```powershell
-psql -U postgres -d catfecito_pern -c "UPDATE users SET role = 'admin' WHERE lower(email) = lower('admin@ejemplo.local');"
-```
+4. Edita el campo `role` y cámbialo de `user` a `admin`
 
-**macOS/Linux (Terminal/Bash):**
+5. Guarda cambios
 
-```bash
-psql -U postgres -d catfecito_pern -c "UPDATE users SET role = 'admin' WHERE lower(email) = lower('admin@ejemplo.local');"
-```
+### Opción B: Script de inicialización (próximamente)
 
-Opción C — Insertar directamente (cuando la base de datos está vacía)
+Agregaremos un comando `npm run create-admin` que lo hará automáticamente.
 
-1. Genera un hash de contraseña con bcrypt en tu máquina (ejemplo con Node.js):
+## 8) Configurar Webhooks de MercadoPago
 
-**Windows (PowerShell):**
+Para recibir notificaciones de pagos en desarrollo:
 
-```powershell
-# Crear archivo temporal para generar hash
-Set-Content -Path .\hash.js -Value "const bcrypt = require('bcrypt'); bcrypt.hash(process.argv[2], 10).then(h=>console.log(h));"
-node .\hash.js "AdminPass123" > .\hash.txt
-Get-Content .\hash.txt
-```
-
-**macOS/Linux (Terminal/Bash):**
-
-```bash
-# Crear archivo temporal para generar hash
-echo "const bcrypt = require('bcrypt'); bcrypt.hash(process.argv[2], 10).then(h=>console.log(h));" > hash.js
-node hash.js "AdminPass123" > hash.txt
-cat hash.txt
-```
-
-2. Copia el hash y ejecuta un INSERT en la DB (reemplaza el hash):
-
-```sql
-INSERT INTO users (name, email, password_hash, role)
-VALUES ('Admin Inicial', 'admin@ejemplo.local', '<PEGA_HASH_AQUI>', 'admin');
-```
-
-Puedes ejecutar la sentencia SQL con psql:
-
-**Windows (PowerShell):**
-
-```powershell
-psql -U postgres -d catfecito_pern -c "INSERT INTO users (name, email, password_hash, role) VALUES ('Admin Inicial','admin@ejemplo.local','<HASH>', 'admin');"
-```
-
-**macOS/Linux (Terminal/Bash):**
-
-```bash
-psql -U postgres -d catfecito_pern -c "INSERT INTO users (name, email, password_hash, role) VALUES ('Admin Inicial','admin@ejemplo.local','<HASH>', 'admin');"
-```
-
-Opción D — Si ya hay un admin en otra instancia
-
-- Registra una cuenta normalmente y pide a ese admin que use la ruta PUT /api/users/:id/role para promoverla.
-
-## Notas de seguridad
-
-- Nunca expongas el `JWT_SECRET` ni las credenciales de DB públicamente.
-- Cambia la contraseña del admin después del primer login.
-
-## Debug y problemas comunes
-
-- Si `psql` no está en el PATH, usa el cliente que tengas o abre la terminal de PostgreSQL.
-- Si al iniciar el servidor falla la conexión a la DB revisa `server/.env` y que el servicio PostgreSQL esté ejecutándose.
-
----
-
-Archivo relacionado: `server/database/init.sql` (esquema y seeds).
-
----
-
-## 7) Exponer el backend con ngrok (webhooks, pruebas externas)
-
-ngrok permite crear una URL pública temporal que redirige a tu servidor local, útil para pruebas de webhooks (ej. MercadoPago) o acceso externo.
-
-### Pasos para usar ngrok en Windows
-
-1. **Instala ngrok:**
-
-   - Descarga desde https://ngrok.com/download
-   - Extrae el ejecutable y colócalo en una carpeta accesible (ej. `C:\ngrok`)
-   - (Opcional) Agrega la carpeta a tu PATH para usarlo desde cualquier terminal.
-
-2. **Crea una cuenta y copia tu authtoken:**
-
-   - Regístrate en https://ngrok.com/
-   - Ve a tu panel de usuario y copia el `authtoken`.
-   - Ejecuta en PowerShell:
-     ```powershell
-     .\ngrok.exe config add-authtoken <TU_AUTHTOKEN>
-     ```
-
-3. **Levanta el backend normalmente:**
-
-   ```powershell
-   cd server; npm run dev
-   ```
-
-4. **Ejecuta ngrok apuntando al puerto del backend (por defecto 5000):**
-
-   ```powershell
-   .\ngrok.exe http 5000
-   ```
-
-   - ngrok mostrará una URL pública HTTPS (ej. `https://xxxx.ngrok.io`) que redirige a tu backend local
-   - pega la URL publica en /server/.env en el campo BACKEND_URL=
-
-5. **Usa la URL pública para webhooks o pruebas externas:**
-   - Configura la URL en MercadoPago, Stripe, etc. para recibir notificaciones en desarrollo.
-   - Puedes ver el tráfico y reintentar peticiones en http://127.0.0.1:4040
-
-> Tip: Puedes automatizar ngrok con un script npm agregando en `server/package.json`:
->
-> ```json
-> "scripts": {
->   "ngrok": "ngrok http 5000"
-> }
-> ```
->
-> Así puedes ejecutar:
->
-> ```powershell
-> npm run ngrok
-> ```
-
-### Pasos para usar ngrok en macOS/Linux
-
-1. **Instala ngrok:**
-
-   **macOS (Homebrew):**
+1. **Instala ngrok** (túnel público):
 
    ```bash
+   # macOS
    brew install ngrok/ngrok/ngrok
+
+   # Windows/Linux: descarga desde https://ngrok.com/download
    ```
 
-   **Linux (descarga manual):**
+2. **Autentica ngrok**:
 
    ```bash
-   # Descarga el archivo desde https://ngrok.com/download
-   # Ejemplo para Linux (64-bit):
-   wget https://bin.equinox.io/c/bNyj1mQVY4c/ngrok-v3-stable-linux-amd64.tgz
-   tar xvzf ngrok-v3-stable-linux-amd64.tgz
-   sudo mv ngrok /usr/local/bin/
+   ngrok config add-authtoken <tu-token>
    ```
 
-2. **Crea una cuenta y copia tu authtoken:**
-
-   - Regístrate en https://ngrok.com/
-   - Ve a tu panel de usuario y copia el `authtoken`.
-   - Ejecuta en Terminal:
-     ```bash
-     ngrok config add-authtoken <TU_AUTHTOKEN>
-     ```
-
-3. **Levanta el backend normalmente:**
+3. **Expón tu API Gateway**:
 
    ```bash
-   cd server && npm run dev
+   ngrok http https://tu-api.execute-api.us-east-1.amazonaws.com --host-header=rewrite
    ```
 
-4. **Ejecuta ngrok apuntando al puerto del backend (por defecto 5000):**
+   > Nota: ngrok te dará una URL como `https://xxxx.ngrok.io`
 
+4. **Configura en MercadoPago**:
+   - Ve a tu cuenta de MercadoPago → Webhooks
+   - Agrega: `https://xxxx.ngrok.io/dev/api/payments/webhook`
+
+5. **Actualiza `.env`**:
+
+   ```env
+   BACKEND_URL=https://xxxx.ngrok.io/dev
+   ```
+
+6. **Re-despliega**:
    ```bash
-   ngrok http 5000
+   serverless deploy
    ```
 
-   - ngrok mostrará una URL pública HTTPS (ej. `https://xxxx.ngrok.io`) que redirige a tu backend local
-   - pega la URL publica en /server/.env en el campo BACKEND_URL=
+## 9) Ver logs en tiempo real
 
-5. **Usa la URL pública para webhooks o pruebas externas:**
-   - Configura la URL en MercadoPago, Stripe, etc. para recibir notificaciones en desarrollo.
-   - Puedes ver el tráfico y reintentar peticiones en http://127.0.0.1:4040
+```bash
+# Logs de una función específica
+serverless logs -f register -t
 
-> Tip: Puedes automatizar ngrok con un script npm agregando en `server/package.json`:
->
-> ```json
-> "scripts": {
->   "ngrok": "ngrok http 5000"
-> }
-> ```
->
-> Así puedes ejecutar:
->
-> ```bash
-> npm run ngrok
-> ```
+# Todos los logs
+serverless logs -t
+
+# O desde AWS Console
+AWS Console → CloudWatch → Log groups → /aws/lambda/catfecito-*
+```
+
+## 10) Comandos útiles
+
+```bash
+# Deploy completo
+serverless deploy
+
+# Deploy de una función
+serverless deploy function -f login
+
+# Ver información del stack
+serverless info
+
+# Eliminar todo (¡cuidado!)
+serverless remove
+
+# Invocar función localmente (con payload)
+serverless invoke local -f register --data '{"body":"{\"email\":\"test@test.com\"}"}'
+
+# Ver métricas
+serverless metrics
+```
+
+## 11) Estructura del código
+
+```
+server/
+├── functions/          # Handlers (orquestación)
+│   ├── auth/
+│   ├── products/
+│   ├── categories/
+│   ├── users/
+│   ├── admin/
+│   └── payments/
+├── services/           # Lógica de negocio
+│   ├── auth.service.js
+│   ├── product.service.js
+│   ├── category.service.js
+│   ├── cart.service.js
+│   ├── order.service.js
+│   ├── payment.service.js
+│   └── admin/
+├── repositories/       # Acceso a datos (DynamoDB)
+│   ├── user.repository.js
+│   ├── product.repository.js
+│   ├── category.repository.js
+│   ├── cart.repository.js
+│   └── order.repository.js
+├── utils/              # Utilidades
+│   ├── auth.js         # Middlewares JWT
+│   ├── responses.js    # Respuestas HTTP
+│   ├── validators.js   # Validaciones
+│   └── helpers.js      # Funciones auxiliares
+├── libs/               # Integraciones
+│   └── mercadopago.js
+├── dynamodb.js         # Cliente DynamoDB
+└── serverless.yml      # Configuración infra
+```
+
+## 12) Arquitectura en capas
+
+**Handler (Controller)**
+
+```javascript
+// Solo orquesta y maneja HTTP
+const loginHandler = async (event) => {
+  const body = parseBody(event);
+  const result = await authService.login(body);
+  return success(result);
+};
+```
+
+**Service (Business Logic)**
+
+```javascript
+// Lógica de negocio
+class AuthService {
+  async login({ email, password }) {
+    const user = await userRepository.findByEmail(email);
+    // validaciones, bcrypt, JWT, etc.
+    return { token, user };
+  }
+}
+```
+
+**Repository (Data Access)**
+
+```javascript
+// Acceso a DynamoDB
+class UserRepository {
+  async findByEmail(email) {
+    const result = await docClient.send(new QueryCommand({...}));
+    return result.Items[0];
+  }
+}
+```
+
+## Problemas comunes
+
+### Error: "Missing credentials in config"
+
+```bash
+aws configure
+# Verifica que ~/.aws/credentials existe
+```
+
+### Error: "Stack with id does not exist"
+
+```bash
+# Primera vez: usa deploy completo
+serverless deploy
+```
+
+### Error: "Rate exceeded" en DynamoDB
+
+- Ajusta la capacidad en `serverless.yml`:
+  ```yaml
+  ProvisionedThroughput:
+    ReadCapacityUnits: 5
+    WriteCapacityUnits: 5
+  ```
+
+### Webhook no recibe notificaciones
+
+- Verifica que ngrok esté corriendo
+- Revisa CloudWatch Logs
+- Confirma la URL en el panel de MercadoPago
+
+## Costos estimados (AWS Free Tier)
+
+- **Lambda**: 1M requests/mes gratis
+- **DynamoDB**: 25 GB storage gratis + 25 WCU/RCU
+- **API Gateway**: 1M requests/mes gratis (primer año)
+- **S3**: 5 GB storage gratis
+
+**Estimado mensual después de Free Tier**: $5-15 USD (tráfico bajo/medio)
+
+## Seguridad
+
+- ✅ JWT con secret fuerte
+- ✅ Variables en `.env` (nunca en el código)
+- ✅ CORS configurado por dominio
+- ✅ Rate limiting en API Gateway
+- ✅ Validaciones en todos los endpoints
+- ✅ Roles de IAM mínimos necesarios
+
+## Próximos pasos
+
+- [ ] CI/CD con GitHub Actions
+- [ ] Tests unitarios e integración
+- [ ] Monitoreo con AWS X-Ray
+- [ ] CDN con CloudFront
+- [ ] Imágenes en S3 con CloudFront
 
 ---
+
+**Migración desde PERN**: Consulta `docs/MIGRATION_GUIDE.md` para entender los cambios arquitectónicos.
