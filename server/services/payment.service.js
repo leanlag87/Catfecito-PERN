@@ -3,9 +3,7 @@ import { cartRepository } from "../repositories/cart.repository.js";
 import { preference } from "../libs/mercadopago.js";
 
 class PaymentService {
-  /**
-   * Crear preferencia de pago en MercadoPago
-   */
+  //Crear preferencia de pago en MercadoPago
   async createPreference(userId, userName, userEmail, orderId, backendUrl) {
     // Validar order_id
     if (!orderId) {
@@ -116,6 +114,38 @@ class PaymentService {
       sandbox_init_point: sandboxInitPoint,
       order_id: orderId,
       total: order.total,
+    };
+  }
+
+  //Obtener estado de pago de una orden
+  async getPaymentStatus(userId, orderId) {
+    // Verificar que la orden pertenece al usuario
+    const isOwner = await orderRepository.verifyOwnership(userId, orderId);
+
+    if (!isOwner) {
+      const error = new Error("Orden no encontrada");
+      error.name = "OrderNotFoundError";
+      throw error;
+    }
+
+    // Obtener metadata completa de la orden
+    const order = await orderRepository.findById(orderId);
+
+    if (!order) {
+      const error = new Error("Orden no encontrada");
+      error.name = "OrderNotFoundError";
+      throw error;
+    }
+
+    return {
+      id: orderId,
+      user_id: order.user_id,
+      total: order.total,
+      status: order.status,
+      payment_status: order.payment_status,
+      payment_id: order.payment_id || null,
+      created_at: order.created_at,
+      updated_at: order.updated_at,
     };
   }
 }
