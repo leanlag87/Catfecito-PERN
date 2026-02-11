@@ -1,6 +1,6 @@
 import { orderRepository } from "../repositories/order.repository.js";
 import { cartRepository } from "../repositories/cart.repository.js";
-import { preference } from "../libs/mercadopago.js";
+import { preference, payment } from "../libs/mercadopago.js";
 
 class PaymentService {
   //Crear preferencia de pago en MercadoPago
@@ -147,6 +147,95 @@ class PaymentService {
       created_at: order.created_at,
       updated_at: order.updated_at,
     };
+  }
+
+  //Procesar webhook de MercadoPago
+  async processWebhook(webhookData) {
+    const { type, data } = webhookData;
+
+    // Procesamos solo notificaciones de payment
+    if (type !== "payment") {
+      return { success: true, message: "Tipo de notificación no procesada" };
+    }
+
+    const paymentId = data?.id;
+    if (!paymentId) {
+      return { success: true, message: "No se recibió payment ID" };
+    }
+
+    // Obtener información del pago de MercadoPago
+    const paymentRaw = await payment.get({ id: paymentId });
+    const paymentInfo = paymentRaw?.body || paymentRaw;
+
+    const externalReference = paymentInfo?.external_reference?.toString(); // order_id
+    const status = paymentInfo?.status; // approved, rejected, pending, etc.
+
+    if (!externalReference) {
+      return { success: true, message: "No se recibió external_reference" };
+    }
+
+    // Verificar que la orden existe
+    const order = await orderRepository.findById(externalReference);
+
+    if (!order) {
+      return { success: true, message: "Orden no encontrada" };
+    }
+
+    // Idempotencia: si ya está aprobada/paid no hacemos nada
+    if (order.payment_status === "approved" || order.status === "paid") {
+      return { success: true, message: "Orden ya procesada" };
+    }
+
+    // Procesar según el estado del pago
+    if (status === "approved") {
+      // Obtener items de la orden
+      const orderItems =
+        await orderRepository.findOrderItems(externalReference);
+
+      // Obtener items del carrito del usuario
+      const cartItems = await cartRepository.findAllByUser(order.user_id);
+
+      // Procesar pago aprobado con transacción atómica
+      await orderRepository.processApprovedPayment(
+        externalReference,
+        order.user_id,
+        paymentId,
+        orderItems,
+        cartItems,
+      );
+
+      return {
+        success: true,
+        message: "Pago aprobado y procesado",
+        orderId: externalReference,
+      };
+    } else if (status === "rejected") {
+      // Actualizar como rechazado
+      await orderRepository.updatePaymentStatus(
+        externalReference,
+        order.user_id,
+        "rejected",
+      );
+
+      return {
+        success: true,
+        message: "Pago rechazado",
+        orderId: externalReference,
+      };
+    } else {
+      // Otros estados (pending, in_process, etc.)
+      await orderRepository.updatePaymentStatus(
+        externalReference,
+        order.user_id,
+        status || "pending",
+      );
+
+      return {
+        success: true,
+        message: `Pago en estado: ${status}`,
+        orderId: externalReference,
+      };
+    }
   }
 }
 
