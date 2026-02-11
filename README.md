@@ -214,8 +214,8 @@ Admin:
 
 ## 📚 Documentación Adicional
 
-- [Guía de migración PERN → AWS](docs/MIGRATION_GUIDE.md) _(próximamente)_
-- [Arquitectura DynamoDB](docs/DYNAMODB_DESIGN.md) _(próximamente)_
+- [Guía de migración PERN → AWS](docs/MIGRATION_GUIDE.md)
+- [Arquitectura DynamoDB](docs/DYNAMODB_DESIGN.md)
 - [Manual de deployment](BACKEND_INSTRUCTIONS.md)
 
 ## 🤝 Contribuciones
