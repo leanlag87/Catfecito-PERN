@@ -1,6 +1,15 @@
 import { v4 as uuidv4 } from "uuid";
 import { docClient, TABLE_NAME, getTimestamp } from "../dynamodb.js";
-import { TransactWriteCommand } from "@aws-sdk/lib-dynamodb";
+import {
+  TransactWriteCommand,
+  GetCommand,
+  QueryCommand,
+  PutCommand,
+  UpdateCommand,
+  DeleteCommand,
+  BatchGetCommand,
+  ScanCommand,
+} from "@aws-sdk/lib-dynamodb";
 
 class OrderRepository {
   /**
@@ -247,6 +256,197 @@ class OrderRepository {
     );
 
     return timestamp;
+  }
+
+  async findAll() {
+    const result = await docClient.send(
+      new ScanCommand({
+        TableName: TABLE_NAME,
+        FilterExpression: "begins_with(PK, :pk) AND SK = :sk",
+        ExpressionAttributeValues: {
+          ":pk": "ORDER#",
+          ":sk": "METADATA",
+        },
+      }),
+    );
+
+    return result.Items || [];
+  }
+
+  async findUsersBatch(userIds) {
+    if (userIds.length === 0) {
+      return [];
+    }
+
+    const userKeys = userIds.map((id) => ({
+      PK: `USER#${id}`,
+      SK: "METADATA",
+    }));
+
+    const result = await docClient.send(
+      new BatchGetCommand({
+        RequestItems: {
+          [TABLE_NAME]: {
+            Keys: userKeys,
+          },
+        },
+      }),
+    );
+
+    return result.Responses[TABLE_NAME] || [];
+  }
+
+  //Guardar "payment_id" en la orden
+  async savePaymentId(orderId, paymentId) {
+    const timestamp = getTimestamp();
+
+    await docClient.send(
+      new UpdateCommand({
+        TableName: TABLE_NAME,
+        Key: {
+          PK: `ORDER#${orderId}`,
+          SK: "METADATA",
+        },
+        UpdateExpression: "SET payment_id = :paymentId, updated_at = :updated",
+        ExpressionAttributeValues: {
+          ":paymentId": paymentId,
+          ":updated": timestamp,
+        },
+      }),
+    );
+
+    return timestamp;
+  }
+
+  //Procesar  pago aprobado con transacción atómica
+  async processApprovedPayment(
+    orderId,
+    userId,
+    paymentId,
+    orderItems,
+    cartItems,
+  ) {
+    const timestamp = getTimestamp();
+    const transactItems = [];
+
+    // Actualizar ORDER METADATA
+    transactItems.push({
+      Update: {
+        TableName: TABLE_NAME,
+        Key: {
+          PK: `ORDER#${orderId}`,
+          SK: "METADATA",
+        },
+        UpdateExpression:
+          "SET #status = :paid, payment_status = :approved, payment_id = :paymentId, updated_at = :updated",
+        ExpressionAttributeNames: {
+          "#status": "status",
+        },
+        ExpressionAttributeValues: {
+          ":paid": "paid",
+          ":approved": "approved",
+          ":paymentId": paymentId.toString(),
+          ":updated": timestamp,
+        },
+      },
+    });
+
+    // Actualizar índice USER#ORDER
+    transactItems.push({
+      Update: {
+        TableName: TABLE_NAME,
+        Key: {
+          PK: `USER#${userId}`,
+          SK: `ORDER#${orderId}`,
+        },
+        UpdateExpression: "SET #status = :paid, payment_status = :approved",
+        ExpressionAttributeNames: {
+          "#status": "status",
+        },
+        ExpressionAttributeValues: {
+          ":paid": "paid",
+          ":approved": "approved",
+        },
+      },
+    });
+
+    // Decrementar stock de cada producto
+    for (const item of orderItems) {
+      transactItems.push({
+        Update: {
+          TableName: TABLE_NAME,
+          Key: {
+            PK: `PRODUCT#${item.product_id}`,
+            SK: "METADATA",
+          },
+          UpdateExpression: "SET stock = stock - :qty, updated_at = :updated",
+          ConditionExpression: "stock >= :qty", // Falla si no hay stock suficiente
+          ExpressionAttributeValues: {
+            ":qty": item.quantity,
+            ":updated": timestamp,
+          },
+        },
+      });
+    }
+
+    // Eliminar items del carrito (máximo 100 operaciones en TransactWrite)
+    for (const cartItem of cartItems) {
+      if (transactItems.length >= 100) {
+        break;
+      }
+
+      transactItems.push({
+        Delete: {
+          TableName: TABLE_NAME,
+          Key: {
+            PK: `USER#${userId}`,
+            SK: `CART#${cartItem.product_id}`,
+          },
+        },
+      });
+    }
+
+    // Ejecutar transacción atómica (todo o nada)
+    await docClient.send(
+      new TransactWriteCommand({
+        TransactItems: transactItems,
+      }),
+    );
+  }
+
+  async updatePaymentStatus(orderId, userId, paymentStatus) {
+    const timestamp = getTimestamp();
+
+    // Actualizar ORDER METADATA
+    await docClient.send(
+      new UpdateCommand({
+        TableName: TABLE_NAME,
+        Key: {
+          PK: `ORDER#${orderId}`,
+          SK: "METADATA",
+        },
+        UpdateExpression: "SET payment_status = :status, updated_at = :updated",
+        ExpressionAttributeValues: {
+          ":status": paymentStatus,
+          ":updated": timestamp,
+        },
+      }),
+    );
+
+    // Actualizar índice USER#ORDER
+    await docClient.send(
+      new UpdateCommand({
+        TableName: TABLE_NAME,
+        Key: {
+          PK: `USER#${userId}`,
+          SK: `ORDER#${orderId}`,
+        },
+        UpdateExpression: "SET payment_status = :status",
+        ExpressionAttributeValues: {
+          ":status": paymentStatus,
+        },
+      }),
+    );
   }
 }
 
