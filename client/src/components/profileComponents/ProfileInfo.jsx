@@ -1,35 +1,35 @@
-import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import api from '../../services/api';
-import '../../pages/Profile.css';
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import api from "../../services/api";
+import "../../pages/profile/Profile.css";
 
 export default function ProfileInfo() {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
-  const [error, setError] = useState('');
-  const [currentPassword, setCurrentPassword] = useState('');
-  const [newPassword, setNewPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
+  const [error, setError] = useState("");
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
 
   useEffect(() => {
-    const token = sessionStorage.getItem('authToken');
+    const token = sessionStorage.getItem("authToken");
     if (!token) {
-      navigate('/login');
+      navigate("/login");
       return;
     }
 
     const load = async () => {
       try {
-        const { data } = await api.get('/users/profile');
+        const { data } = await api.get("/users/profile");
         setUser(data?.user || null);
       } catch (e) {
         if (e?.response?.status === 401) {
-          sessionStorage.removeItem('authToken');
-          sessionStorage.removeItem('authUser');
-          navigate('/login');
+          sessionStorage.removeItem("authToken");
+          sessionStorage.removeItem("authUser");
+          navigate("/login");
           return;
         }
-        setError(e?.response?.data?.message || 'Error al cargar el perfil');
+        setError(e?.response?.data?.message || "Error al cargar el perfil");
       }
     };
     load();
@@ -37,39 +37,39 @@ export default function ProfileInfo() {
 
   const handleChangePassword = async (e) => {
     e.preventDefault();
-    setError('');
+    setError("");
     if (newPassword.length < 8) {
-      setError('La nueva contraseña debe tener al menos 8 caracteres');
+      setError("La nueva contraseña debe tener al menos 8 caracteres");
       return;
     }
     if (newPassword !== confirmPassword) {
-      setError('Las contraseñas nuevas no coinciden');
+      setError("Las contraseñas nuevas no coinciden");
       return;
     }
 
     try {
-      const { data } = await api.put(
-        '/users/change-password',
-        { currentPassword, newPassword }
-      );
-      alert(data?.message || 'Contraseña actualizada');
-      setCurrentPassword('');
-      setNewPassword('');
-      setConfirmPassword('');
+      const { data } = await api.put("/users/change-password", {
+        currentPassword,
+        newPassword,
+      });
+      alert(data?.message || "Contraseña actualizada");
+      setCurrentPassword("");
+      setNewPassword("");
+      setConfirmPassword("");
     } catch (e) {
-      setError(e?.response?.data?.message || 'Error al cambiar la contraseña');
+      setError(e?.response?.data?.message || "Error al cambiar la contraseña");
     }
   };
 
   const handleLogout = async () => {
     try {
-      await api.post('/auth/logout', {});
+      await api.post("/auth/logout", {});
     } catch {
       // ignorar errores de logout
     } finally {
-      sessionStorage.removeItem('authToken');
-      sessionStorage.removeItem('authUser');
-      navigate('/');
+      sessionStorage.removeItem("authToken");
+      sessionStorage.removeItem("authUser");
+      navigate("/");
     }
   };
 
@@ -122,12 +122,14 @@ export default function ProfileInfo() {
             required
           />
 
-          <button type="submit" className="btn-primary">Actualizar contraseña</button>
+          <button type="submit" className="btn-primary">
+            Actualizar contraseña
+          </button>
         </form>
         <div class="cerrar-sesion-row">
-        <button type="button" className="btn-danger" onClick={handleLogout}>
-          Cerrar sesión
-        </button>
+          <button type="button" className="btn-danger" onClick={handleLogout}>
+            Cerrar sesión
+          </button>
         </div>
       </section>
     </>
