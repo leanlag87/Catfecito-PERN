@@ -1,10 +1,10 @@
-import React, { useMemo, useState, useEffect } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { UserHeader } from "../../components/usersComponents/UserHeader";
 import MetaData from "../../components/ui/MetaData/MetaData";
 import api from "../../services/api";
 import { CheckoutButton } from "../../components/checkoutPageComponent/CheckoutButton";
-import "../components/checkoutPageComponent/CheckoutButton.css";
+import "../../components/checkoutPageComponent/CheckoutButton.css";
 import "./CheckoutPage.css";
 
 export const CheckoutPage = ({ cartItems = [], subtotal = 0 }) => {
@@ -63,7 +63,7 @@ export const CheckoutPage = ({ cartItems = [], subtotal = 0 }) => {
   useEffect(() => {
     if (paymentStatus === "failure" && orderId) {
       setError(
-        "❌ El pago no se pudo completar. Por favor, intenta nuevamente."
+        "❌ El pago no se pudo completar. Por favor, intenta nuevamente.",
       );
       // Limpiar parámetros de URL
       window.history.replaceState({}, "", "/checkout");
@@ -139,7 +139,7 @@ export const CheckoutPage = ({ cartItems = [], subtotal = 0 }) => {
     // PERO solo si el usuario realmente modifica algo importante (no solo al tipear)
     if (preferenceId) {
       console.warn(
-        "⚠️ Se modificaron datos después de crear la orden. Considera resetear."
+        "⚠️ Se modificaron datos después de crear la orden. Considera resetear.",
       );
       // Opcional: descomentar para forzar reset
       // setPreferenceId(null);
@@ -369,8 +369,8 @@ export const CheckoutPage = ({ cartItems = [], subtotal = 0 }) => {
               {isLoadingAddress
                 ? "Cargando..."
                 : isCreatingOrder
-                ? "Procesando..."
-                : "Continuar al pago"}
+                  ? "Procesando..."
+                  : "Continuar al pago"}
             </button>
           </form>
         </section>
@@ -403,7 +403,7 @@ export const CheckoutPage = ({ cartItems = [], subtotal = 0 }) => {
                         <div className="subtotal">
                           $
                           {Number(item.price * item.quantity).toLocaleString(
-                            "es-AR"
+                            "es-AR",
                           )}
                         </div>
                       </div>
