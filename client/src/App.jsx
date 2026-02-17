@@ -24,6 +24,7 @@ import ProfileOrders from "./components/profileComponents/ProfileOrders";
 import ProfileAddress from "./components/profileComponents/ProfileAddress";
 import { CheckoutPage } from "./pages/CheckoutPage";
 import AdminOrders from "./components/admincomponents/AdminOrders";
+import { InstallPWA } from "./components/ui/MetaData/InstallPWA/InstallPWA";
 
 function FloatingCartWrapper({ isOpen, onCloseCart, ...rest }) {
   const location = useLocation();
@@ -210,6 +211,7 @@ function App() {
         onClearCart={clearCart}
         onOpenAuthModal={openModal}
       />
+      <InstallPWA />
     </Router>
   );
 }
