@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import api from "../../services/api";
 import "../../styles/Auth.css";
-import logo from "../assets/img/Group.svg";
+import logo from "../../assets/img/Group.svg";
 
 export const Login = ({ onSwitch, onSuccess }) => {
   const [email, setEmail] = useState("");
