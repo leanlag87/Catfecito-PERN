@@ -4,26 +4,27 @@ import {
   Route,
   useLocation,
 } from "react-router-dom";
+import { useState, useEffect } from "react";
 import React from "react";
 import { useCartLogic } from "./hooks/useCartLogic";
-import { HomePage } from "./pages/HomePage";
-import ContactPage from "./pages/ContactPage";
-import { Products } from "./pages/Products";
+import { HomePage } from "./pages/home/HomePage";
+import ContactPage from "./pages/contact/ContactPage";
+import { Products } from "./pages/product/Products";
 import { FloatingCart } from "./components/cartComponents/FloatingCart";
-import { Login } from "./pages/Login";
-import { Register } from "./pages/Register";
+import { Login } from "./pages/auth/Login";
+import { Register } from "./pages/auth/Register";
 import ModalContainer from "./components/Modal/ModalContainer";
-import { useState, useEffect } from "react";
-import { Profile } from "./pages/Profile";
-import { AdminProfile } from "./pages/AdminProfile";
+import { Profile } from "./pages/profile/Profile";
+import { AdminProfile } from "./pages/admin/AdminProfile";
 import AdminInsert from "./components/admincomponents/AdminInsert";
 import AdminUpdate from "./components/admincomponents/AdminUpdate";
 import AdminDelete from "./components/admincomponents/AdminDelete";
 import ProfileInfo from "./components/profileComponents/ProfileInfo";
 import ProfileOrders from "./components/profileComponents/ProfileOrders";
 import ProfileAddress from "./components/profileComponents/ProfileAddress";
-import { CheckoutPage } from "./pages/CheckoutPage";
+import { CheckoutPage } from "./pages/checkout/CheckoutPage";
 import AdminOrders from "./components/admincomponents/AdminOrders";
+import { InstallPWA } from "./components/ui/MetaData/InstallPWA/InstallPWA";
 
 function FloatingCartWrapper({ isOpen, onCloseCart, ...rest }) {
   const location = useLocation();
@@ -210,6 +211,7 @@ function App() {
         onClearCart={clearCart}
         onOpenAuthModal={openModal}
       />
+      <InstallPWA />
     </Router>
   );
 }

@@ -24,7 +24,13 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: "autoUpdate",
-      includeAssets: ["favicon.ico", "robots.txt", "apple-touch-icon.png"],
+      includeAssets: [
+        "favicon.ico",
+        "robots.txt",
+        "ios/180.png", // Apple Touch Icon
+        "android/android-launchericon-192-192.png",
+        "android/android-launchericon-512-512.png",
+      ],
       manifest: {
         name: "CatFecito - Tienda de Café Premium",
         short_name: "CatFecito",
@@ -36,21 +42,74 @@ export default defineConfig({
         start_url: "/",
         orientation: "portrait-primary",
         icons: [
+          // Android
           {
-            src: "/pwa-192x192.png",
+            src: "/android/android-launchericon-48-48.png",
+            sizes: "48x48",
+            type: "image/png",
+            purpose: "any",
+          },
+          {
+            src: "/android/android-launchericon-72-72.png",
+            sizes: "72x72",
+            type: "image/png",
+            purpose: "any",
+          },
+          {
+            src: "/android/android-launchericon-96-96.png",
+            sizes: "96x96",
+            type: "image/png",
+            purpose: "any",
+          },
+          {
+            src: "/android/android-launchericon-144-144.png",
+            sizes: "144x144",
+            type: "image/png",
+            purpose: "any",
+          },
+          {
+            src: "/android/android-launchericon-192-192.png",
             sizes: "192x192",
             type: "image/png",
             purpose: "any maskable",
           },
           {
-            src: "/pwa-512x512.png",
+            src: "/android/android-launchericon-512-512.png",
             sizes: "512x512",
             type: "image/png",
             purpose: "any maskable",
           },
+          // iOS
           {
-            src: "/apple-touch-icon.png",
+            src: "/ios/180.png",
             sizes: "180x180",
+            type: "image/png",
+            purpose: "apple touch icon",
+          },
+          {
+            src: "/ios/192.png",
+            sizes: "192x192",
+            type: "image/png",
+          },
+          {
+            src: "/ios/512.png",
+            sizes: "512x512",
+            type: "image/png",
+          },
+          // Windows
+          {
+            src: "/windows11/Square44x44Logo.scale-100.png",
+            sizes: "44x44",
+            type: "image/png",
+          },
+          {
+            src: "/windows11/Square150x150Logo.scale-100.png",
+            sizes: "150x150",
+            type: "image/png",
+          },
+          {
+            src: "/windows11/Square310x310Logo.scale-100.png",
+            sizes: "310x310",
             type: "image/png",
           },
         ],
@@ -61,22 +120,31 @@ export default defineConfig({
             short_name: "Productos",
             description: "Ver catálogo de productos",
             url: "/products",
-            icons: [{ src: "/pwa-192x192.png", sizes: "192x192" }],
+            icons: [
+              {
+                src: "/android/android-launchericon-192-192.png",
+                sizes: "192x192",
+              },
+            ],
           },
           {
             name: "Mi Carrito",
             short_name: "Carrito",
             description: "Ver carrito de compras",
             url: "/cart",
-            icons: [{ src: "/pwa-192x192.png", sizes: "192x192" }],
+            icons: [
+              {
+                src: "/android/android-launchericon-192-192.png",
+                sizes: "192x192",
+              },
+            ],
           },
         ],
       },
       workbox: {
-        // Estrategia de caché
         runtimeCaching: [
           {
-            urlPattern: /^https:\/\/api\.catfecito\.com\/.*$/,
+            urlPattern: /^https:\/\/.*\.execute-api\..*\.amazonaws\.com\/.*$/,
             handler: "NetworkFirst",
             options: {
               cacheName: "api-cache",
@@ -116,9 +184,20 @@ export default defineConfig({
         navigateFallbackDenylist: [/^\/api\//],
       },
       devOptions: {
-        enabled: true, // PWA en desarrollo también
+        enabled: true,
         type: "module",
       },
     }),
   ],
+  server: {
+    port: 5173,
+    host: true,
+  },
+  build: {
+    outDir: "dist",
+    sourcemap: false,
+  },
+  preview: {
+    host: true,
+  },
 });

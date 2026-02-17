@@ -1,6 +1,6 @@
-import "../styles/CustomBar.css";
-import "../styles/index.css";
-import "../styles/App.css";
+import "../../styles/CustomBar.css";
+import "../../styles/index.css";
+import "../../styles/App.css";
 import "animate.css";
 import MetaData from "../../components/ui/MetaData/MetaData";
 

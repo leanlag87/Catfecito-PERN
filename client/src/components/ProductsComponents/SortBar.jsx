@@ -1,9 +1,13 @@
-import React, { useState } from 'react';
-import './SortBar.css';
+import { useState } from "react";
+import "./SortBar.css";
 
-export const SortBar = ({ onSortChange, searchQuery = '', onClearSearch = null }) => {
-  const [sortBy, setSortBy] = useState('manual');
-  
+export const SortBar = ({
+  onSortChange,
+  searchQuery = "",
+  onClearSearch = null,
+}) => {
+  const [sortBy, setSortBy] = useState("manual");
+
   const handleSortChange = (e) => {
     const value = e.target.value;
     setSortBy(value);
@@ -11,13 +15,13 @@ export const SortBar = ({ onSortChange, searchQuery = '', onClearSearch = null }
   };
 
   const sortOptions = [
-    { value: 'manual', label: 'Características' },
-    { value: 'title-ascending', label: 'Alfabéticamente, A-Z' },
-    { value: 'title-descending', label: 'Alfabéticamente, Z-A' },
-    { value: 'price-ascending', label: 'Precio, menor a mayor' },
-    { value: 'price-descending', label: 'Precio, mayor a menor' },
-    { value: 'created-ascending', label: 'Fecha, más antiguo a más reciente' },
-    { value: 'created-descending', label: 'Fecha, más reciente a más antiguo' }
+    { value: "manual", label: "Características" },
+    { value: "title-ascending", label: "Alfabéticamente, A-Z" },
+    { value: "title-descending", label: "Alfabéticamente, Z-A" },
+    { value: "price-ascending", label: "Precio, menor a mayor" },
+    { value: "price-descending", label: "Precio, mayor a menor" },
+    { value: "created-ascending", label: "Fecha, más antiguo a más reciente" },
+    { value: "created-descending", label: "Fecha, más reciente a más antiguo" },
   ];
 
   return (
@@ -37,7 +41,9 @@ export const SortBar = ({ onSortChange, searchQuery = '', onClearSearch = null }
               ×
             </button>
           </div>
-        ) : <div className="search-tag-placeholder" />}
+        ) : (
+          <div className="search-tag-placeholder" />
+        )}
 
         {/* Right: existing sort form */}
         <form className="facets-vertical-form" id="FacetSortForm">
@@ -45,10 +51,10 @@ export const SortBar = ({ onSortChange, searchQuery = '', onClearSearch = null }
             <label htmlFor="SortByCategory">Ordenar por:</label>
           </p>
           <div className="select">
-            <select 
-              name="sort-by" 
-              className="sort-by-category" 
-              id="SortByCategory" 
+            <select
+              name="sort-by"
+              className="sort-by-category"
+              id="SortByCategory"
               value={sortBy}
               onChange={handleSortChange}
               aria-describedby="ally-refresh-page-message"

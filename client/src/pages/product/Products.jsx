@@ -1,9 +1,9 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import api from "../../services/api";
-import "../styles/CustomBar.css";
-import "../styles/index.css";
-import "../styles/App.css";
+import "../../styles/CustomBar.css";
+import "../../styles/index.css";
+import "../../styles/App.css";
 import "animate.css";
 import "./Products.css";
 import MetaData from "../../components/ui/MetaData/MetaData";
@@ -49,8 +49,8 @@ export const Products = ({
         const list = Array.isArray(data?.products)
           ? data.products
           : Array.isArray(data)
-          ? data
-          : [];
+            ? data
+            : [];
         const BACKEND_ORIGIN = import.meta.env.VITE_BACKEND_URL
           ? import.meta.env.VITE_BACKEND_URL.replace(/\/$/, "")
           : "";
@@ -95,7 +95,7 @@ export const Products = ({
         .replace(/[\u0300-\u036f]/g, "")
         .toLowerCase()
         .trim(),
-    []
+    [],
   );
 
   // Leer query param "search" y aplicarlo junto con los filtros existentes
@@ -119,7 +119,7 @@ export const Products = ({
       const q = normalize(searchParam);
       result = result.filter(
         (p) =>
-          normalize(p.name).includes(q) || normalize(p.type || "").includes(q)
+          normalize(p.name).includes(q) || normalize(p.type || "").includes(q),
       );
     }
 
@@ -190,7 +190,7 @@ export const Products = ({
   };
 
   const visibleProducts = moveOutOfStockToEnd(
-    applySort(applyFilters(dataSource))
+    applySort(applyFilters(dataSource)),
   );
 
   // Aplica filtros excluyendo un "facet" específico para calcular conteos dinámicos
@@ -228,7 +228,7 @@ export const Products = ({
         ) {
           const productType = normalize(p.type);
           const matchesType = f.grindType.some(
-            (t) => normalize(t) && productType.includes(normalize(t))
+            (t) => normalize(t) && productType.includes(normalize(t)),
           );
           if (!matchesType) return false;
         }
@@ -236,7 +236,7 @@ export const Products = ({
         return true;
       });
     },
-    [filters, normalize]
+    [filters, normalize],
   );
 
   // Listas base que usa el UI
@@ -248,7 +248,7 @@ export const Products = ({
       "Molido Francesa",
       "Molido Italiana",
     ],
-    []
+    [],
   );
 
   // Conteos dinámicos por facet
@@ -262,7 +262,7 @@ export const Products = ({
     UI_GRIND_TYPES.forEach((label) => {
       const sel = normalize(label);
       grindTypeCounts[label] = grindBase.filter((p) =>
-        normalize(p.type).includes(sel)
+        normalize(p.type).includes(sel),
       ).length;
     });
 

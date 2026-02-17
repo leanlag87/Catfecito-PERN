@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import "../../styles/ModalContainer.css";
 import { Login } from "../../pages/auth/Login";
-import { Register } from "../../pages/Register";
+import { Register } from "../../pages/auth/Register";
 import { ConstructionComponent } from "../constructionComponent/constructionComponent";
 import { LogoutPopUpComponent } from "../LogoutPopUpComponent/LogoutPopUpComponent";
 

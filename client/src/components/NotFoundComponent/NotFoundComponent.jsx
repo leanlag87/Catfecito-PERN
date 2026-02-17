@@ -1,6 +1,5 @@
-import React from 'react';
-import NotFoundImg from '../../assets/img/404NotFound.png';
-import './NotFoundComponent.css';
+import NotFoundImg from "../../assets/img/404NotFound.png";
+import "./NotFoundComponent.css";
 
 export const NotFoundComponent = () => {
   return (
@@ -10,4 +9,4 @@ export const NotFoundComponent = () => {
       <h2 className="notfound-subtitle">CATFECITO NOT FOUND</h2>
     </div>
   );
-}
+};
