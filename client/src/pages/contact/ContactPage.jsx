@@ -1,8 +1,8 @@
-import React, { useState } from "react";
-import "../styles/CustomBar.css";
-import "../styles/index.css";
-import "../styles/App.css";
-import "../components/FooterComponent/Footer.css";
+import { useState } from "react";
+import "../../styles/CustomBar.css";
+import "../../styles/index.css";
+import "../../styles/App.css";
+import "../../components/FooterComponent/Footer.css";
 import "./ContactPage.css";
 import MetaData from "../../components/ui/MetaData/MetaData";
 
