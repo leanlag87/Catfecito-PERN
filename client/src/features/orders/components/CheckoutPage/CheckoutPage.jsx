@@ -1,9 +1,9 @@
 import { useMemo, useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { UserHeader } from "../../components/usersComponents/UserHeader";
+import { UserHeader } from "../../../../components/usersComponents/UserHeader";
 import MetaData from "../../components/ui/MetaData/MetaData";
-import api from "../../services/api";
-import { CheckoutButton } from "../../components/checkoutPageComponent/CheckoutButton";
+import api from "../../../../services/api";
+import { CheckoutButton } from "../../../../components/checkoutPageComponent/CheckoutButton";
 import "../../components/checkoutPageComponent/CheckoutButton.css";
 import "./CheckoutPage.css";
 
