@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import api from "../../services/api";
+import api from "../../../../services/api";
 import "./ProfileOrders.css";
 
 export default function ProfileOrders() {
@@ -58,7 +58,7 @@ export default function ProfileOrders() {
       try {
         setLoading(true);
         setError("");
-        const { data } = await api.get('/orders');
+        const { data } = await api.get("/orders");
         setOrders(Array.isArray(data?.orders) ? data.orders : []);
       } catch (e) {
         if (e?.response?.status === 401) {
@@ -99,9 +99,12 @@ export default function ProfileOrders() {
 
   const continuePayment = async (orderId) => {
     try {
-      const { data } = await api.post('/payments/create-preference', { order_id: orderId });
+      const { data } = await api.post("/payments/create-preference", {
+        order_id: orderId,
+      });
       // mercado pago puede devolver init_point o preference.init_point según SDK/version
-      const url = data?.init_point || data?.preference?.init_point || data?.payment_url;
+      const url =
+        data?.init_point || data?.preference?.init_point || data?.payment_url;
       if (url) {
         window.location.href = url;
       } else {
@@ -109,19 +112,25 @@ export default function ProfileOrders() {
       }
     } catch (err) {
       console.error(err);
-      alert(err?.response?.data?.message || "Error al crear preferencia de pago");
+      alert(
+        err?.response?.data?.message || "Error al crear preferencia de pago",
+      );
     }
   };
-  
+
   const cancelOrder = async (orderId) => {
-    const ok = window.confirm("¿Seguro querés cancelar este pedido? Esta acción no se puede deshacer.");
+    const ok = window.confirm(
+      "¿Seguro querés cancelar este pedido? Esta acción no se puede deshacer.",
+    );
     if (!ok) return;
 
     try {
       const { data } = await api.patch(`/orders/${orderId}/cancel`, {});
 
       // actualizar lista localmente
-      setOrders((prev) => prev.map((o) => (o.id === orderId ? { ...o, ...data.order } : o)));
+      setOrders((prev) =>
+        prev.map((o) => (o.id === orderId ? { ...o, ...data.order } : o)),
+      );
 
       // si ya tenemos detalles cargados, actualizarlos también
       setOrderDetails((prev) => {
@@ -140,21 +149,27 @@ export default function ProfileOrders() {
         <h2>Mis pedidos</h2>
       </div>
 
-      {orders.some(o => o.payment_status === 'pending') && (
+      {orders.some((o) => o.payment_status === "pending") && (
         <div className="pending-orders-banner">
           <h3>Tienes pagos pendientes</h3>
           {orders
-            .filter(o => o.payment_status === 'pending')
-            .map(o => (
+            .filter((o) => o.payment_status === "pending")
+            .map((o) => (
               <div key={o.id} className="pending-orders-info">
-                <div><strong>Pedido pendiente: {o.id}</strong></div>
+                <div>
+                  <strong>Pedido pendiente: {o.id}</strong>
+                </div>
                 <div className="pending-actions">
-                  <button onClick={() => continuePayment(o.id)}>Continuar pago</button>
-                  <button onClick={() => cancelOrder(o.id)}>Cancelar pedido</button>
+                  <button onClick={() => continuePayment(o.id)}>
+                    Continuar pago
+                  </button>
+                  <button onClick={() => cancelOrder(o.id)}>
+                    Cancelar pedido
+                  </button>
                   <small>Pedido pendiente — se cancelará en ~10 min</small>
                 </div>
               </div>
-          ))}
+            ))}
         </div>
       )}
 
@@ -162,15 +177,18 @@ export default function ProfileOrders() {
       {loading && <p>Cargando pedidos…</p>}
       {error && <div className="orders-error">{error}</div>}
 
-      {!loading && !error && (
-        orders.length === 0 ? (
+      {!loading &&
+        !error &&
+        (orders.length === 0 ? (
           <p>No tienes pedidos todavía.</p>
         ) : (
           <ul className="orders-list">
             {orders.map((o) => (
               <li key={o.id} className="disponsal-item">
                 <div className="disponsal-summary">
-                  <div><strong>Pedido #{o.id}</strong></div>
+                  <div>
+                    <strong>Pedido #{o.id}</strong>
+                  </div>
                   <div>
                     Fecha:{" "}
                     {o.created_at
@@ -209,7 +227,6 @@ export default function ProfileOrders() {
                           <p>{orderDetails[o.id].shipping_state}</p>
                           <p>{orderDetails[o.id].shipping_zip}</p>
                           <p>Tel: {orderDetails[o.id].shipping_phone}</p>
-
                         </div>
 
                         <div className="purchase-info">
@@ -218,7 +235,9 @@ export default function ProfileOrders() {
                             {orderDetails[o.id].items.map((item) => (
                               <li key={item.id} className="purchase-item">
                                 <div className="purchase-text">
-                                  <p><strong>{item.product_name}</strong></p>
+                                  <p>
+                                    <strong>{item.product_name}</strong>
+                                  </p>
                                   <p>Cantidad: {item.quantity}</p>
                                   <p>Precio: ${item.price}</p>
                                   <p>Subtotal: ${item.subtotal}</p>
@@ -242,8 +261,7 @@ export default function ProfileOrders() {
               </li>
             ))}
           </ul>
-        )
-      )}
+        ))}
     </section>
   );
 }
