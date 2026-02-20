@@ -7,27 +7,42 @@ import logo from "../../assets/img/Group.svg";
 export const Login = ({ onSwitch, onSuccess }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleLogin = async (e) => {
     e.preventDefault();
+    setIsLoading(true);
     try {
-      const { data } = await api.post("/auth/login", { email, password });
-      // Espera { user, token, ... }
+      // Usa el servicio centralizado
+      const { data } = await api.auth.login({ email, password });
+
+      // Validar respuesta
       if (data?.token) {
+        // Guardar token y usuario en sessionStorage
         sessionStorage.setItem("authToken", data.token);
         sessionStorage.setItem("authUser", JSON.stringify(data.user));
+
+        // Disparar evento para actualizar el estado global
         window.dispatchEvent(new Event("authChanged"));
-        api.defaults.headers.common["Authorization"] = `Bearer ${data.token}`;
-        // Llamar onSuccess si fue pasado (permite cerrar modal sin navegar)
-        if (typeof onSuccess === "function") return onSuccess(data);
-        // Fallback: recarga para compatibilidad con comportamiento previo
+
+        // Llamar onSuccess si fue pasado (cierra modal)
+        if (typeof onSuccess === "function") {
+          return onSuccess(data);
+        }
+
+        //Redirigir al home
         window.location.replace("/");
       } else {
-        console.error("Respuesta de login inválida");
+        throw new Error("Respuesta de login inválida");
       }
     } catch (error) {
-      console.error("Error logging in:", error);
-      alert(error?.response?.data?.message || "Error al iniciar sesión");
+      console.error("Error en login:", error);
+
+      // Mostrar mensaje de error al usuario
+      const errorMessage = error?.message || "Error al iniciar sesión";
+      alert(errorMessage);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -47,7 +62,8 @@ export const Login = ({ onSwitch, onSuccess }) => {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
-          autoComplete="current-email"
+          autoComplete="email"
+          disabled={isLoading}
         />
 
         <label htmlFor="password">Contraseña</label>
@@ -59,8 +75,11 @@ export const Login = ({ onSwitch, onSuccess }) => {
           onChange={(e) => setPassword(e.target.value)}
           required
           autoComplete="current-password"
+          disabled={isLoading}
         />
-        <button type="submit">Ingresar</button>
+        <button type="submit" disabled={isLoading}>
+          {isLoading ? "Ingresando..." : "Ingresar"}
+        </button>
         <p>
           ¿No tenés cuenta?{" "}
           {onSwitch ? (
@@ -68,6 +87,7 @@ export const Login = ({ onSwitch, onSuccess }) => {
               type="button"
               className="auth-link-btn"
               onClick={() => onSwitch("register")}
+              disabled={isLoading}
             >
               Registrate
             </button>
