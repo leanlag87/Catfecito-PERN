@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useNavigate, Outlet } from "react-router-dom";
-import { UserHeader } from "../../components/usersComponents/UserHeader";
-import ProfileNav from "../../components/profileComponents/ProfileNav";
+import { UserHeader } from "../../../../components/usersComponents/UserHeader";
+import ProfileNav from "../../../../components/profileComponents/ProfileNav";
 import MetaData from "../../components/ui/MetaData/MetaData";
 import "./Profile.css";
 
