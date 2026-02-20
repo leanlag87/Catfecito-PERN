@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import "./FloatingCart.css";
 import cart from "../../assets/img/cart.svg";
-import { Cart } from "../../pages/cart/Cart";
+import { Cart } from "../../features/cart/components/Cart";
 
 export const FloatingCart = ({
   items = [],
