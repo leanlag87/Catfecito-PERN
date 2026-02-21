@@ -1,9 +1,9 @@
 import { useEffect } from "react";
 import { useNavigate, Outlet } from "react-router-dom";
-import { UserHeader } from "../../components/usersComponents/UserHeader";
+import { UserHeader } from "../../../../components/usersComponents/UserHeader";
 import MetaData from "../../components/ui/MetaData/MetaData";
 import "./AdminProfile.css";
-import AdminNav from "../../components/adminComponents/AdminNav";
+import AdminNav from "../AdminNav";
 
 export const AdminProfile = () => {
   const navigate = useNavigate();

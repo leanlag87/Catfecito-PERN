@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import api from "../../services/api";
+import api from "../../../services/api";
 import "../profileComponents/ProfileOrders.css";
 
 export default function AdminOrders() {
@@ -31,7 +31,7 @@ export default function AdminOrders() {
       try {
         setLoading(true);
         setError("");
-        const { data } = await api.get('/orders/admin/all');
+        const { data } = await api.get("/orders/admin/all");
         setOrders(Array.isArray(data?.orders) ? data.orders : []);
       } catch (e) {
         setError(e?.response?.data?.message || "Error al obtener órdenes");
@@ -68,8 +68,9 @@ export default function AdminOrders() {
       </div>
       {loading && <p>Cargando pedidos…</p>}
       {error && <div className="orders-error">{error}</div>}
-      {!loading && !error && (
-        orders.length === 0 ? (
+      {!loading &&
+        !error &&
+        (orders.length === 0 ? (
           <p>No hay pedidos todavía.</p>
         ) : (
           <ul className="orders-list">
@@ -83,10 +84,14 @@ export default function AdminOrders() {
                     <strong>Usuario:</strong> {o.user_name} ({o.user_email})
                   </div>
                   <div>
-                    Fecha: {o.created_at ? new Date(o.created_at).toLocaleString("es-AR") : "-"}
+                    Fecha:{" "}
+                    {o.created_at
+                      ? new Date(o.created_at).toLocaleString("es-AR")
+                      : "-"}
                   </div>
                   <div>
-                    Estado: {o.status} {o.payment_status ? `(pago: ${o.payment_status})` : ""}
+                    Estado: {o.status}{" "}
+                    {o.payment_status ? `(pago: ${o.payment_status})` : ""}
                   </div>
                   <div>
                     Total: ${Number(o.total || 0).toLocaleString("es-AR")}
@@ -96,7 +101,11 @@ export default function AdminOrders() {
                     onClick={() => toggleOrderDetails(o.id)}
                   >
                     Items: {o.items_count}
-                    <span className={`arrow ${expandedOrder === o.id ? "open" : ""}`}>▼</span>
+                    <span
+                      className={`arrow ${expandedOrder === o.id ? "open" : ""}`}
+                    >
+                      ▼
+                    </span>
                   </div>
                 </div>
                 {expandedOrder === o.id && (
@@ -118,7 +127,9 @@ export default function AdminOrders() {
                             {orderDetails[o.id].items.map((item) => (
                               <li key={item.id} className="purchase-item">
                                 <div className="purchase-text">
-                                  <p><strong>{item.product_name}</strong></p>
+                                  <p>
+                                    <strong>{item.product_name}</strong>
+                                  </p>
                                   <p>Cantidad: {item.quantity}</p>
                                   <p>Precio: ${item.price}</p>
                                   <p>Subtotal: ${item.subtotal}</p>
@@ -142,8 +153,7 @@ export default function AdminOrders() {
               </li>
             ))}
           </ul>
-        )
-      )}
+        ))}
     </section>
   );
 }

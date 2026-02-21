@@ -16,14 +16,14 @@ import { Register } from "./pages/auth/Register";
 import ModalContainer from "./components/Modal/ModalContainer";
 import { Profile } from "./pages/profile/Profile";
 import { AdminProfile } from "./pages/admin/AdminProfile";
-import AdminInsert from "./components/admincomponents/AdminInsert";
-import AdminUpdate from "./components/admincomponents/AdminUpdate";
-import AdminDelete from "./components/admincomponents/AdminDelete";
+import AdminInsert from "./features/admin/components/AdminInsert";
+import AdminUpdate from "./features/admin/components/AdminUpdate";
+import AdminDelete from "./features/admin/components/AdminDelete";
 import ProfileInfo from "./components/profileComponents/ProfileInfo";
 import ProfileOrders from "./components/profileComponents/ProfileOrders";
 import ProfileAddress from "./components/profileComponents/ProfileAddress";
 import { CheckoutPage } from "./pages/checkout/CheckoutPage";
-import AdminOrders from "./components/admincomponents/AdminOrders";
+import AdminOrders from "./features/admin/components/AdminOrders";
 import { InstallPWA } from "./components/ui/MetaData/InstallPWA/InstallPWA";
 
 function FloatingCartWrapper({ isOpen, onCloseCart, ...rest }) {
