@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import "./NavBar.css";
 import { useNavigate } from "react-router-dom";
-import { ModalContainer } from "../Modal/ModalContainer";
+import { ModalContainer } from "../../../components/Modal/ModalContainer";
 
 export const NavBar = () => {
   const navigate = useNavigate();

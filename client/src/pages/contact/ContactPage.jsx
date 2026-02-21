@@ -6,7 +6,7 @@ import "../../components/FooterComponent/Footer.css";
 import "./ContactPage.css";
 import MetaData from "../../components/ui/MetaData/MetaData";
 
-import { NavBar } from "../../components/CustomBarComponents/NavBar";
+import { NavBar } from "../../shared/components/NavBar/NavBar";
 import { Header } from "../../shared/components/Header/Header";
 import { Footer } from "../../components/FooterComponent/Footer";
 
