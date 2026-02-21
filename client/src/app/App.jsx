@@ -7,8 +7,8 @@ import {
 import { useState, useEffect } from "react";
 import React from "react";
 import { useCartLogic } from "./hooks/useCartLogic";
-import { HomePage } from "./pages/home/HomePage";
-import ContactPage from "./pages/contact/ContactPage";
+import { HomePage } from "../pages/home/HomePage";
+import ContactPage from "../pages/contact/ContactPage";
 import { Products } from "./pages/product/Products";
 import { FloatingCart } from "./components/cartComponents/FloatingCart";
 import { Login } from "./pages/auth/Login";
@@ -16,14 +16,14 @@ import { Register } from "./pages/auth/Register";
 import ModalContainer from "./components/Modal/ModalContainer";
 import { Profile } from "./pages/profile/Profile";
 import { AdminProfile } from "./pages/admin/AdminProfile";
-import AdminInsert from "./features/admin/components/AdminInsert";
-import AdminUpdate from "./features/admin/components/AdminUpdate";
-import AdminDelete from "./features/admin/components/AdminDelete";
+import AdminInsert from "../features/admin/components/AdminInsert";
+import AdminUpdate from "../features/admin/components/AdminUpdate";
+import AdminDelete from "../features/admin/components/AdminDelete";
 import ProfileInfo from "./components/profileComponents/ProfileInfo";
 import ProfileOrders from "./components/profileComponents/ProfileOrders";
 import ProfileAddress from "./components/profileComponents/ProfileAddress";
 import { CheckoutPage } from "./pages/checkout/CheckoutPage";
-import AdminOrders from "./features/admin/components/AdminOrders";
+import AdminOrders from "../features/admin/components/AdminOrders";
 import { InstallPWA } from "./components/ui/MetaData/InstallPWA/InstallPWA";
 
 function FloatingCartWrapper({ isOpen, onCloseCart, ...rest }) {
