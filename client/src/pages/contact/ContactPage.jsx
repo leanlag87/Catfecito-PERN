@@ -7,7 +7,7 @@ import "./ContactPage.css";
 import MetaData from "../../components/ui/MetaData/MetaData";
 
 import { NavBar } from "../../components/CustomBarComponents/NavBar";
-import { Header } from "../../components/CustomBarComponents/Header";
+import { Header } from "../../shared/components/Header/Header";
 import { Footer } from "../../components/FooterComponent/Footer";
 
 export const ContactPage = ({

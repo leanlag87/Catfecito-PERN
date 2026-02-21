@@ -5,7 +5,7 @@ import "animate.css";
 import MetaData from "../../components/ui/MetaData/MetaData";
 
 import { NavBar } from "../../components/CustomBarComponents/NavBar";
-import { Header } from "../../components/CustomBarComponents/Header";
+import { Header } from "../../shared/components/Header/Header";
 import { Banner } from "../../components/CustomBarComponents/Banner";
 import { Footer } from "../../components/FooterComponent/Footer";
 

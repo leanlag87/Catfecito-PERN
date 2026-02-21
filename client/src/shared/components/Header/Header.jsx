@@ -4,9 +4,9 @@ import group from "../../assets/img/Group.svg";
 import searchIcon from "../../assets/img/lupa.png";
 import user from "../../assets/img/user.svg";
 import cart from "../../assets/img/cart.svg";
-import { Cart } from "../../features/cart/components/Cart";
+import { Cart } from "../../../features/cart/components/Cart";
 import { useNavigate } from "react-router-dom";
-import api from "../../services/api";
+import api from "../../../services/api";
 import logout from "../../assets/img/logout.svg";
 import { debounce } from "lodash";
 
