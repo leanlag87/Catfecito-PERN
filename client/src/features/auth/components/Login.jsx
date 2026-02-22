@@ -1,48 +1,34 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import api from "../../../services/api";
-import "../../styles/Auth.css";
+import { useAuthStore } from "../stores/authStore";
+import "../Auth.css";
 import logo from "../../assets/img/Group.svg";
 
 export const Login = ({ onSwitch, onSuccess }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
+  const { login, isLoading, error, clearError } = useAuthStore();
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    setIsLoading(true);
-    try {
-      // Usa el servicio centralizado
-      const { data } = await api.auth.login({ email, password });
 
-      // Validar respuesta
-      if (data?.token) {
-        // Guardar token y usuario en sessionStorage
-        sessionStorage.setItem("authToken", data.token);
-        sessionStorage.setItem("authUser", JSON.stringify(data.user));
+    // Limpiar errores previos
+    clearError();
 
-        // Disparar evento para actualizar el estado global
-        window.dispatchEvent(new Event("authChanged"));
+    // Llama al método login del store
+    const result = await login({ email, password });
 
-        // Llamar onSuccess si fue pasado (cierra modal)
-        if (typeof onSuccess === "function") {
-          return onSuccess(data);
-        }
-
-        //Redirigir al home
-        window.location.replace("/");
-      } else {
-        throw new Error("Respuesta de login inválida");
+    if (result.success) {
+      // Login exitoso
+      if (typeof onSuccess === "function") {
+        return onSuccess(result.data);
       }
-    } catch (error) {
-      console.error("Error en login:", error);
 
-      // Mostrar mensaje de error al usuario
-      const errorMessage = error?.message || "Error al iniciar sesión";
-      alert(errorMessage);
-    } finally {
-      setIsLoading(false);
+      // Redirigir al home
+      window.location.replace("/");
+    } else {
+      // Login fallido - el error ya está en el store
+      alert(result.error);
     }
   };
 
@@ -53,6 +39,9 @@ export const Login = ({ onSwitch, onSuccess }) => {
           <h2>Iniciar sesión</h2>
           <img src={logo} alt="CatFecito" className="auth-logo" />
         </div>
+
+        {/* Mostrar error si existe */}
+        {error && <div className="auth-error">{error}</div>}
 
         <label htmlFor="email">Correo electrónico</label>
         <input
