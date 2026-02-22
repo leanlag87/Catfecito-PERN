@@ -21,9 +21,9 @@
   max-width: 420px;
   background: #ffffff;
   border-radius: 12px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
   padding: 1rem 1.1rem; /* padding reducido */
-  border: 1px solid rgba(0,0,0,0.06);
+  border: 1px solid rgba(0, 0, 0, 0.06);
 }
 
 .auth-header {
@@ -39,7 +39,7 @@
   height: 68px;
   object-fit: contain;
   border-radius: 8px;
-  box-shadow: 0 6px 18px -12px rgba(0,0,0,0.12);
+  box-shadow: 0 6px 18px -12px rgba(0, 0, 0, 0.12);
 }
 
 .auth-form h2 {
@@ -111,15 +111,25 @@
   text-decoration: underline;
 }
 
+.auth-error {
+  background-color: #fee;
+  border: 1px solid #fcc;
+  color: #c33;
+  padding: 0.75rem;
+  border-radius: 4px;
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
+}
+
 /* ---- Autofill (Chrome / Blink) ---- */
 input:-webkit-autofill,
 textarea:-webkit-autofill,
 select:-webkit-autofill {
   -webkit-box-shadow: 0 0 0px 1000px #ffffff inset !important; /* fondo deseado */
   box-shadow: 0 0 0px 1000px #ffffff inset !important;
-  -webkit-text-fill-color: #222222 !important;                /* color del texto */
+  -webkit-text-fill-color: #222222 !important; /* color del texto */
   caret-color: #222222 !important;
-  transition: background-color 5000s ease-in-out 0s;           /* evita parpadeo */
+  transition: background-color 5000s ease-in-out 0s; /* evita parpadeo */
 }
 
 /* Mantener mismo look al recibir foco */
