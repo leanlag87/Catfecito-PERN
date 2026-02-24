@@ -5,26 +5,26 @@ import {
   useLocation,
 } from "react-router-dom";
 import { useState, useEffect } from "react";
-import React from "react";
-import { useCartLogic } from "./hooks/useCartLogic";
+import { useAuthStore } from "../features/auth/stores/authStore";
+import { useCartStore } from "../features/cart/stores/cartStore";
 import { HomePage } from "../pages/home/HomePage";
 import ContactPage from "../pages/contact/ContactPage";
-import { Products } from "./pages/product/Products";
-import { FloatingCart } from "./components/cartComponents/FloatingCart";
-import { Login } from "./pages/auth/Login";
-import { Register } from "./pages/auth/Register";
-import ModalContainer from "./components/Modal/ModalContainer";
-import { Profile } from "./pages/profile/Profile";
-import { AdminProfile } from "./pages/admin/AdminProfile";
+import { Products } from "../features/products/components/Products";
+import { FloatingCart } from "../features/cart/components/FloatingCart/FloatingCart";
+import { Login } from "../features/auth/components/Login";
+import { Register } from "../features/auth/components/Register";
+import ModalContainer from "../shared/components/Modal/ModalContainer";
+import { Profile } from "../features/profile/components/Profile/Profile";
+import { AdminProfile } from "../features/admin/components/AdminProfile/AdminProfile";
 import AdminInsert from "../features/admin/components/AdminInsert";
 import AdminUpdate from "../features/admin/components/AdminUpdate";
 import AdminDelete from "../features/admin/components/AdminDelete";
-import ProfileInfo from "./components/profileComponents/ProfileInfo";
-import ProfileOrders from "./components/profileComponents/ProfileOrders";
-import ProfileAddress from "./components/profileComponents/ProfileAddress";
-import { CheckoutPage } from "./pages/checkout/CheckoutPage";
+import ProfileInfo from "../features/profile/components/ProfileInfo";
+import ProfileOrders from "../features/profile/components/ProfileOrders/ProfileOrders";
+import ProfileAddress from "../features/profile/components/ProfileAddress";
+import { CheckoutPage } from "../features/orders/components/CheckoutPage/CheckoutPage";
 import AdminOrders from "../features/admin/components/AdminOrders";
-import { InstallPWA } from "./components/ui/MetaData/InstallPWA/InstallPWA";
+import { InstallPWA } from "../shared/components/InstallPWA/InstallPWA";
 
 function FloatingCartWrapper({ isOpen, onCloseCart, ...rest }) {
   const location = useLocation();
@@ -34,8 +34,7 @@ function FloatingCartWrapper({ isOpen, onCloseCart, ...rest }) {
     path.startsWith("/admin") ||
     path === "/checkout";
 
-  // cerrar carrito si la ruta lo oculta y está abierto
-  React.useEffect(() => {
+  useEffect(() => {
     if (hide && isOpen && typeof onCloseCart === "function") {
       onCloseCart();
     }
@@ -49,21 +48,10 @@ function App() {
   const [modalVisible, setModalVisible] = useState(false);
   const [modalType, setModalType] = useState("login");
 
-  const openModal = (type) => {
-    setModalType(type);
-    setModalVisible(true);
-  };
+  // Store de autenticación
+  const { isAuthenticated, logout } = useAuthStore();
 
-  const closeModal = () => setModalVisible(false);
-
-  const switchModal = (type) => setModalType(type);
-
-  const handleSuccess = async () => {
-    // payload can contain user/token if needed
-    // Sincronizar carrito después del login y esperar a que termine
-    await syncCartWithBackend();
-    setModalVisible(false);
-  };
+  // Store del carrito
   const {
     items,
     isCartOpen,
@@ -77,23 +65,36 @@ function App() {
     closeCart,
     toggleCart,
     syncCartWithBackend,
-  } = useCartLogic();
+  } = useCartStore();
 
+  const openModal = (type) => {
+    setModalType(type);
+    setModalVisible(true);
+  };
+
+  const closeModal = () => setModalVisible(false);
+  const switchModal = (type) => setModalType(type);
+
+  const handleSuccess = async () => {
+    await syncCartWithBackend();
+    setModalVisible(false);
+  };
+
+  // Auto-logout por inactividad
   useEffect(() => {
+    if (!isAuthenticated) return;
+
     let timeout;
     const MAX_INACTIVE_TIME = 600 * 1000; // 10 minutos
 
     const handleLogoutDueToInactivity = () => {
-      // Elimina token y usuario
-      sessionStorage.removeItem("authToken");
-      sessionStorage.removeItem("authUser");
-      // Muestra modal de logout
+      // Mostrar modal de logout
       setModalType("logout");
       setModalVisible(true);
 
-      // Espera 2.2 segundos antes de redirigir
+      // Ejecutar logout después de 10 segundos
       setTimeout(() => {
-        window.location.replace("/");
+        logout();
       }, 10000);
     };
 
@@ -110,14 +111,11 @@ function App() {
     return () => {
       clearTimeout(timeout);
       events.forEach((evt) => window.removeEventListener(evt, resetTimer));
-      console.log("Sesión expirada por inactividad");
     };
-  }, []);
+  }, [isAuthenticated, logout]);
 
   return (
     <Router>
-      {/* Auth buttons removed */}
-
       <Routes>
         <Route
           path="/"
@@ -193,6 +191,7 @@ function App() {
           }
         />
       </Routes>
+
       <ModalContainer
         type={modalType}
         visible={modalVisible}
@@ -200,6 +199,7 @@ function App() {
         onSwitch={switchModal}
         onSuccess={handleSuccess}
       />
+
       <FloatingCartWrapper
         items={items}
         itemCount={itemCount}
@@ -211,6 +211,7 @@ function App() {
         onClearCart={clearCart}
         onOpenAuthModal={openModal}
       />
+
       <InstallPWA />
     </Router>
   );
