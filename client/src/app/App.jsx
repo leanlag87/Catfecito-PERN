@@ -6,7 +6,7 @@ import {
 } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { useAuthStore } from "../features/auth/stores/authStore";
-import { useCartLogic } from "../features/cart/hooks/useCartLogic";
+import { useCartStore } from "../features/cart/stores/cartStore";
 import { HomePage } from "../pages/home/HomePage";
 import ContactPage from "../pages/contact/ContactPage";
 import { Products } from "../features/products/components/Products";
@@ -51,18 +51,7 @@ function App() {
   // Store de autenticación
   const { isAuthenticated, logout } = useAuthStore();
 
-  const openModal = (type) => {
-    setModalType(type);
-    setModalVisible(true);
-  };
-
-  const closeModal = () => setModalVisible(false);
-  const switchModal = (type) => setModalType(type);
-  const handleSuccess = async () => {
-    await syncCartWithBackend();
-    setModalVisible(false);
-  };
-
+  // Store del carrito
   const {
     items,
     isCartOpen,
@@ -76,7 +65,20 @@ function App() {
     closeCart,
     toggleCart,
     syncCartWithBackend,
-  } = useCartLogic();
+  } = useCartStore();
+
+  const openModal = (type) => {
+    setModalType(type);
+    setModalVisible(true);
+  };
+
+  const closeModal = () => setModalVisible(false);
+  const switchModal = (type) => setModalType(type);
+
+  const handleSuccess = async () => {
+    await syncCartWithBackend();
+    setModalVisible(false);
+  };
 
   // Auto-logout por inactividad
   useEffect(() => {
