@@ -1,14 +1,15 @@
-import { useState, useEffect, useCallback, useRef } from "react";
-import "./Header.css";
-import group from "../../assets/img/Group.svg";
-import searchIcon from "../../assets/img/lupa.png";
-import user from "../../assets/img/user.svg";
-import cart from "../../assets/img/cart.svg";
-import { Cart } from "../../../features/cart/components/Cart";
+import { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import api from "../../../services/api";
-import logout from "../../assets/img/logout.svg";
 import { debounce } from "lodash";
+import { useAuthStore } from "../../../features/auth/stores/authStore";
+import api from "../../../services/api";
+import { Cart } from "../../../features/cart/components/Cart";
+import "./Header.css";
+import group from "../../../assets/img/Group.svg";
+import searchIcon from "../../../assets/img/lupa.png";
+import user from "../../../assets/img/user.svg";
+import cart from "../../../assets/img/cart.svg";
+import logoutIcon from "../../../assets/img/logout.svg";
 
 export const Header = ({
   cartItems = [],
@@ -20,94 +21,61 @@ export const Header = ({
   onRemoveItem = () => {},
   onOpenAuthModal = null,
 }) => {
-  const [isLogged, setIsLogged] = useState(
-    !!sessionStorage.getItem("authToken"),
-  );
+  const navigate = useNavigate();
+  const inputRef = useRef(null);
+
+  // Usa el store de Zustand
+  const { user: currentUser, isAuthenticated, logout } = useAuthStore();
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState([]);
   const [isSearching, setIsSearching] = useState(false);
+  const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
+
   const BACKEND_ORIGIN = import.meta.env.VITE_BACKEND_URL
     ? import.meta.env.VITE_BACKEND_URL.replace(/\/$/, "")
     : "";
 
-  //traemos imagenes de los items para el buscador
   const getItemImageSrc = (it) => {
     if (!it) return "";
     let v = it.image ?? it.image_url ?? "";
-    // Si es un objeto con propiedad url
     if (v && typeof v === "object" && typeof v.url === "string") {
       v = v.url;
     }
     if (typeof v !== "string") return "";
     const src = v.trim();
     if (!src) return "";
-    // Aceptar URLs absolutas y data URLs
     if (src.startsWith("http") || src.startsWith("data:")) return src;
-    // Asegurarse de que BACKEND_ORIGIN exista antes de la concatenación
     if (!BACKEND_ORIGIN) return src;
     return `${BACKEND_ORIGIN}${src.startsWith("/") ? "" : "/"}${src}`;
   };
-
-  const navigate = useNavigate();
-  const inputRef = useRef(null);
-  const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
-
-  // Hook para gestionar el estado de login
-  useEffect(() => {
-    const onStorage = () => setIsLogged(!!sessionStorage.getItem("authToken"));
-    const onAuthChanged = () =>
-      setIsLogged(!!sessionStorage.getItem("authToken"));
-    window.addEventListener("storage", onStorage);
-    window.addEventListener("authChanged", onAuthChanged);
-    return () => {
-      window.removeEventListener("storage", onStorage);
-      window.removeEventListener("authChanged", onAuthChanged);
-    };
-  }, []);
 
   const handleNavigateToHome = () => {
     navigate("/");
   };
 
-  const handleLogout = async () => {
-    const token = sessionStorage.getItem("authToken");
-    try {
-      if (token) {
-        await api.post("/auth/logout", {});
-      }
-    } catch {
-      // ignorar errores de logout
-    } finally {
-      sessionStorage.removeItem("authToken");
-      sessionStorage.removeItem("authUser");
-      setIsLogged(false);
-      navigate("/");
-    }
+  const handleLogout = () => {
+    logout();
   };
 
-  const resolveUserRole = () => {
-    try {
-      const stored = sessionStorage.getItem("authUser");
-      if (stored) {
-        const parsed = JSON.parse(stored);
-        if (parsed?.role) return parsed.role;
+  const handleProfileClick = () => {
+    if (!isAuthenticated) {
+      if (typeof onOpenAuthModal === "function") {
+        return onOpenAuthModal("login");
       }
-    } catch {
-      /* noop */
+      return navigate("/login", {
+        state: {
+          from: window.location.pathname,
+          background: { pathname: window.location.pathname },
+        },
+      });
     }
 
-    const token = sessionStorage.getItem("authToken");
-    if (!token) return null;
-    try {
-      const payload = JSON.parse(atob(token.split(".")[1] || ""));
-      return payload?.role || null;
-    } catch {
-      return null;
-    }
+    const role = currentUser?.role;
+    navigate(role === "admin" ? "/admin" : "/profile");
   };
 
-  // Función de búsqueda con debounce
-  const performSearch = async (query) => {
+  // useCallback para performSearch
+  const performSearch = useCallback(async (query) => {
     if (!query) {
       setSearchResults([]);
       setIsSearching(false);
@@ -115,11 +83,8 @@ export const Header = ({
     }
     setIsSearching(true);
     try {
-      // Trae todos los productos activos
-      const { data } = await api.get("/products");
-      // data.products porque tu backend responde { success, count, products }
+      const { data } = await api.products.getAll();
       const products = data.products || [];
-      // Normaliza y filtra por nombre o categoría
       const normalize = (str) =>
         (str || "")
           .toString()
@@ -140,14 +105,16 @@ export const Header = ({
     } finally {
       setIsSearching(false);
     }
-  };
+  }, []);
 
-  // Usamos useCallback para memorizar la función debounced
-  const debouncedSearch = useCallback(debounce(performSearch, 300), []);
+  // useMemo para crear debounce
+  const debouncedSearch = useMemo(
+    () => debounce(performSearch, 300),
+    [performSearch],
+  );
 
   useEffect(() => {
     debouncedSearch(searchQuery);
-    // Cancelar el debounce si el componente se desmonta
     return () => {
       debouncedSearch.cancel();
     };
@@ -155,9 +122,10 @@ export const Header = ({
 
   return (
     <div className="header">
-      <div className={`logo-container`} onClick={handleNavigateToHome}>
+      <div className="logo-container" onClick={handleNavigateToHome}>
         <img src={group} alt="Catfecito logo" />
       </div>
+
       <div className={`searcher ${mobileSearchOpen ? "visible" : ""}`}>
         <input
           ref={inputRef}
@@ -167,20 +135,17 @@ export const Header = ({
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
         />
-        {/* Mobile hint: visible only on small screens when input is empty. Click focuses input. */}
+
         <span
           className={`mobile-search-hint ${searchQuery ? "hidden" : ""}`}
           role="button"
           tabIndex={0}
-          onClick={() => {
-            if (inputRef.current) inputRef.current.focus();
-          }}
+          onClick={() => inputRef.current?.focus()}
           onKeyDown={(e) => {
-            if (e.key === "Enter") {
-              if (inputRef.current) inputRef.current.focus();
-            }
+            if (e.key === "Enter") inputRef.current?.focus();
           }}
-        ></span>
+        />
+
         <button
           type="button"
           className="clear-search"
@@ -194,7 +159,7 @@ export const Header = ({
         <button
           className="search-icon"
           onClick={() => {
-            const q = (searchQuery || "").trim();
+            const q = searchQuery.trim();
             if (!q) return;
             navigate(`/products?search=${encodeURIComponent(q)}`);
             setSearchResults([]);
@@ -203,7 +168,6 @@ export const Header = ({
           <img src={searchIcon} alt="Buscar" />
         </button>
 
-        {/* Dropdown de resultados de búsqueda */}
         <div
           className={`search-results ${isSearching || searchResults.length > 0 || searchQuery ? "visible" : ""}`}
         >
@@ -216,7 +180,7 @@ export const Header = ({
                 className="search-result-item"
                 type="button"
                 onClick={() => {
-                  const q = (p.name || "").trim();
+                  const q = p.name.trim();
                   if (q) {
                     setSearchQuery("");
                     setSearchResults([]);
@@ -243,7 +207,6 @@ export const Header = ({
       </div>
 
       <div className="user-icons">
-        {/* Mobile: search toggle shown beside other icons */}
         <button
           type="button"
           className="mobile-search-toggle"
@@ -252,50 +215,39 @@ export const Header = ({
           onClick={() => {
             const next = !mobileSearchOpen;
             setMobileSearchOpen(next);
-            // focus input when opening
             if (next && inputRef.current)
               setTimeout(() => inputRef.current.focus(), 50);
           }}
         >
           <img src={searchIcon} alt="Buscar" />
         </button>
+
         <button
           type="button"
           className="profile-button"
-          onClick={() => {
-            const token = sessionStorage.getItem("authToken");
-            if (!token) {
-              if (typeof onOpenAuthModal === "function") {
-                onOpenAuthModal("login");
-                return;
-              }
-              navigate("/login", {
-                state: {
-                  from: window.location.pathname,
-                  background: { pathname: window.location.pathname },
-                },
-              });
-              return;
-            }
-            const role = resolveUserRole();
-            if (role === "admin") navigate("/admin");
-            else navigate("/profile");
-          }}
+          onClick={handleProfileClick}
+          aria-label={isAuthenticated ? "Ver perfil" : "Iniciar sesión"}
         >
           <img className="user" src={user} alt="Usuario" />
         </button>
 
-        {isLogged && (
+        {isAuthenticated && (
           <button
             type="button"
             className="logout-button"
             onClick={handleLogout}
+            aria-label="Cerrar sesión"
           >
-            <img className="log-out" src={logout} alt="Cerrar sesión" />
+            <img className="log-out" src={logoutIcon} alt="Cerrar sesión" />
           </button>
         )}
 
-        <button type="button" className="cart-button" onClick={onOpenCart}>
+        <button
+          type="button"
+          className="cart-button"
+          onClick={onOpenCart}
+          aria-label={`Carrito (${itemCount} items)`}
+        >
           <img className="cart" src={cart} alt="Carrito" />
           {itemCount > 0 && <span className="cart-count">{itemCount}</span>}
         </button>
