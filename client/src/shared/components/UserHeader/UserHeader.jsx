@@ -1,38 +1,39 @@
-import api from "../../../services/api";
-import "../CustomBarComponents/Header.css";
-import group from "../../assets/img/Group.svg";
-import user from "../../assets/img/user.svg";
-import logout from "../../assets/img/logout.svg";
 import { useNavigate } from "react-router-dom";
+import { useAuthStore } from "../../../features/auth/stores/authStore";
+import "./Header.css";
+import group from "../../../assets/img/Group.svg";
+import user from "../../../assets/img/user.svg";
+import logoutIcon from "../../../assets/img/logout.svg";
 
 export const UserHeader = () => {
   const navigate = useNavigate();
 
+  // Usa el store de Zustand
+  const { user: currentUser, isAuthenticated, logout } = useAuthStore();
+
   const handleNavigateToHome = () => {
-    console.log("Navegando a home...");
     navigate("/");
-    console.log("Navigate ejecutado");
   };
 
   const handleNavigateToProducts = () => {
-    console.log("Navegando a products...");
     navigate("/products");
-    console.log("Navigate ejecutado");
   };
 
-  const handleLogout = async () => {
-    const token = sessionStorage.getItem("authToken");
-    try {
-      if (token) {
-        await api.post("/auth/logout", {});
-      }
-    } catch {
-      // ignorar errores de logout
-    } finally {
-      sessionStorage.removeItem("authToken");
-      sessionStorage.removeItem("authUser");
-      navigate("/");
+  const handleLogout = () => {
+    // Llama al método logout del store
+    // (limpia estado, sessionStorage, y redirige)
+    logout();
+  };
+
+  const handleProfileClick = () => {
+    // Si no está autenticado, ir a login
+    if (!isAuthenticated) {
+      return navigate("/login");
     }
+
+    //Navegar según el rol del usuario (desde el store)
+    const role = currentUser?.role;
+    navigate(role === "admin" ? "/admin" : "/profile");
   };
 
   return (
@@ -55,55 +56,20 @@ export const UserHeader = () => {
         <button
           type="button"
           className="profile-button"
-          onClick={() => {
-            const token = sessionStorage.getItem("authToken");
-            if (!token) return navigate("/login");
-
-            // 1) Try role from stored user
-            let role = undefined;
-            try {
-              const u = JSON.parse(
-                sessionStorage.getItem("authUser") || "null",
-              );
-              role = u?.role;
-            } catch {
-              // ignore JSON parse errors
-            }
-
-            // 2) Fallback: decode JWT payload (no verify, solo lectura)
-            if (!role) {
-              try {
-                const base64Url = token.split(".")[1];
-                const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
-                const jsonPayload = decodeURIComponent(
-                  atob(base64)
-                    .split("")
-                    .map(function (c) {
-                      return (
-                        "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2)
-                      );
-                    })
-                    .join(""),
-                );
-                const payload = JSON.parse(jsonPayload);
-                role = payload?.role;
-              } catch {
-                // ignore jwt decode errors
-              }
-            }
-
-            navigate(role === "admin" ? "/admin" : "/profile");
-          }}
+          onClick={handleProfileClick}
+          aria-label={isAuthenticated ? "Ver perfil" : "Iniciar sesión"}
         >
           <img className="user" src={user} alt="Usuario" />
         </button>
-        {logout && (
+
+        {isAuthenticated && (
           <button
             type="button"
             className="logout-button"
             onClick={handleLogout}
+            aria-label="Cerrar sesión"
           >
-            <img className="log-out" src={logout} alt="Cerrar sesión" />
+            <img className="log-out" src={logoutIcon} alt="Cerrar sesión" />
           </button>
         )}
       </div>
