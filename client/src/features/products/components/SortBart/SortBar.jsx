@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import "./SortBar.css";
 
 export const SortBar = ({
@@ -11,8 +11,14 @@ export const SortBar = ({
   const handleSortChange = (e) => {
     const value = e.target.value;
     setSortBy(value);
-    onSortChange && onSortChange(value);
+    onSortChange?.(value);
   };
+
+  useEffect(() => {
+    if (!searchQuery && sortBy !== "manual") {
+      setSortBy("manual");
+    }
+  }, [searchQuery, sortBy]);
 
   const sortOptions = [
     { value: "manual", label: "Características" },
@@ -27,7 +33,6 @@ export const SortBar = ({
   return (
     <div className="filter-right-bar">
       <div className="sortbar-row">
-        {/* Left: search tag */}
         {searchQuery ? (
           <div className="search-tag" role="status">
             <span className="search-tag-label">Búsqueda:</span>
@@ -36,7 +41,7 @@ export const SortBar = ({
               type="button"
               className="search-tag-clear"
               aria-label="Quitar filtro de búsqueda"
-              onClick={() => onClearSearch && onClearSearch()}
+              onClick={onClearSearch}
             >
               ×
             </button>
@@ -45,7 +50,6 @@ export const SortBar = ({
           <div className="search-tag-placeholder" />
         )}
 
-        {/* Right: existing sort form */}
         <form className="facets-vertical-form" id="FacetSortForm">
           <p className="order-by">
             <label htmlFor="SortByCategory">Ordenar por:</label>
