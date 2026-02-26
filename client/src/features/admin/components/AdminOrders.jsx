@@ -39,7 +39,7 @@ export default function AdminOrders() {
 
     if (!orderDetails[orderId]) {
       try {
-        const { data } = await api.get(`/orders/admin/${orderId}`);
+        const { data } = await api.orders.getById(orderId);
         setOrderDetails((prev) => ({
           ...prev,
           [orderId]: data.order,
