@@ -1,73 +1,60 @@
 import { useState, useEffect } from "react";
-import api from "../../../services/api";
-import "../../pages/admin/AdminProfile.css";
+import { useAdminStore } from "../stores/adminStore";
+import "./AdminProfile.css";
 
 export default function AdminDelete() {
+  const { products, fetchAllProducts, deleteProduct, isLoading } =
+    useAdminStore();
+
   const [id, setId] = useState("");
   const [product, setProduct] = useState(null);
-  const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
-  const [loadingProduct, setLoadingProduct] = useState(false);
   const [messageType, setMessageType] = useState("");
-  const [productsList, setProductsList] = useState([]);
+  const [loadingProduct, setLoadingProduct] = useState(false);
 
-  const remove = async (e) => {
-    e.preventDefault();
-    setMessage("");
-    if (!id) {
-      setMessage("Id requerido");
-      return;
-    }
-    setLoading(true);
-    try {
-      const { data } = await api.delete(`/products/${id}`);
-      setMessage(data?.message || "Producto eliminado");
-      setMessageType("success");
-    } catch (err) {
-      setMessage(err?.response?.data?.message || "Error al eliminar");
-      setMessageType("error");
-    } finally {
-      setLoading(false);
-    }
-  };
+  useEffect(() => {
+    fetchAllProducts();
+  }, [fetchAllProducts]);
 
   const loadProduct = async () => {
     if (!id) return setMessage("Selecciona un producto");
     setMessage("");
     setLoadingProduct(true);
-    try {
-      const { data } = await api.get(`/products/${id}`);
-      setProduct(data?.product || null);
-    } catch (err) {
-      setMessage(
-        err?.response?.data?.message || "No se pudo cargar el producto",
-      );
+
+    const selectedProduct = products.find((p) => p.id === parseInt(id));
+
+    if (selectedProduct) {
+      setProduct(selectedProduct);
+    } else {
+      setMessage("No se pudo cargar el producto");
       setMessageType("error");
       setProduct(null);
-    } finally {
-      setLoadingProduct(false);
     }
+
+    setLoadingProduct(false);
   };
 
-  useEffect(() => {
-    let mounted = true;
-    (async () => {
-      try {
-        const { data } = await api.get("/products");
-        const list = Array.isArray(data?.products)
-          ? data.products
-          : Array.isArray(data)
-            ? data
-            : [];
-        if (mounted) setProductsList(list);
-      } catch (e) {
-        console.error("No se pudo cargar lista de productos", e);
-      }
-    })();
-    return () => {
-      mounted = false;
-    };
-  }, []);
+  const remove = async (e) => {
+    e.preventDefault();
+    setMessage("");
+
+    if (!id) {
+      setMessage("Id requerido");
+      return;
+    }
+
+    const result = await deleteProduct(id);
+
+    if (result.success) {
+      setMessage("Producto eliminado");
+      setMessageType("success");
+      setProduct(null);
+      setId("");
+    } else {
+      setMessage(result.error);
+      setMessageType("error");
+    }
+  };
 
   return (
     <section className="profile-card-admin">
@@ -92,7 +79,7 @@ export default function AdminDelete() {
           <div className="product-select-update">
             <select value={id} onChange={(e) => setId(e.target.value)}>
               <option value="">-- Selecciona un producto --</option>
-              {productsList.map((p) => (
+              {products.map((p) => (
                 <option key={p.id} value={p.id}>
                   {p.name} {p.stock != null ? `(${p.stock})` : ""}
                 </option>
@@ -136,10 +123,12 @@ export default function AdminDelete() {
             </div>
           </div>
         )}
+
         <label>Producto ID</label>
         <input value={id} onChange={(e) => setId(e.target.value)} required />
-        <button className="btn-primary-admin" disabled={loading}>
-          {loading ? "Eliminando..." : "Eliminar"}
+
+        <button className="btn-primary-admin" disabled={isLoading}>
+          {isLoading ? "Eliminando..." : "Eliminar"}
         </button>
       </form>
     </section>
