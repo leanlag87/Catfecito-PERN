@@ -1,9 +1,11 @@
 import { useState, useEffect } from "react";
-import api from "../../../services/api";
-import "../../pages/admin/AdminProfile.css";
+import { useAdminStore } from "../stores/adminStore";
+import "./AdminProfile.css";
 
 export default function AdminInsert() {
-  const [categories, setCategories] = useState([]);
+  const { categories, fetchCategories, createProduct, isLoading } =
+    useAdminStore();
+
   const [form, setForm] = useState({
     name: "",
     description: "",
@@ -12,42 +14,36 @@ export default function AdminInsert() {
     category_id: "",
   });
   const [imageFile, setImageFile] = useState(null);
-  const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
   useEffect(() => {
-    (async () => {
-      try {
-        const { data } = await api.get("/categories");
-        setCategories(Array.isArray(data?.categories) ? data.categories : data);
-      } catch (e) {
-        console.error(e);
-      }
-    })();
-  }, []);
+    fetchCategories();
+  }, [fetchCategories]);
 
   const onChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
-
   const onFile = (e) => setImageFile(e.target.files?.[0] || null);
 
   const submit = async (e) => {
     e.preventDefault();
     setError("");
     setSuccess("");
+
     if (!form.name || !form.description || !form.price || !form.category_id) {
       setError("Nombre, descripción, precio y categoría son requeridos");
       return;
     }
-    setLoading(true);
-    try {
-      const fd = new FormData();
-      Object.entries(form).forEach(([k, v]) => {
-        if (v !== "") fd.append(k, v);
-      });
-      if (imageFile) fd.append("image", imageFile);
-      const { data } = await api.post("/products", fd);
-      setSuccess(data?.message || "Producto creado");
+
+    const fd = new FormData();
+    Object.entries(form).forEach(([k, v]) => {
+      if (v !== "") fd.append(k, v);
+    });
+    if (imageFile) fd.append("image", imageFile);
+
+    const result = await createProduct(fd);
+
+    if (result.success) {
+      setSuccess(result.data?.message || "Producto creado");
       setForm({
         name: "",
         description: "",
@@ -56,10 +52,8 @@ export default function AdminInsert() {
         category_id: "",
       });
       setImageFile(null);
-    } catch (err) {
-      setError(err?.response?.data?.message || "Error al crear producto");
-    } finally {
-      setLoading(false);
+    } else {
+      setError(result.error);
     }
   };
 
@@ -68,6 +62,7 @@ export default function AdminInsert() {
       <h3>Agregar producto</h3>
       {error && <div className="profile-error">{error}</div>}
       {success && <div className="profile-success">{success}</div>}
+
       <form onSubmit={submit} className="iud-products-admin">
         <label>Nombre</label>
         <input name="name" value={form.name} onChange={onChange} required />
@@ -123,8 +118,8 @@ export default function AdminInsert() {
           {imageFile && <div>✓ {imageFile.name}</div>}
         </div>
 
-        <button className="btn-primary-admin" disabled={loading}>
-          {loading ? "Creando..." : "Crear"}
+        <button className="btn-primary-admin" disabled={isLoading}>
+          {isLoading ? "Creando..." : "Crear"}
         </button>
       </form>
     </section>

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import api from "../../../../services/api";
+import { useAuthStore } from "../../../auth/stores/authStore";
+import { useOrdersStore } from "../../../orders/stores/ordersStore";
 import "./ProfileOrders.css";
 
 export default function ProfileOrders() {
@@ -8,12 +9,22 @@ export default function ProfileOrders() {
   const [searchParams] = useSearchParams();
   const paymentStatus = searchParams.get("payment");
   const orderId = searchParams.get("order_id");
-  const [orders, setOrders] = useState([]);
+
+  const { isAuthenticated } = useAuthStore();
+  const {
+    orders,
+    fetchOrders,
+    fetchOrderById,
+    cancelOrder,
+    createPaymentPreference,
+    isLoading,
+    error,
+  } = useOrdersStore();
+
   const [expandedOrder, setExpandedOrder] = useState(null);
   const [orderDetails, setOrderDetails] = useState({});
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
+
   const BACKEND_ORIGIN = import.meta.env.VITE_BACKEND_URL
     ? import.meta.env.VITE_BACKEND_URL.replace(/\/$/, "")
     : "";
@@ -32,10 +43,8 @@ export default function ProfileOrders() {
     return `${BACKEND_ORIGIN}${src.startsWith("/") ? "" : "/"}${src}`;
   };
 
-  // Obtener las órdenes del usuario
   useEffect(() => {
-    const token = sessionStorage.getItem("authToken");
-    if (!token) {
+    if (!isAuthenticated) {
       navigate("/login");
       return;
     }
@@ -54,28 +63,9 @@ export default function ProfileOrders() {
       }, 5000);
     }
 
-    const fetchOrders = async () => {
-      try {
-        setLoading(true);
-        setError("");
-        const { data } = await api.get("/orders");
-        setOrders(Array.isArray(data?.orders) ? data.orders : []);
-      } catch (e) {
-        if (e?.response?.status === 401) {
-          sessionStorage.removeItem("authToken");
-          sessionStorage.removeItem("authUser");
-          navigate("/login");
-          return;
-        }
-        setError(e?.response?.data?.message || "Error al obtener órdenes");
-      } finally {
-        setLoading(false);
-      }
-    };
     fetchOrders();
-  }, [navigate, paymentStatus, orderId]);
+  }, [isAuthenticated, navigate, paymentStatus, orderId, fetchOrders]);
 
-  // Expandir o colapsar pedido
   const toggleOrderDetails = async (orderId) => {
     if (expandedOrder === orderId) {
       setExpandedOrder(null);
@@ -83,14 +73,15 @@ export default function ProfileOrders() {
     }
 
     if (!orderDetails[orderId]) {
-      try {
-        const { data } = await api.get(`/orders/${orderId}`);
+      const result = await fetchOrderById(orderId);
+
+      if (result.success) {
         setOrderDetails((prev) => ({
           ...prev,
-          [orderId]: data.order,
+          [orderId]: result.data,
         }));
-      } catch (err) {
-        console.error("Error al obtener detalles:", err);
+      } else {
+        console.error("Error al obtener detalles:", result.error);
       }
     }
 
@@ -98,48 +89,32 @@ export default function ProfileOrders() {
   };
 
   const continuePayment = async (orderId) => {
-    try {
-      const { data } = await api.post("/payments/create-preference", {
-        order_id: orderId,
-      });
-      // mercado pago puede devolver init_point o preference.init_point según SDK/version
-      const url =
-        data?.init_point || data?.preference?.init_point || data?.payment_url;
-      if (url) {
-        window.location.href = url;
-      } else {
-        alert("No se pudo obtener la URL de pago.");
-      }
-    } catch (err) {
-      console.error(err);
-      alert(
-        err?.response?.data?.message || "Error al crear preferencia de pago",
-      );
+    const result = await createPaymentPreference(orderId);
+
+    if (result.success) {
+      window.location.href = result.url;
+    } else {
+      alert(result.error || "No se pudo obtener la URL de pago.");
     }
   };
 
-  const cancelOrder = async (orderId) => {
+  const handleCancelOrder = async (orderId) => {
     const ok = window.confirm(
       "¿Seguro querés cancelar este pedido? Esta acción no se puede deshacer.",
     );
     if (!ok) return;
 
-    try {
-      const { data } = await api.patch(`/orders/${orderId}/cancel`, {});
+    const result = await cancelOrder(orderId);
 
-      // actualizar lista localmente
-      setOrders((prev) =>
-        prev.map((o) => (o.id === orderId ? { ...o, ...data.order } : o)),
-      );
-
-      // si ya tenemos detalles cargados, actualizarlos también
-      setOrderDetails((prev) => {
-        if (!prev[orderId]) return prev;
-        return { ...prev, [orderId]: { ...prev[orderId], ...data.order } };
-      });
-    } catch (err) {
-      console.error("Error al cancelar pedido:", err);
-      alert(err?.response?.data?.message || "No se pudo cancelar el pedido");
+    if (result.success) {
+      if (orderDetails[orderId]) {
+        setOrderDetails((prev) => ({
+          ...prev,
+          [orderId]: { ...prev[orderId], ...result.data.order },
+        }));
+      }
+    } else {
+      alert(result.error || "No se pudo cancelar el pedido");
     }
   };
 
@@ -163,7 +138,7 @@ export default function ProfileOrders() {
                   <button onClick={() => continuePayment(o.id)}>
                     Continuar pago
                   </button>
-                  <button onClick={() => cancelOrder(o.id)}>
+                  <button onClick={() => handleCancelOrder(o.id)}>
                     Cancelar pedido
                   </button>
                   <small>Pedido pendiente — se cancelará en ~10 min</small>
@@ -174,10 +149,10 @@ export default function ProfileOrders() {
       )}
 
       {successMessage && <div className="orders-success">{successMessage}</div>}
-      {loading && <p>Cargando pedidos…</p>}
+      {isLoading && <p>Cargando pedidos…</p>}
       {error && <div className="orders-error">{error}</div>}
 
-      {!loading &&
+      {!isLoading &&
         !error &&
         (orders.length === 0 ? (
           <p>No tienes pedidos todavía.</p>

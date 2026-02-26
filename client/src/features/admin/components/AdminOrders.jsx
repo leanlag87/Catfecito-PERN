@@ -1,13 +1,14 @@
 import { useEffect, useState } from "react";
+import { useAdminStore } from "../stores/adminStore";
 import api from "../../../services/api";
-import "../profileComponents/ProfileOrders.css";
+import "../../profile/components/ProfileOrders/ProfileOrders.css";
 
 export default function AdminOrders() {
-  const [orders, setOrders] = useState([]);
+  const { allOrders, fetchAllOrders, isLoading, error } = useAdminStore();
+
   const [expandedOrder, setExpandedOrder] = useState(null);
   const [orderDetails, setOrderDetails] = useState({});
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+
   const BACKEND_ORIGIN = import.meta.env.VITE_BACKEND_URL
     ? import.meta.env.VITE_BACKEND_URL.replace(/\/$/, "")
     : "";
@@ -27,29 +28,18 @@ export default function AdminOrders() {
   };
 
   useEffect(() => {
-    const fetchOrders = async () => {
-      try {
-        setLoading(true);
-        setError("");
-        const { data } = await api.get("/orders/admin/all");
-        setOrders(Array.isArray(data?.orders) ? data.orders : []);
-      } catch (e) {
-        setError(e?.response?.data?.message || "Error al obtener órdenes");
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchOrders();
-  }, []);
+    fetchAllOrders();
+  }, [fetchAllOrders]);
 
   const toggleOrderDetails = async (orderId) => {
     if (expandedOrder === orderId) {
       setExpandedOrder(null);
       return;
     }
+
     if (!orderDetails[orderId]) {
       try {
-        const { data } = await api.get(`/orders/admin/${orderId}`);
+        const { data } = await api.orders.getById(orderId);
         setOrderDetails((prev) => ({
           ...prev,
           [orderId]: data.order,
@@ -58,6 +48,7 @@ export default function AdminOrders() {
         console.error("Error al obtener detalles:", err);
       }
     }
+
     setExpandedOrder(orderId);
   };
 
@@ -66,15 +57,17 @@ export default function AdminOrders() {
       <div className="orders-header">
         <h2>Pedidos de usuarios</h2>
       </div>
-      {loading && <p>Cargando pedidos…</p>}
+
+      {isLoading && <p>Cargando pedidos…</p>}
       {error && <div className="orders-error">{error}</div>}
-      {!loading &&
+
+      {!isLoading &&
         !error &&
-        (orders.length === 0 ? (
+        (allOrders.length === 0 ? (
           <p>No hay pedidos todavía.</p>
         ) : (
           <ul className="orders-list">
-            {orders.map((o) => (
+            {allOrders.map((o) => (
               <li key={o.id} className="disponsal-item">
                 <div className="disponsal-summary">
                   <div>
@@ -108,6 +101,7 @@ export default function AdminOrders() {
                     </span>
                   </div>
                 </div>
+
                 {expandedOrder === o.id && (
                   <div className="order-details">
                     {orderDetails[o.id] ? (
@@ -121,6 +115,7 @@ export default function AdminOrders() {
                           <p>{orderDetails[o.id].shipping_zip}</p>
                           <p>Tel: {orderDetails[o.id].shipping_phone}</p>
                         </div>
+
                         <div className="purchase-info">
                           <h4>Datos de la compra</h4>
                           <ul className="purchase-list">

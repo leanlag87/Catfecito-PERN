@@ -1,8 +1,11 @@
 import { useState, useEffect } from "react";
-import api from "../../../services/api";
-import "../../pages/admin/AdminProfile.css";
+import { useAdminStore } from "../stores/adminStore";
+import "./AdminProfile.css";
 
 export default function AdminUpdate() {
+  const { products, fetchAllProducts, updateProduct, isLoading } =
+    useAdminStore();
+
   const [id, setId] = useState("");
   const [product, setProduct] = useState(null);
   const [payload, setPayload] = useState({
@@ -12,103 +15,78 @@ export default function AdminUpdate() {
     description: "",
   });
   const [imageFile, setImageFile] = useState(null);
-  const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
-  const [messageType, setMessageType] = useState(""); // 'success' | 'error'
+  const [messageType, setMessageType] = useState("");
   const [loadingProduct, setLoadingProduct] = useState(false);
-  const [productsList, setProductsList] = useState([]);
 
-  const update = async (e) => {
-    e.preventDefault();
-    setMessage("");
-    if (!id) {
-      setMessage("Id requerido");
-      return;
-    }
-    setLoading(true);
-    try {
-      let body;
-
-      if (imageFile) {
-        // Si hay imagen, usar FormData
-        body = new FormData();
-        Object.keys(payload).forEach((k) => {
-          if (payload[k] !== "") body.append(k, payload[k]);
-        });
-        body.append("image", imageFile);
-        console.log("Enviando con imagen:", imageFile.name);
-      } else {
-        // Sin imagen, usar objeto JSON
-        body = {};
-        Object.keys(payload).forEach((k) => {
-          if (payload[k] !== "") body[k] = payload[k];
-        });
-        console.log("Enviando sin imagen");
-      }
-
-      const { data } = await api.put(`/products/${id}`, body);
-      setMessage(data?.message || "Producto actualizado");
-      setMessageType("success");
-      setImageFile(null);
-    } catch (err) {
-      console.error("Error al actualizar:", err);
-      setMessage(err?.response?.data?.message || "Error al actualizar");
-      setMessageType("error");
-    } finally {
-      setLoading(false);
-    }
-  };
+  useEffect(() => {
+    fetchAllProducts();
+  }, [fetchAllProducts]);
 
   const loadProduct = async () => {
     if (!id) return setMessage("Selecciona un producto");
     setMessage("");
     setLoadingProduct(true);
-    try {
-      const { data } = await api.get(`/products/${id}`);
-      const p = data?.product || null;
-      setProduct(p);
+
+    const selectedProduct = products.find((p) => p.id === parseInt(id));
+
+    if (selectedProduct) {
+      setProduct(selectedProduct);
       setImageFile(null);
-      if (p) {
-        setPayload({
-          name: p.name || "",
-          price: p.price != null ? String(p.price) : "",
-          stock: p.stock != null ? String(p.stock) : "",
-          description: p.description || "",
-        });
-      }
-    } catch (err) {
-      setMessage(
-        err?.response?.data?.message || "No se pudo cargar el producto",
-      );
+      setPayload({
+        name: selectedProduct.name || "",
+        price:
+          selectedProduct.price != null ? String(selectedProduct.price) : "",
+        stock:
+          selectedProduct.stock != null ? String(selectedProduct.stock) : "",
+        description: selectedProduct.description || "",
+      });
+    } else {
+      setMessage("No se pudo cargar el producto");
       setMessageType("error");
       setProduct(null);
-    } finally {
-      setLoadingProduct(false);
+    }
+
+    setLoadingProduct(false);
+  };
+
+  const update = async (e) => {
+    e.preventDefault();
+    setMessage("");
+
+    if (!id) {
+      setMessage("Id requerido");
+      return;
+    }
+
+    let body;
+
+    if (imageFile) {
+      body = new FormData();
+      Object.keys(payload).forEach((k) => {
+        if (payload[k] !== "") body.append(k, payload[k]);
+      });
+      body.append("image", imageFile);
+    } else {
+      body = {};
+      Object.keys(payload).forEach((k) => {
+        if (payload[k] !== "") body[k] = payload[k];
+      });
+    }
+
+    const result = await updateProduct(id, body);
+
+    if (result.success) {
+      setMessage(result.data?.message || "Producto actualizado");
+      setMessageType("success");
+      setImageFile(null);
+    } else {
+      setMessage(result.error);
+      setMessageType("error");
     }
   };
 
   const onFile = (e) => setImageFile(e.target.files?.[0] || null);
-
-  useEffect(() => {
-    // Cargar lista de productos para el select
-    let mounted = true;
-    (async () => {
-      try {
-        const { data } = await api.get("/products");
-        const list = Array.isArray(data?.products)
-          ? data.products
-          : Array.isArray(data)
-            ? data
-            : [];
-        if (mounted) setProductsList(list);
-      } catch (e) {
-        console.error("No se pudo cargar lista de productos", e);
-      }
-    })();
-    return () => {
-      mounted = false;
-    };
-  }, []);
 
   return (
     <section className="profile-card-admin">
@@ -126,19 +104,15 @@ export default function AdminUpdate() {
           {message}
         </div>
       )}
+
       <form onSubmit={update} className="iud-products-admin">
         <div>
           <label>Producto</label>
           <div className="product-select-update">
             <div>
-              <select
-                value={id}
-                onChange={(e) => {
-                  setId(e.target.value);
-                }}
-              >
+              <select value={id} onChange={(e) => setId(e.target.value)}>
                 <option value="">-- Selecciona un producto --</option>
-                {productsList.map((p) => (
+                {products.map((p) => (
                   <option key={p.id} value={p.id}>
                     {p.name} {p.stock != null ? `(${p.stock})` : ""}
                   </option>
@@ -224,8 +198,8 @@ export default function AdminUpdate() {
           {imageFile && <div>✓ {imageFile.name}</div>}
         </div>
 
-        <button className="btn-primary-admin" disabled={loading}>
-          {loading ? "Actualizando..." : "Actualizar"}
+        <button className="btn-primary-admin" disabled={isLoading}>
+          {isLoading ? "Actualizando..." : "Actualizar"}
         </button>
       </form>
     </section>

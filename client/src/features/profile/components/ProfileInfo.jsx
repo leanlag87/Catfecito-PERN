@@ -1,47 +1,36 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuthStore } from "../../auth/stores/authStore";
+import { useProfileStore } from "../stores/profileStore";
 import api from "../../../services/api";
-import "../../pages/profile/Profile.css";
+import "./Profile.css";
 
 export default function ProfileInfo() {
   const navigate = useNavigate();
-  const [user, setUser] = useState(null);
+
+  const { isAuthenticated, logout } = useAuthStore();
+  const { profile, isLoading, error: profileError } = useProfileStore();
+
   const [error, setError] = useState("");
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
   useEffect(() => {
-    const token = sessionStorage.getItem("authToken");
-    if (!token) {
+    if (!isAuthenticated) {
       navigate("/login");
-      return;
     }
-
-    const load = async () => {
-      try {
-        const { data } = await api.get("/users/profile");
-        setUser(data?.user || null);
-      } catch (e) {
-        if (e?.response?.status === 401) {
-          sessionStorage.removeItem("authToken");
-          sessionStorage.removeItem("authUser");
-          navigate("/login");
-          return;
-        }
-        setError(e?.response?.data?.message || "Error al cargar el perfil");
-      }
-    };
-    load();
-  }, [navigate]);
+  }, [isAuthenticated, navigate]);
 
   const handleChangePassword = async (e) => {
     e.preventDefault();
     setError("");
+
     if (newPassword.length < 8) {
       setError("La nueva contraseña debe tener al menos 8 caracteres");
       return;
     }
+
     if (newPassword !== confirmPassword) {
       setError("Las contraseñas nuevas no coinciden");
       return;
@@ -52,6 +41,7 @@ export default function ProfileInfo() {
         currentPassword,
         newPassword,
       });
+
       alert(data?.message || "Contraseña actualizada");
       setCurrentPassword("");
       setNewPassword("");
@@ -61,31 +51,33 @@ export default function ProfileInfo() {
     }
   };
 
-  const handleLogout = async () => {
-    try {
-      await api.post("/auth/logout", {});
-    } catch {
-      // ignorar errores de logout
-    } finally {
-      sessionStorage.removeItem("authToken");
-      sessionStorage.removeItem("authUser");
-      navigate("/");
-    }
+  const handleLogout = () => {
+    logout();
   };
+
+  const displayError = error || profileError;
+
+  if (isLoading) {
+    return (
+      <section className="profile-card">
+        <p>Cargando perfil...</p>
+      </section>
+    );
+  }
 
   return (
     <>
       <section className="profile-card">
-        {error && <div className="profile-error">{error}</div>}
-        {user ? (
+        {displayError && <div className="profile-error">{displayError}</div>}
+        {profile ? (
           <div className="profile-fields">
             <div className="field">
               <div className="field-label">Nombre</div>
-              <div className="field-value">{user.name}</div>
+              <div className="field-value">{profile.name}</div>
             </div>
             <div className="field">
               <div className="field-label">Correo electrónico</div>
-              <div className="field-value">{user.email}</div>
+              <div className="field-value">{profile.email}</div>
             </div>
           </div>
         ) : (
@@ -104,6 +96,7 @@ export default function ProfileInfo() {
             value={currentPassword}
             onChange={(e) => setCurrentPassword(e.target.value)}
             required
+            autoComplete="current-password"
           />
 
           <label>Nueva contraseña</label>
@@ -112,6 +105,8 @@ export default function ProfileInfo() {
             value={newPassword}
             onChange={(e) => setNewPassword(e.target.value)}
             required
+            minLength={8}
+            autoComplete="new-password"
           />
 
           <label>Confirmar nueva contraseña</label>
@@ -120,13 +115,15 @@ export default function ProfileInfo() {
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
             required
+            minLength={8}
+            autoComplete="new-password"
           />
 
           <button type="submit" className="btn-primary">
             Actualizar contraseña
           </button>
         </form>
-        <div class="cerrar-sesion-row">
+        <div className="cerrar-sesion-row">
           <button type="button" className="btn-danger" onClick={handleLogout}>
             Cerrar sesión
           </button>

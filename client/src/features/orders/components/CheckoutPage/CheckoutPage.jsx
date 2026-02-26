@@ -1,17 +1,26 @@
 import { useMemo, useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { UserHeader } from "../../../../components/usersComponents/UserHeader";
-import MetaData from "../../components/ui/MetaData/MetaData";
+import { useAuthStore } from "../../../auth/stores/authStore";
+import { useCartStore } from "../../../cart/stores/cartStore";
+import { useOrdersStore } from "../../stores/ordersStore";
+import { useProfileStore } from "../../../profile/stores/profileStore";
+import { UserHeader } from "../../../../shared/components/UserHeader/UserHeader";
+import MetaData from "../../../../shared/components/MetaData/MetaData";
 import api from "../../../../services/api";
 import { CheckoutButton } from "../CheckoutButton/CheckoutButton";
-import "../../components/checkoutPageComponent/CheckoutButton.css";
 import "./CheckoutPage.css";
 
-export const CheckoutPage = ({ cartItems = [], subtotal = 0 }) => {
+export const CheckoutPage = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const paymentStatus = searchParams.get("payment");
   const orderId = searchParams.get("order_id");
+
+  const { isAuthenticated } = useAuthStore();
+  const { items: cartItems, subtotal } = useCartStore();
+  const { createOrder, createPaymentPreference } = useOrdersStore();
+  const { profile, updateProfile } = useProfileStore();
+
   const [form, setForm] = useState({
     country: "Argentina",
     firstName: "",
@@ -23,102 +32,74 @@ export const CheckoutPage = ({ cartItems = [], subtotal = 0 }) => {
     state: "Buenos Aires",
     phone: "",
   });
+
   const [isCreatingOrder, setIsCreatingOrder] = useState(false);
   const [preferenceId, setPreferenceId] = useState(null);
   const [error, setError] = useState("");
   const [isLoadingAddress, setIsLoadingAddress] = useState(true);
-  const [saveAddress, setSaveAddress] = useState(false); // Checkbox para guardar dirección
+  const [saveAddress, setSaveAddress] = useState(false);
 
   const total = useMemo(() => subtotal, [subtotal]);
+
   const BACKEND_ORIGIN = import.meta.env.VITE_BACKEND_URL
     ? import.meta.env.VITE_BACKEND_URL.replace(/\/$/, "")
     : "";
-  const getToken = () =>
-    (
-      sessionStorage.getItem("authToken") ||
-      sessionStorage.getItem("token") ||
-      ""
-    )
-      .toString()
-      .trim();
 
-  // Traemos imagenes de los items del carrito
   const getItemImageSrc = (it) => {
     if (!it) return "";
     let v = it.image ?? it.image_url ?? "";
-    // Si es un objeto con propiedad url
     if (v && typeof v === "object" && typeof v.url === "string") {
       v = v.url;
     }
     if (typeof v !== "string") return "";
     const src = v.trim();
     if (!src) return "";
-    // Aceptar URLs absolutas y data URLs
     if (src.startsWith("http") || src.startsWith("data:")) return src;
-    // Asegurarse de que BACKEND_ORIGIN exista antes de la concatenación
     if (!BACKEND_ORIGIN) return src;
     return `${BACKEND_ORIGIN}${src.startsWith("/") ? "" : "/"}${src}`;
   };
-  // Manejar retorno de pago fallido
+
   useEffect(() => {
+    if (!isAuthenticated) {
+      navigate("/login");
+      return;
+    }
+
     if (paymentStatus === "failure" && orderId) {
-      setError(
-        "❌ El pago no se pudo completar. Por favor, intenta nuevamente.",
-      );
-      // Limpiar parámetros de URL
+      setError("El pago no se pudo completar. Por favor, intenta nuevamente.");
       window.history.replaceState({}, "", "/checkout");
     }
-    // Si el pago fue exitoso, redirigir a mis órdenes
+
     if (paymentStatus === "success") {
       navigate("/profile/orders?payment=success&order_id=" + orderId);
     }
-  }, [paymentStatus, orderId, navigate]);
+  }, [paymentStatus, orderId, navigate, isAuthenticated]);
 
-  // Cargar dirección predeterminada del usuario
   useEffect(() => {
-    const loadUserAddress = async () => {
-      const token = getToken();
-      if (!token) {
-        setIsLoadingAddress(false);
-        return;
-      }
+    if (!profile) {
+      setIsLoadingAddress(false);
+      return;
+    }
 
-      try {
-        const response = await api.get("/users/profile");
+    const nameParts = (profile.name || "").trim().split(" ");
+    const firstName = nameParts[0] || "";
+    const lastName = nameParts.slice(1).join(" ") || "";
 
-        const data = response.data;
-        const user = data?.user;
+    setForm({
+      country: profile.default_country || "Argentina",
+      firstName: firstName,
+      lastName: lastName,
+      address: profile.default_address || "",
+      address2: profile.default_address2 || "",
+      zip: profile.default_zip || "",
+      city: profile.default_city || "",
+      state: profile.default_state || "Buenos Aires",
+      phone: profile.default_phone || "",
+    });
 
-        // Autocompletar formulario con dirección guardada
-        if (user) {
-          // Extraer nombre y apellido del campo "name"
-          const nameParts = (user.name || "").trim().split(" ");
-          const firstName = nameParts[0] || "";
-          const lastName = nameParts.slice(1).join(" ") || "";
+    setIsLoadingAddress(false);
+  }, [profile]);
 
-          setForm({
-            country: user.default_country || "Argentina",
-            firstName: firstName,
-            lastName: lastName,
-            address: user.default_address || "",
-            address2: user.default_address2 || "",
-            zip: user.default_zip || "",
-            city: user.default_city || "",
-            state: user.default_state || "Buenos Aires",
-            phone: user.default_phone || "",
-          });
-        }
-      } catch (err) {
-        console.error("Error cargando dirección:", err);
-      } finally {
-        setIsLoadingAddress(false);
-      }
-    };
-
-    loadUserAddress();
-  }, [navigate]);
-
-  // Verificar si el formulario está completo para mostrar el botón de pago
   const isFormComplete = useMemo(() => {
     return !!(
       form.firstName &&
@@ -135,15 +116,10 @@ export const CheckoutPage = ({ cartItems = [], subtotal = 0 }) => {
     const { name, value } = e.target;
     setForm((f) => ({ ...f, [name]: value }));
 
-    // Si ya se creó una orden, resetear el proceso al cambiar datos
-    // PERO solo si el usuario realmente modifica algo importante (no solo al tipear)
     if (preferenceId) {
       console.warn(
-        "⚠️ Se modificaron datos después de crear la orden. Considera resetear.",
+        " Se modificaron datos después de crear la orden. Considera resetear.",
       );
-      // Opcional: descomentar para forzar reset
-      // setPreferenceId(null);
-      // setError('Datos modificados. Por favor, crea una nueva orden.');
     }
   };
 
@@ -151,7 +127,6 @@ export const CheckoutPage = ({ cartItems = [], subtotal = 0 }) => {
     e.preventDefault();
     setError("");
 
-    // Validar campos requeridos
     if (
       !form.firstName ||
       !form.lastName ||
@@ -168,13 +143,6 @@ export const CheckoutPage = ({ cartItems = [], subtotal = 0 }) => {
       return;
     }
 
-    const token = getToken();
-    if (!token) {
-      setError("Debes iniciar sesión para continuar.");
-      return;
-    }
-
-    // Si ya existe una preferencia, no crear otra
     if (preferenceId) {
       return;
     }
@@ -182,26 +150,23 @@ export const CheckoutPage = ({ cartItems = [], subtotal = 0 }) => {
     setIsCreatingOrder(true);
 
     try {
-      // 1. Guardar dirección si el usuario lo solicitó
+      // Guardar dirección si el usuario lo solicitó
       if (saveAddress) {
-        try {
-          await api.put("/users/address", {
-            default_country: form.country,
-            default_address: form.address,
-            default_address2: form.address2,
-            default_city: form.city,
-            default_state: form.state,
-            default_zip: form.zip,
-            default_phone: form.phone,
-          });
-          // No mostrar error si falla guardar dirección, continuar con la orden
-        } catch (e) {
+        await updateProfile({
+          default_country: form.country,
+          default_address: form.address,
+          default_address2: form.address2,
+          default_city: form.city,
+          default_state: form.state,
+          default_zip: form.zip,
+          default_phone: form.phone,
+        }).catch((e) => {
           console.log("No se pudo guardar la dirección (continuando):", e);
-        }
+        });
       }
 
-      // 2. Crear orden con dirección completa
-      const orderResp = await api.post("/orders", {
+      // Crear orden con el store
+      const orderResult = await createOrder({
         shipping_first_name: form.firstName,
         shipping_last_name: form.lastName,
         shipping_country: form.country,
@@ -213,17 +178,28 @@ export const CheckoutPage = ({ cartItems = [], subtotal = 0 }) => {
         shipping_phone: form.phone,
       });
 
-      const orderData = orderResp.data;
-      const createdOrderId = orderData?.order?.id;
+      if (!orderResult.success) {
+        throw new Error(orderResult.error || "Error al crear la orden");
+      }
+
+      const createdOrderId = orderResult.data?.order?.id;
       if (!createdOrderId) throw new Error("No se obtuvo el ID de la orden");
 
-      // 2. Crear preferencia de MercadoPago
-      const prefResp = await api.post("/payments/create-preference", {
+      // Crear preferencia de pago con el store
+      const paymentResult = await createPaymentPreference(createdOrderId);
+
+      if (!paymentResult.success) {
+        throw new Error(
+          paymentResult.error || "Error al crear preferencia de pago",
+        );
+      }
+
+      // Extraer preference_id de la respuesta
+      const prefData = await api.post("/payments/create-preference", {
         order_id: createdOrderId,
       });
 
-      const prefData = prefResp.data;
-      setPreferenceId(prefData.preference_id);
+      setPreferenceId(prefData.data.preference_id);
     } catch (err) {
       setError(err.message || "Error al procesar el pago");
       console.error("Error en checkout:", err);
@@ -438,7 +414,6 @@ export const CheckoutPage = ({ cartItems = [], subtotal = 0 }) => {
                       onError={(err) => {
                         console.error("Error en CheckoutButton:", err);
                         setError(err?.message || "Error en el botón de pago");
-                        // Permitir reintentar limpiando el preferenceId
                         setPreferenceId(null);
                       }}
                     />
