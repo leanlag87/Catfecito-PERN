@@ -1,8 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useAuthStore } from "../../../auth/stores/authStore";
-import { useProfileStore } from "../../stores/profileStore";
-import api from "../../../../services/api";
+import { useOrdersStore } from "../../../orders/stores/ordersStore";
 import "./ProfileOrders.css";
 
 export default function ProfileOrders() {
@@ -15,9 +14,12 @@ export default function ProfileOrders() {
   const {
     orders,
     fetchOrders,
+    fetchOrderById,
+    cancelOrder,
+    createPaymentPreference,
     isLoading,
-    error: profileError,
-  } = useProfileStore();
+    error,
+  } = useOrdersStore();
 
   const [expandedOrder, setExpandedOrder] = useState(null);
   const [orderDetails, setOrderDetails] = useState({});
@@ -71,14 +73,15 @@ export default function ProfileOrders() {
     }
 
     if (!orderDetails[orderId]) {
-      try {
-        const { data } = await api.get(`/orders/${orderId}`);
+      const result = await fetchOrderById(orderId);
+
+      if (result.success) {
         setOrderDetails((prev) => ({
           ...prev,
-          [orderId]: data.order,
+          [orderId]: result.data,
         }));
-      } catch (err) {
-        console.error("Error al obtener detalles:", err);
+      } else {
+        console.error("Error al obtener detalles:", result.error);
       }
     }
 
@@ -86,45 +89,32 @@ export default function ProfileOrders() {
   };
 
   const continuePayment = async (orderId) => {
-    try {
-      const { data } = await api.post("/payments/create-preference", {
-        order_id: orderId,
-      });
-      const url =
-        data?.init_point || data?.preference?.init_point || data?.payment_url;
-      if (url) {
-        window.location.href = url;
-      } else {
-        alert("No se pudo obtener la URL de pago.");
-      }
-    } catch (err) {
-      console.error(err);
-      alert(
-        err?.response?.data?.message || "Error al crear preferencia de pago",
-      );
+    const result = await createPaymentPreference(orderId);
+
+    if (result.success) {
+      window.location.href = result.url;
+    } else {
+      alert(result.error || "No se pudo obtener la URL de pago.");
     }
   };
 
-  const cancelOrder = async (orderId) => {
+  const handleCancelOrder = async (orderId) => {
     const ok = window.confirm(
       "¿Seguro querés cancelar este pedido? Esta acción no se puede deshacer.",
     );
     if (!ok) return;
 
-    try {
-      const { data } = await api.patch(`/orders/${orderId}/cancel`, {});
+    const result = await cancelOrder(orderId);
 
-      await fetchOrders();
-
+    if (result.success) {
       if (orderDetails[orderId]) {
         setOrderDetails((prev) => ({
           ...prev,
-          [orderId]: { ...prev[orderId], ...data.order },
+          [orderId]: { ...prev[orderId], ...result.data.order },
         }));
       }
-    } catch (err) {
-      console.error("Error al cancelar pedido:", err);
-      alert(err?.response?.data?.message || "No se pudo cancelar el pedido");
+    } else {
+      alert(result.error || "No se pudo cancelar el pedido");
     }
   };
 
@@ -148,7 +138,7 @@ export default function ProfileOrders() {
                   <button onClick={() => continuePayment(o.id)}>
                     Continuar pago
                   </button>
-                  <button onClick={() => cancelOrder(o.id)}>
+                  <button onClick={() => handleCancelOrder(o.id)}>
                     Cancelar pedido
                   </button>
                   <small>Pedido pendiente — se cancelará en ~10 min</small>
@@ -160,10 +150,10 @@ export default function ProfileOrders() {
 
       {successMessage && <div className="orders-success">{successMessage}</div>}
       {isLoading && <p>Cargando pedidos…</p>}
-      {profileError && <div className="orders-error">{profileError}</div>}
+      {error && <div className="orders-error">{error}</div>}
 
       {!isLoading &&
-        !profileError &&
+        !error &&
         (orders.length === 0 ? (
           <p>No tienes pedidos todavía.</p>
         ) : (
