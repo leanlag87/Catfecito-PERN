@@ -1,20 +1,29 @@
 import { useEffect } from "react";
 import { useNavigate, Outlet } from "react-router-dom";
-import { UserHeader } from "../../../../components/usersComponents/UserHeader";
+import { useAuthStore } from "../../../auth/stores/authStore";
+import { useProfileStore } from "../../stores/profileStore";
+import { UserHeader } from "../../../../shared/components/UserHeader/UserHeader";
 import ProfileNav from "../ProfileNav";
-import MetaData from "../../components/ui/MetaData/MetaData";
+import MetaData from "../../../../shared/components/MetaData/MetaData";
 import "./Profile.css";
 
 export const Profile = () => {
   const navigate = useNavigate();
 
+  const { isAuthenticated } = useAuthStore();
+  const { fetchProfile, fetchAddresses, fetchOrders } = useProfileStore();
+
   useEffect(() => {
-    const token = sessionStorage.getItem("authToken");
-    if (!token) {
+    if (!isAuthenticated) {
       navigate("/login");
       return;
     }
-  }, [navigate]);
+
+    // Cargar datos del perfil cuando se monta el componente
+    fetchProfile();
+    fetchAddresses();
+    fetchOrders();
+  }, [isAuthenticated, navigate, fetchProfile, fetchAddresses, fetchOrders]);
 
   return (
     <>
