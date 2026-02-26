@@ -1,26 +1,27 @@
 import { useEffect } from "react";
 import { useNavigate, Outlet } from "react-router-dom";
-import { UserHeader } from "../../../../components/usersComponents/UserHeader";
-import MetaData from "../../components/ui/MetaData/MetaData";
-import "./AdminProfile.css";
+import { useAuthStore } from "../../../auth/stores/authStore";
+import { UserHeader } from "../../../../shared/components/UserHeader/UserHeader";
+import MetaData from "../../../../shared/components/MetaData/MetaData";
 import AdminNav from "../AdminNav";
+import "./AdminProfile.css";
 
 export const AdminProfile = () => {
   const navigate = useNavigate();
-  // estado mínimo en este layout, los formularios están en admincomponents/
+
+  const { isAuthenticated, user } = useAuthStore();
 
   useEffect(() => {
-    // Require auth token to access admin panel
-    const token = sessionStorage.getItem("authToken");
-    if (!token) {
+    if (!isAuthenticated) {
       navigate("/login");
       return;
     }
 
-    // No cargamos datos aquí: cada subcomponente carga lo que necesite
-  }, [navigate]);
-
-  // Los subformularios realizan sus propias llamadas
+    if (user?.role !== "admin") {
+      navigate("/");
+      return;
+    }
+  }, [isAuthenticated, user, navigate]);
 
   return (
     <>
@@ -31,7 +32,6 @@ export const AdminProfile = () => {
           <h1 className="profile-title-admin">Panel de Admin</h1>
           <AdminNav />
           <div style={{ marginTop: 8 }}>
-            {/* Outlet para subrutas: insert / update / delete */}
             <Outlet />
           </div>
         </div>
