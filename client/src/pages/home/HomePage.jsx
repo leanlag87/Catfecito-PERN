@@ -2,12 +2,12 @@ import "../../styles/CustomBar.css";
 import "../../styles/index.css";
 import "../../styles/App.css";
 import "animate.css";
-import MetaData from "../../components/ui/MetaData/MetaData";
+import MetaData from "../../shared/components/MetaData/MetaData";
 
 import { NavBar } from "../../shared/components/NavBar/NavBar";
 import { Header } from "../../shared/components/Header/Header";
-import { Banner } from "../../components/CustomBarComponents/Banner";
-import { Footer } from "../../components/FooterComponent/Footer";
+import { Banner } from "../../shared/components/Banner/Banner";
+import { Footer } from "../../shared/components/Footer/Footer";
 
 export const HomePage = ({
   cartItems,
