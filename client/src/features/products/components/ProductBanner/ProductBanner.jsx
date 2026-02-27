@@ -1,5 +1,5 @@
 import "./ProductBanner.css";
-import bannerImage from "../../assets/img/CoffeeBeans.jpeg";
+import bannerImage from "../../../../assets/img/CoffeeBeans.jpeg";
 
 export const ProductBanner = () => {
   return (

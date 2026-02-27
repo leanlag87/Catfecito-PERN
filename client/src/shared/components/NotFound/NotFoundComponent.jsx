@@ -1,4 +1,4 @@
-import NotFoundImg from "../../assets/img/404NotFound.png";
+import NotFoundImg from "../../../assets/img/404NotFound.png";
 import "./NotFoundComponent.css";
 
 export const NotFoundComponent = () => {

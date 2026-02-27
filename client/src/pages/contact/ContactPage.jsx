@@ -2,13 +2,13 @@ import { useState } from "react";
 import "../../styles/CustomBar.css";
 import "../../styles/index.css";
 import "../../styles/App.css";
-import "../../components/FooterComponent/Footer.css";
+import "../../shared/components/Footer/Footer.css";
 import "./ContactPage.css";
-import MetaData from "../../components/ui/MetaData/MetaData";
+import MetaData from "../../shared/components/MetaData/MetaData";
 
 import { NavBar } from "../../shared/components/NavBar/NavBar";
 import { Header } from "../../shared/components/Header/Header";
-import { Footer } from "../../components/FooterComponent/Footer";
+import { Footer } from "../../shared/components/Footer/Footer";
 
 export const ContactPage = ({
   cartItems,

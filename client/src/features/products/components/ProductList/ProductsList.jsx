@@ -1,4 +1,4 @@
-import { ProductCard } from "./ProductCard";
+import { ProductCard } from "../ProductCard/ProductCard";
 import "./ProductsList.css";
 
 export const ProductsList = ({ products, onAddToCart = () => {} }) => {

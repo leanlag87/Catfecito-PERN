@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuthStore } from "../stores/authStore";
-import "..Auth.css";
-import logo from "../../assets/img/Group.svg";
+import "./Auth.css";
+import logo from "../../../assets/img/Group.svg";
 
 export const Register = ({ onSwitch, onSuccess }) => {
   const [firstName, setFirstname] = useState("");

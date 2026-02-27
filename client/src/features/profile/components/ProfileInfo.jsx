@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "../../auth/stores/authStore";
 import { useProfileStore } from "../stores/profileStore";
 import api from "../../../services/api";
-import "./Profile.css";
+import "./Profile/Profile.css";
 
 export default function ProfileInfo() {
   const navigate = useNavigate();

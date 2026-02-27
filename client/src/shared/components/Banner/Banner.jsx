@@ -1,9 +1,9 @@
 import { useState } from "react";
-import "./Banner.css";
 import { useNavigate } from "react-router-dom";
-import bannerBackground from "../../assets/img/gato-portada.png";
-import catImg from "../../assets/img/cat.png";
-import logoSvg from "../../assets/img/Group.svg";
+import "./Banner.css";
+import bannerBackground from "../../../assets/img/gato-portada.png";
+import catImg from "../../../assets/img/cat.png";
+import logoSvg from "../../../assets/img/Group.svg";
 
 export const Banner = () => {
   const [currentSlide, setCurrentSlide] = useState(0);

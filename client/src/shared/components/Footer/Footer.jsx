@@ -1,15 +1,15 @@
 import "./Footer.css";
-import logo from "../../assets/img/Group.svg";
-import instagramIcon from "../../assets/img/instagram.svg";
-import facebookIcon from "../../assets/img/facebook.svg";
-import twitterIcon from "../../assets/img/twitterx.png";
-import inicioImg from "../../assets/img/inicio.png";
-import productosImg from "../../assets/img/productos.png";
-import promocionesImg from "../../assets/img/promociones.png";
-import contactoImg from "../../assets/img/contacto.png";
-import faqImg from "../../assets/img/faq.png";
-import entregaImg from "../../assets/img/entrega.png";
-import devolucionesImg from "../../assets/img/devoluciones.png";
+import logo from "../../../assets/img/Group.svg";
+import instagramIcon from "../../../assets/img/instagram.svg";
+import facebookIcon from "../../../assets/img/facebook.svg";
+import twitterIcon from "../../../assets/img/twitterx.png";
+import inicioImg from "../../../assets/img/inicio.png";
+import productosImg from "../../../assets/img/productos.png";
+import promocionesImg from "../../../assets/img/promociones.png";
+import contactoImg from "../../../assets/img/contacto.png";
+import faqImg from "../../../assets/img/faq.png";
+import entregaImg from "../../../assets/img/entrega.png";
+import devolucionesImg from "../../../assets/img/devoluciones.png";
 
 export const Footer = () => {
   return (
