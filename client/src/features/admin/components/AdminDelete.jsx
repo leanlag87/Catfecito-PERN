@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useAdminStore } from "../stores/adminStore";
-import "./AdminProfile.css";
+import "./AdminProfile/AdminProfile.css";
 
 export default function AdminDelete() {
   const { products, fetchAllProducts, deleteProduct, isLoading } =
