@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "../../../features/auth/stores/authStore";
-import "./Header.css";
+import "../Header/Header.css";
 import group from "../../../assets/img/Group.svg";
 import user from "../../../assets/img/user.svg";
 import logoutIcon from "../../../assets/img/logout.svg";
