@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
-import "../../styles/ModalContainer.css";
-import { Login } from "../../pages/auth/Login";
-import { Register } from "../../pages/auth/Register";
-import { ConstructionComponent } from "../../../components/constructionComponent/constructionComponent";
-import { LogoutPopUpComponent } from "../LogoutPopUpComponent/LogoutPopUpComponent";
+import "./ModalContainer.css";
+import { Login } from "../../../features/auth/components/Login";
+import { Register } from "../../../features/auth/components/Register";
+import { LogoutPopUpComponent } from "../../../features/auth/components/LogoutPopUp/LogoutPopUpComponent";
+import { ConstructionComponent } from "../../components/Construction/ConstructionComponent";
 
 export const ModalContainer = ({
   type,
