@@ -1,5 +1,5 @@
 import { NavLink } from "react-router-dom";
-import "../../pages/admin/AdminProfile.css";
+import "./AdminProfile/AdminProfile.css";
 
 export const AdminNav = () => {
   return (
