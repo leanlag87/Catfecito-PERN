@@ -19,6 +19,28 @@ provider:
     CURRENCY_ID: ${env:CURRENCY_ID, 'ARS'}
 
   httpApi:
+    cors: 
+      allowedOrigins:
+        - http://localhost:5173
+        - http://localhost:3000
+        - https://ry3vb22xv3.execute-api.sa-east-1.amazonaws.com
+      allowedHeaders:
+        - Content-Type
+        - Authorization
+        - X-Amz-Date
+        - X-Api-Key
+        - X-Amz-Security-Token
+        - X-Requested-With
+      allowedMethods:
+        - GET
+        - POST
+        - PUT
+        - PATCH
+        - DELETE
+        - OPTIONS
+      allowCredentials: false
+      maxAge: 3600
+
     authorizers: ${file(server/serverless-config/provider/httpApi.yml)}
 
   iam: 
