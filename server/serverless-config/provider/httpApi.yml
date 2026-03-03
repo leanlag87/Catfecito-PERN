@@ -1,25 +1,4 @@
 # Se encarga de definir el authorizer JWT para la API HTTP
-      cors:
-        allowedOrigins:
-          - http://localhost:5173
-          - https://ry3vb22xv3.execute-api.sa-east-1.amazonaws.com
-        allowedHeaders:
-          - Content-Type
-          - Authorization
-          - X-Amz-Date
-          - X-Api-Key
-          - X-Amz-Security-Token
-        allowedMethods:
-          - GET
-          - POST
-          - PUT
-          - PATCH
-          - DELETE
-          - OPTIONS
-        allowCredentials: false
-        maxAge: 3600
-
-
       jwtAuthorizer:
         type: request
         payloadVersion: "2.0"
