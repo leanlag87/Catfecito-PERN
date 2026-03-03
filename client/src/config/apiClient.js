@@ -1,7 +1,8 @@
 import axios from "axios";
 
 // Base URL desde variables de entorno
-const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
+const API_BASE_URL =
+  import.meta.env.VITE_BACKEND_URL || "http://localhost:3000";
 
 const apiClient = axios.create({
   baseURL: API_BASE_URL,
@@ -11,7 +12,7 @@ const apiClient = axios.create({
   },
 });
 
-// 📤 REQUEST INTERCEPTOR
+// REQUEST INTERCEPTOR
 apiClient.interceptors.request.use(
   (config) => {
     // Agregar token JWT si existe
@@ -36,7 +37,7 @@ apiClient.interceptors.request.use(
   },
 );
 
-// 📥 RESPONSE INTERCEPTOR
+// RESPONSE INTERCEPTOR
 apiClient.interceptors.response.use(
   (response) => {
     // Log en desarrollo
