@@ -1,29 +1,16 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import { VitePWA } from "vite-plugin-pwa";
-
-// https://vite.dev/config/
-// export default defineConfig({
-//   plugins: [react()],
-//   server: {
-//     port: 5173,
-//     host: true, // Equivalente a --host 0.0.0.0 para desarrollo
-//   },
-//   build: {
-//     outDir: "dist", // Ya es el default, pero explícito está bien
-//     sourcemap: false, // Recomendado para producción (reduce tamaño)
-//   },
-//   preview: {
-//     host: true, // Para que preview también escuche en todas las interfaces
-//     // NO especificar port aquí - Railway lo asignará automáticamente
-//   },
-// });
+import process from "process";
 
 export default defineConfig({
   plugins: [
     react(),
     VitePWA({
       registerType: "autoUpdate",
+      //  DESARROLLO: Desactivar PWA para evitar regeneración constante
+      //  PRODUCCIÓN: Cambiar a false o comentar esta línea
+      disable: process.env.NODE_ENV === "development",
       includeAssets: [
         "favicon.ico",
         "robots.txt",
@@ -183,8 +170,10 @@ export default defineConfig({
         navigateFallback: "/index.html",
         navigateFallbackDenylist: [/^\/api\//],
       },
+      // DESARROLLO: Mantener enabled: true para probar PWA localmente
+      // PRODUCCIÓN: Ya está configurado correctamente (se activa automáticamente en build)
       devOptions: {
-        enabled: true,
+        enabled: true, // Cambiar a false si no quieres PWA en dev
         type: "module",
       },
     }),
