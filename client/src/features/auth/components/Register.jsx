@@ -1,27 +1,36 @@
-import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuthStore } from "../stores/authStore";
+import { useAuthForm } from "../hooks/useAuthForm";
 import "./Auth.css";
 import logo from "../../../assets/img/Group.svg";
 
 export const Register = ({ onSwitch, onSuccess }) => {
-  const [firstName, setFirstname] = useState("");
-  const [lastName, setLastName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const { register, isLoading, error, clearError } = useAuthStore();
+  const { register, isLoading, error: storeError, clearError } = useAuthStore();
 
-  const handleRegister = async (e) => {
-    e.preventDefault();
+  // Hook personalizado para manejar el formulario
+  const {
+    values,
+    errors,
+    touched,
+    handleChange,
+    handleBlur,
+    handleSubmit,
+    isValid,
+  } = useAuthForm("register");
 
-    // Limpia errores previos
+  const onSubmit = async (formattedData) => {
+    // Limpiar errores previos del store
     clearError();
 
-    // Combinar nombre y apellido
-    const name = `${firstName} ${lastName}`.trim();
+    // Combinar firstName y lastName en name (para tu backend)
+    const dataToSend = {
+      name: `${formattedData.firstName} ${formattedData.lastName}`.trim(),
+      email: formattedData.email,
+      password: formattedData.password,
+    };
 
-    // Llama al método register del store
-    const result = await register({ name, email, password });
+    // Llamar al register del store
+    const result = await register(dataToSend);
 
     if (result.success) {
       // Registro exitoso
@@ -32,68 +41,96 @@ export const Register = ({ onSwitch, onSuccess }) => {
       // Redirigir al home (recarga para sincronizar carrito)
       window.location.replace("/");
     } else {
-      // Registro fallido - el error viene del store
-      alert(result.error);
+      // Registro fallido - mostrar error del backend
+      console.error("Error en registro:", result.error);
     }
   };
 
   return (
     <main className="auth-container-register">
-      <form className="auth-form" onSubmit={handleRegister}>
+      <form className="auth-form" onSubmit={handleSubmit(onSubmit)}>
         <div className="auth-header">
           <h2>Registrarse</h2>
           <img src={logo} alt="CatFecito" className="auth-logo" />
         </div>
 
-        {/* Mostrar error si existe */}
-        {error && <div className="auth-error">{error}</div>}
+        {/* Error global del backend */}
+        {storeError && <div className="auth-error">{storeError}</div>}
 
+        {/* Nombre */}
         <label htmlFor="firstName">Nombre</label>
         <input
           type="text"
           id="firstName"
-          value={firstName}
-          onChange={(e) => setFirstname(e.target.value)}
+          name="firstName"
+          value={values.firstName}
+          onChange={handleChange}
+          onBlur={handleBlur}
           required
           autoComplete="given-name"
           disabled={isLoading}
+          className={touched.firstName && errors.firstName ? "input-error" : ""}
         />
+        {touched.firstName && errors.firstName && (
+          <span className="field-error">{errors.firstName}</span>
+        )}
 
+        {/* Apellido */}
         <label htmlFor="lastName">Apellido</label>
         <input
           type="text"
           id="lastName"
-          value={lastName}
-          onChange={(e) => setLastName(e.target.value)}
+          name="lastName"
+          value={values.lastName}
+          onChange={handleChange}
+          onBlur={handleBlur}
           required
           autoComplete="family-name"
           disabled={isLoading}
+          className={touched.lastName && errors.lastName ? "input-error" : ""}
         />
+        {touched.lastName && errors.lastName && (
+          <span className="field-error">{errors.lastName}</span>
+        )}
 
+        {/* Email */}
         <label htmlFor="email">Correo</label>
         <input
           type="email"
           id="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          name="email"
+          value={values.email}
+          onChange={handleChange}
+          onBlur={handleBlur}
           required
           autoComplete="email"
           disabled={isLoading}
+          className={touched.email && errors.email ? "input-error" : ""}
         />
+        {touched.email && errors.email && (
+          <span className="field-error">{errors.email}</span>
+        )}
 
+        {/* Contraseña */}
         <label htmlFor="password">Contraseña</label>
         <input
           type="password"
           id="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
+          name="password"
+          value={values.password}
+          onChange={handleChange}
+          onBlur={handleBlur}
           required
           autoComplete="new-password"
           disabled={isLoading}
           minLength={6}
+          className={touched.password && errors.password ? "input-error" : ""}
         />
+        {touched.password && errors.password && (
+          <span className="field-error">{errors.password}</span>
+        )}
 
-        <button type="submit" disabled={isLoading}>
+        <button type="submit" disabled={isLoading || !isValid}>
           {isLoading ? "Creando cuenta..." : "Crear cuenta"}
         </button>
 
