@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "../stores/authStore";
 
@@ -30,7 +30,7 @@ export const useRequireRole = (requiredRole, redirectTo = "/") => {
   const { isAuthenticated, isLoading, user } = useAuthStore();
 
   // Verificar si el usuario tiene el rol requerido
-  const hasRole = () => {
+  const hasRole = useMemo(() => {
     if (!user || !user.role) return false;
 
     if (Array.isArray(requiredRole)) {
@@ -38,7 +38,7 @@ export const useRequireRole = (requiredRole, redirectTo = "/") => {
     }
 
     return user.role === requiredRole;
-  };
+  }, [user, requiredRole]); // ← Dependencias correctas
 
   useEffect(() => {
     // Esperar a que termine de cargar
@@ -54,16 +54,24 @@ export const useRequireRole = (requiredRole, redirectTo = "/") => {
     }
 
     // Si no tiene el rol requerido, redirigir
-    if (!hasRole()) {
+    if (!hasRole) {
       console.warn(
         `useRequireRole: Usuario no tiene rol requerido (${requiredRole}), tiene: ${user?.role}`,
       );
       navigate(redirectTo, { replace: true });
     }
-  }, [isAuthenticated, isLoading, user, requiredRole, navigate, redirectTo]);
+  }, [
+    isAuthenticated,
+    isLoading,
+    hasRole,
+    user,
+    requiredRole,
+    navigate,
+    redirectTo,
+  ]);
 
   return {
-    hasRole: hasRole(),
+    hasRole,
     isLoading,
     user,
   };
