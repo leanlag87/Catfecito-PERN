@@ -1,22 +1,29 @@
-import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuthStore } from "../stores/authStore";
+import { useAuthForm } from "../hooks/useAuthForm";
 import "./Auth.css";
 import logo from "../../../assets/img/Group.svg";
 
 export const Login = ({ onSwitch, onSuccess }) => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const { login, isLoading, error, clearError } = useAuthStore();
+  const { login, isLoading, error: storeError, clearError } = useAuthStore();
 
-  const handleLogin = async (e) => {
-    e.preventDefault();
+  // Hook personalizado para manejar el formulario
+  const {
+    values,
+    errors,
+    touched,
+    handleChange,
+    handleBlur,
+    handleSubmit,
+    isValid,
+  } = useAuthForm("login");
 
-    // Limpiar errores previos
+  const onSubmit = async (formattedData) => {
+    // Limpiar errores previos del store
     clearError();
 
-    // Llama al método login del store
-    const result = await login({ email, password });
+    // Llamar al login del store con datos formateados
+    const result = await login(formattedData);
 
     if (result.success) {
       // Login exitoso
@@ -24,51 +31,67 @@ export const Login = ({ onSwitch, onSuccess }) => {
         return onSuccess(result.data);
       }
 
-      // Redirigir al home
+      // Redirigir al home (recarga para sincronizar carrito)
       window.location.replace("/");
     } else {
       // Login fallido - el error ya está en el store
-      alert(result.error);
+      console.error("Error en login:", result.error);
     }
   };
 
   return (
     <main className="auth-container">
-      <form className="auth-form" onSubmit={handleLogin}>
+      <form className="auth-form" onSubmit={handleSubmit(onSubmit)}>
         <div className="auth-header">
           <h2>Iniciar sesión</h2>
           <img src={logo} alt="CatFecito" className="auth-logo" />
         </div>
 
-        {/* Mostrar error si existe */}
-        {error && <div className="auth-error">{error}</div>}
+        {/* Error global del backend */}
+        {storeError && <div className="auth-error">{storeError}</div>}
 
+        {/* Email */}
         <label htmlFor="email">Correo electrónico</label>
         <input
           type="email"
           id="email"
+          name="email"
           placeholder="tu@email.com"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          value={values.email}
+          onChange={handleChange}
+          onBlur={handleBlur}
           required
           autoComplete="email"
           disabled={isLoading}
+          className={touched.email && errors.email ? "input-error" : ""}
         />
+        {touched.email && errors.email && (
+          <span className="field-error">{errors.email}</span>
+        )}
 
+        {/* Contraseña */}
         <label htmlFor="password">Contraseña</label>
         <input
           type="password"
           id="password"
+          name="password"
           placeholder="••••••••"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
+          value={values.password}
+          onChange={handleChange}
+          onBlur={handleBlur}
           required
           autoComplete="current-password"
           disabled={isLoading}
+          className={touched.password && errors.password ? "input-error" : ""}
         />
-        <button type="submit" disabled={isLoading}>
+        {touched.password && errors.password && (
+          <span className="field-error">{errors.password}</span>
+        )}
+
+        <button type="submit" disabled={isLoading || !isValid}>
           {isLoading ? "Ingresando..." : "Ingresar"}
         </button>
+
         <p>
           ¿No tenés cuenta?{" "}
           {onSwitch ? (

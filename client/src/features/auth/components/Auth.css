@@ -148,3 +148,68 @@ select:-moz-autofill {
   box-shadow: 0 0 0px 1000px #ffffff inset !important;
   -moz-text-fill-color: #222222 !important;
 }
+
+/* ESTILOS PARA VALIDACIÓN DE FORMULARIOS */
+
+/* Mensaje de error por campo */
+.field-error {
+  color: #e74c3c;
+  font-size: 0.85rem;
+  margin-top: 0.3rem;
+  margin-bottom: 0.5rem;
+  display: block;
+  font-weight: 500;
+  animation: slideDown 0.3s ease-out;
+}
+
+/* Input con error */
+.input-error {
+  border-color: #e74c3c !important;
+  background-color: #fff5f5 !important;
+}
+
+.input-error:focus {
+  border-color: #e74c3c !important;
+  box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.1) !important;
+}
+
+/* Botón de link en texto (ej: "¿Ya tenés cuenta? Ingresar") */
+.auth-link-btn {
+  background: none;
+  border: none;
+  color: #b18253;
+  padding: 0;
+  font: inherit;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline;
+}
+
+.auth-link-btn:hover {
+  text-decoration: underline;
+}
+
+.auth-link-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Animación para errores */
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Botón deshabilitado */
+.auth-form button[type="submit"]:disabled {
+  background: #ddd;
+  color: #999;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
