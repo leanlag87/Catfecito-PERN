@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
-import { useProductsStore } from "../stores/productsStore";
+import { useProducts } from "../hooks";
+import { useProductFilters } from "../hooks";
 import { useCartStore } from "../../cart/stores/cartStore";
 import { Header } from "../../../shared/components/Header/Header";
 import { NavBar } from "../../../shared/components/NavBar/NavBar";
@@ -15,17 +16,30 @@ import "./Products.css";
 export const Products = ({ onOpenAuthModal }) => {
   const [searchParams, setSearchParams] = useSearchParams();
 
-  // Store de productos
+  // Hook de productos wrapper del store
+  const { fetchProducts, isLoading, error, hasProducts } = useProducts();
+
+  // Hook de filtros con sincronización URL
   const {
-    filteredProducts,
     filters,
-    isLoading,
-    fetchProducts,
-    fetchCategories,
-    setSearch,
-    setSorting,
+    filteredProducts,
+    hasActiveFilters,
+    activeFiltersCount,
+    updateFilter,
     clearFilters,
-  } = useProductsStore();
+    setSearch,
+    setSortBy,
+  } = useProductFilters({
+    syncWithUrl: true,
+    initialFilters: {
+      category: "all",
+      search: "",
+      minPrice: null,
+      maxPrice: null,
+      sortBy: "name-asc",
+      inStockOnly: false,
+    },
+  });
 
   // Store del carrito
   const {
@@ -39,11 +53,10 @@ export const Products = ({ onOpenAuthModal }) => {
     closeCart,
   } = useCartStore();
 
-  // Cargar productos y categorías al montar
+  // Cargar productos al montar
   useEffect(() => {
     fetchProducts();
-    fetchCategories();
-  }, [fetchProducts, fetchCategories]);
+  }, [fetchProducts]);
 
   // Sincronizar búsqueda desde URL
   useEffect(() => {
@@ -53,38 +66,58 @@ export const Products = ({ onOpenAuthModal }) => {
     }
   }, [searchParams, filters.search, setSearch]);
 
+  // Manejar cambio de ordenamiento simplificado
   const handleSortChange = (sortValue) => {
-    const mappings = {
-      "title-ascending": { field: "name", order: "asc" },
-      "title-descending": { field: "name", order: "desc" },
-      "price-ascending": { field: "price", order: "asc" },
-      "price-descending": { field: "price", order: "desc" },
-      "created-ascending": { field: "created_at", order: "asc" },
-      "created-descending": { field: "created_at", order: "desc" },
-      manual: { field: "name", order: "asc" },
+    const sortMappings = {
+      "title-ascending": "name-asc",
+      "title-descending": "name-desc",
+      "price-ascending": "price-asc",
+      "price-descending": "price-desc",
+      "created-ascending": "oldest",
+      "created-descending": "newest",
+      manual: "name-asc",
     };
 
-    const { field, order } = mappings[sortValue] || mappings.manual;
-    setSorting(field, order);
+    const mappedSort = sortMappings[sortValue] || "name-asc";
+    setSortBy(mappedSort);
   };
 
+  // Limpiar búsqueda
   const handleClearSearch = () => {
     setSearch("");
     setSearchParams({});
   };
 
+  // Manejar cambios en filtros avanzados
   const handleFiltersChange = (newFilters) => {
-    // Implementación pendiente conectar filtros avanzados al store
-    console.log("Filtros cambiados:", newFilters);
+    // Actualizar categoría
+    if (newFilters.category !== undefined) {
+      updateFilter("category", newFilters.category);
+    }
+
+    // Actualizar rango de precios
+    if (
+      newFilters.minPrice !== undefined ||
+      newFilters.maxPrice !== undefined
+    ) {
+      updateFilter("minPrice", newFilters.minPrice);
+      updateFilter("maxPrice", newFilters.maxPrice);
+    }
+
+    // Actualizar solo en stock
+    if (newFilters.inStockOnly !== undefined) {
+      updateFilter("inStockOnly", newFilters.inStockOnly);
+    }
   };
 
+  // Obtener contadores para filtros
   const getCounts = () => {
     return {
       availability: {
         in_stock: filteredProducts.filter((p) => p.stock > 0).length,
         out_of_stock: filteredProducts.filter((p) => p.stock === 0).length,
       },
-      grindType: {},
+      grindType: {}, // Para futuras categorías
     };
   };
 
@@ -108,6 +141,8 @@ export const Products = ({ onOpenAuthModal }) => {
         <ProductFilters
           onFiltersChange={handleFiltersChange}
           counts={getCounts()}
+          activeFilters={filters}
+          activeFiltersCount={activeFiltersCount}
         />
 
         <div className="products-main">
@@ -115,16 +150,50 @@ export const Products = ({ onOpenAuthModal }) => {
             onSortChange={handleSortChange}
             searchQuery={filters.search}
             onClearSearch={handleClearSearch}
+            resultsCount={filteredProducts.length}
+            hasActiveFilters={hasActiveFilters}
           />
 
-          {isLoading ? (
-            <div className="products-loading">Cargando productos...</div>
-          ) : filteredProducts.length === 0 ? (
-            <div className="products-empty">
-              <p>No se encontraron productos</p>
-              <button onClick={clearFilters}>Limpiar filtros</button>
+          {/* Estado de carga */}
+          {isLoading && (
+            <div className="products-loading">
+              <div className="spinner"></div>
+              <p>Cargando productos...</p>
             </div>
-          ) : (
+          )}
+
+          {/* Error */}
+          {error && !isLoading && (
+            <div className="products-error">
+              <p>❌ {error}</p>
+              <button onClick={fetchProducts}>Reintentar</button>
+            </div>
+          )}
+
+          {/* Sin productos */}
+          {!isLoading && !error && !hasProducts && (
+            <div className="products-empty">
+              <p>No hay productos disponibles</p>
+            </div>
+          )}
+
+          {/* Sin resultados (filtros aplicados) */}
+          {!isLoading &&
+            !error &&
+            hasProducts &&
+            filteredProducts.length === 0 && (
+              <div className="products-empty">
+                <p>No se encontraron productos con los filtros aplicados</p>
+                {hasActiveFilters && (
+                  <button onClick={clearFilters} className="btn-clear-filters">
+                    🗑️ Limpiar filtros ({activeFiltersCount})
+                  </button>
+                )}
+              </div>
+            )}
+
+          {/* Lista de productos */}
+          {!isLoading && !error && filteredProducts.length > 0 && (
             <ProductsList products={filteredProducts} onAddToCart={addItem} />
           )}
         </div>

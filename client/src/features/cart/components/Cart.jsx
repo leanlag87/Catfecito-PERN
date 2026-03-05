@@ -1,5 +1,13 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuthStore } from "../../auth/stores/authStore";
+import { useFreeShipping } from "../hooks";
+import {
+  formatCartItemImage,
+  formatCartPrice,
+  calculateItemTotal,
+  validateCartForCheckout,
+} from "../services/cart.service";
 import "./Cart.css";
 
 export const Cart = ({
@@ -11,74 +19,46 @@ export const Cart = ({
   onOpenAuthModal = null,
 }) => {
   const navigate = useNavigate();
+  const { isAuthenticated } = useAuthStore();
   const [checkoutError, setCheckoutError] = useState("");
   const [mustLogin, setMustLogin] = useState(false);
-  const subtotal = cartItems.reduce(
-    (sum, item) => sum + item.price * item.quantity,
-    0
-  );
-  const freeShippingThreshold = 36355;
-  const isEligibleForFreeShipping = subtotal >= freeShippingThreshold;
-  const amountForFreeShipping = freeShippingThreshold - subtotal;
-  const BACKEND_ORIGIN = import.meta.env.VITE_BACKEND_URL
-    ? import.meta.env.VITE_BACKEND_URL.replace(/\/$/, "")
-    : "";
 
-  const getToken = () =>
-    (
-      sessionStorage.getItem("authToken") ||
-      sessionStorage.getItem("token") ||
-      ""
-    )
-      .toString()
-      .trim();
+  // Hook de envío gratis
+  const {
+    isEligible: isEligibleForFreeShipping,
+    amountNeeded: amountForFreeShipping,
+    progress,
+  } = useFreeShipping(36355);
 
-  const getItemImageSrc = (it) => {
-    if (!it) return "";
-    // Cambiar el nombre a estas variables para mayor claridad
-    let v = it.image ?? it.image_url ?? "";
-    // If object with url property
-    if (v && typeof v === "object" && typeof v.url === "string") {
-      v = v.url;
-    }
-    if (typeof v !== "string") return "";
-    const src = v.trim();
-    if (!src) return "";
-    // Accept absolute URLs and data URLs
-    if (src.startsWith("http") || src.startsWith("data:")) return src;
-    // Ensure BACKEND_ORIGIN exists before concatenation
-    if (!BACKEND_ORIGIN) return src;
-    return `${BACKEND_ORIGIN}${src.startsWith("/") ? "" : "/"}${src}`;
-  };
+  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "";
 
   const handleCheckout = () => {
-    // Verificar si el usuario está autenticado
-    const token = getToken();
-    if (!token) {
+    // Verificar autenticación
+    if (!isAuthenticated) {
       setCheckoutError("Debes iniciar sesión para continuar con el pago.");
       setMustLogin(true);
       return;
     }
 
-    if (cartItems.length === 0) {
-      alert("Tu carrito está vacío");
+    // Validar carrito
+    const validation = validateCartForCheckout(cartItems);
+    if (!validation.isValid) {
+      setCheckoutError(validation.errors[0]);
       return;
     }
 
-    // Cerrar el carrito y redirigir a la página de checkout
+    // Cerrar carrito y redirigir
     onClose();
     navigate("/checkout");
   };
 
-  // Si el usuario inicia sesión vía modal mientras el carrito está abierto,
-  // limpiar el aviso automáticamente cuando aparezca el token.
+  // Limpiar error cuando el usuario se autentique
   useEffect(() => {
-    if (mustLogin && getToken()) {
+    if (mustLogin && isAuthenticated) {
       setMustLogin(false);
       setCheckoutError("");
     }
-    // también re-chequear al abrir el carrito
-  }, [mustLogin, isOpen]);
+  }, [mustLogin, isAuthenticated]);
 
   if (!isOpen) return null;
 
@@ -87,21 +67,25 @@ export const Cart = ({
       <div className="cart-container" onClick={(e) => e.stopPropagation()}>
         <div className="cart-header">
           <h2>Carrito ({cartItems.length})</h2>
-          <button className="cart-close" onClick={onClose}>
+          <button
+            className="cart-close"
+            onClick={onClose}
+            aria-label="Cerrar carrito"
+          >
             ×
           </button>
         </div>
 
+        {/* Barra de envío gratis mejorada */}
         <div className="cart-shipping-info">
           <div className="shipping-progress">
             <div
               className="progress-bar"
-              style={{
-                width: `${Math.min(
-                  (subtotal / freeShippingThreshold) * 100,
-                  100
-                )}%`,
-              }}
+              style={{ width: `${Math.min(progress, 100)}%` }}
+              role="progressbar"
+              aria-valuenow={progress}
+              aria-valuemin="0"
+              aria-valuemax="100"
             ></div>
           </div>
           <p className="shipping-text">
@@ -109,10 +93,7 @@ export const Cart = ({
               <>El envío es gratis 🎁</>
             ) : (
               <>
-                Suma{" "}
-                <strong>
-                  ${amountForFreeShipping.toLocaleString("es-CO")}
-                </strong>{" "}
+                Suma <strong>${formatCartPrice(amountForFreeShipping)}</strong>{" "}
                 más para envío gratis 🎁
               </>
             )}
@@ -125,69 +106,75 @@ export const Cart = ({
               <p>Tu carrito está vacío</p>
             </div>
           ) : (
-            cartItems.map((item) => (
-              <div key={item.id} className="cart-item">
-                <div className="item-image">
-                  <img src={getItemImageSrc(item)} alt={item.name} />
-                </div>
+            cartItems.map((item) => {
+              const itemTotal = calculateItemTotal(item);
+              const canIncrease =
+                typeof item.stock === "number"
+                  ? item.quantity < item.stock
+                  : true;
 
-                <div className="item-details">
-                  <h4 className="item-name">{item.name}</h4>
-                  <p className="item-type">
-                    Molido o grano: <span>Granos</span>
-                  </p>
-                  <p className="item-price">
-                    ${item.price.toLocaleString("es-CO")}
-                  </p>
-                  {item.quantity > 1 && (
-                    <p className="item-total">
-                      Total:{" "}
-                      <strong>
-                        ${(item.price * item.quantity).toLocaleString("es-CO")}
-                      </strong>
-                    </p>
-                  )}
-                </div>
-
-                <div className="item-controls">
-                  <div className="quantity-controls">
-                    <button
-                      onClick={() =>
-                        onUpdateQuantity(item.id, item.quantity - 1)
-                      }
-                      disabled={item.quantity <= 1}
-                    >
-                      −
-                    </button>
-                    <span className="quantity">{item.quantity}</span>
-                    <button
-                      onClick={() =>
-                        onUpdateQuantity(item.id, item.quantity + 1)
-                      }
-                      disabled={
-                        typeof item.stock === "number" &&
-                        item.quantity >= item.stock
-                      }
-                      title={
-                        typeof item.stock === "number" &&
-                        item.quantity >= item.stock
-                          ? "Stock máximo alcanzado"
-                          : "Incrementar"
-                      }
-                    >
-                      +
-                    </button>
+              return (
+                <div key={item.id} className="cart-item">
+                  <div className="item-image">
+                    <img
+                      src={formatCartItemImage(item, BACKEND_URL)}
+                      alt={item.name}
+                      loading="lazy"
+                    />
                   </div>
 
-                  <button
-                    className="remove-item"
-                    onClick={() => onRemoveItem(item.id)}
-                  >
-                    🗑️
-                  </button>
+                  <div className="item-details">
+                    <h4 className="item-name">{item.name}</h4>
+                    <p className="item-type">
+                      Molido o grano: <span>Granos</span>
+                    </p>
+                    <p className="item-price">${formatCartPrice(item.price)}</p>
+                    {item.quantity > 1 && (
+                      <p className="item-total">
+                        Total: <strong>${formatCartPrice(itemTotal)}</strong>
+                      </p>
+                    )}
+                  </div>
+
+                  <div className="item-controls">
+                    <div className="quantity-controls">
+                      <button
+                        onClick={() =>
+                          onUpdateQuantity(item.id, item.quantity - 1)
+                        }
+                        disabled={item.quantity <= 1}
+                        aria-label="Disminuir cantidad"
+                      >
+                        −
+                      </button>
+                      <span className="quantity">{item.quantity}</span>
+                      <button
+                        onClick={() =>
+                          onUpdateQuantity(item.id, item.quantity + 1)
+                        }
+                        disabled={!canIncrease}
+                        title={
+                          !canIncrease
+                            ? "Stock máximo alcanzado"
+                            : "Incrementar"
+                        }
+                        aria-label="Aumentar cantidad"
+                      >
+                        +
+                      </button>
+                    </div>
+
+                    <button
+                      className="remove-item"
+                      onClick={() => onRemoveItem(item.id)}
+                      aria-label={`Eliminar ${item.name}`}
+                    >
+                      🗑️
+                    </button>
+                  </div>
                 </div>
-              </div>
-            ))
+              );
+            })
           )}
         </div>
 
@@ -196,21 +183,22 @@ export const Cart = ({
             <div className="subtotal">
               <strong>
                 Subtotal ({cartItems.length}) $
-                {subtotal.toLocaleString("es-CO")}
+                {formatCartPrice(
+                  cartItems.reduce(
+                    (sum, item) => sum + calculateItemTotal(item),
+                    0,
+                  ),
+                )}
               </strong>
             </div>
 
             <div className="checkout-buttons">
               {checkoutError && (
-                <div
-                  className="checkout-error"
-                  style={{ color: "#b00020", marginBottom: 8 }}
-                >
-                  {checkoutError}
-                </div>
+                <div className="checkout-error">{checkoutError}</div>
               )}
+
               {mustLogin && (
-                <div style={{ display: "flex", gap: 8, marginBottom: 8 }}>
+                <div className="login-prompt">
                   {typeof onOpenAuthModal === "function" ? (
                     <button
                       className="btn-checkout"
@@ -234,6 +222,7 @@ export const Cart = ({
                   )}
                 </div>
               )}
+
               <button className="btn-checkout" onClick={handleCheckout}>
                 Pagar Pedido
               </button>

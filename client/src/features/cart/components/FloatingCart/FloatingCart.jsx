@@ -1,50 +1,51 @@
 import { useState, useEffect } from "react";
+import { useCart } from "../../hooks";
 import "./FloatingCart.css";
 import cart from "../../../../assets/img/cart.svg";
 import { Cart } from "../Cart";
 
-export const FloatingCart = ({
-  items = [],
-  itemCount = 0,
-  isOpen = false,
-  onOpenCart = () => {},
-  onCloseCart = () => {},
-  onUpdateQuantity = () => {},
-  onRemoveItem = () => {},
-  onClearCart = () => {},
-  onOpenAuthModal = null,
-}) => {
+export const FloatingCart = ({ onOpenAuthModal = null }) => {
+  //  Usar hook de cart en lugar de props
+  const {
+    items,
+    itemCount,
+    isCartOpen,
+    openCart,
+    closeCart,
+    updateQuantity,
+    removeItem,
+    clearCart,
+  } = useCart();
+
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
       const scrollY = window.pageYOffset || window.scrollY || 0;
       const headerEl = document.querySelector("header");
-      const headerHeight =
-        headerEl && headerEl.offsetHeight ? headerEl.offsetHeight : 50;
-      if (scrollY > headerHeight) {
-        setIsVisible(true);
-      } else {
-        setIsVisible(false);
-      }
+      const headerHeight = headerEl?.offsetHeight || 50;
+
+      setIsVisible(scrollY > headerHeight);
     };
 
-    // calcular visibilidad inicial
+    // Calcular visibilidad inicial
     handleScroll();
+
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Mostrar botón solo si hay items y es visible; el modal se puede abrir siempre que isOpen sea true
-  const hideButton = !isVisible || Number(itemCount) <= 0;
+  // Mostrar botón solo si hay items y es visible
+  const shouldShowButton = isVisible && itemCount > 0;
 
   return (
     <>
-      {!hideButton && (
+      {shouldShowButton && (
         <button
-          className={`floating-cart ${isVisible ? "visible" : ""}`}
-          onClick={onOpenCart}
+          className={`floating-cart visible`}
+          onClick={openCart}
           title={`Carrito (${itemCount} ${itemCount === 1 ? "item" : "items"})`}
+          aria-label={`Abrir carrito con ${itemCount} productos`}
         >
           <img src={cart} alt="Carrito flotante" />
           <span className="floating-cart-count">{itemCount}</span>
@@ -52,12 +53,12 @@ export const FloatingCart = ({
       )}
 
       <Cart
-        isOpen={isOpen}
-        onClose={onCloseCart}
+        isOpen={isCartOpen}
+        onClose={closeCart}
         cartItems={items}
-        onUpdateQuantity={onUpdateQuantity}
-        onRemoveItem={onRemoveItem}
-        onClearCart={onClearCart}
+        onUpdateQuantity={updateQuantity}
+        onRemoveItem={removeItem}
+        onClearCart={clearCart}
         onOpenAuthModal={onOpenAuthModal}
       />
     </>

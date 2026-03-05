@@ -1,28 +1,93 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { getPriceRange } from "../../services/products.service";
+import { useProductsStore } from "../../stores/productsStore";
 import "./ProductFilters.css";
 
-export const ProductFilters = ({ onFiltersChange, counts }) => {
+export const ProductFilters = ({
+  onFiltersChange,
+  counts,
+  activeFilters = {},
+  activeFiltersCount = 0,
+}) => {
+  const { products } = useProductsStore();
+
+  // Calcular rango de precios dinámico desde productos
+  const priceRange = getPriceRange(products);
+
   const [filters, setFilters] = useState({
-    availability: { in_stock: true, out_of_stock: false },
-    priceMin: 0,
-    priceMax: 66155,
+    availability: {
+      in_stock: activeFilters.inStockOnly || false,
+      out_of_stock: false,
+    },
+    priceMin: activeFilters.minPrice ?? priceRange.min,
+    priceMax: activeFilters.maxPrice ?? priceRange.max,
     grindType: [],
   });
+
+  // Sincronizar con filtros externos
+  useEffect(() => {
+    setFilters((prev) => ({
+      ...prev,
+      availability: {
+        in_stock: activeFilters.inStockOnly || false,
+        out_of_stock: false,
+      },
+      priceMin: activeFilters.minPrice ?? priceRange.min,
+      priceMax: activeFilters.maxPrice ?? priceRange.max,
+    }));
+  }, [
+    activeFilters.inStockOnly,
+    activeFilters.minPrice,
+    activeFilters.maxPrice,
+    priceRange,
+  ]);
+
+  // Actualizar rango cuando cambian los productos
+  useEffect(() => {
+    if (priceRange.min > 0 && priceRange.max > 0) {
+      setFilters((prev) => ({
+        ...prev,
+        priceMin: prev.priceMin || priceRange.min,
+        priceMax: prev.priceMax || priceRange.max,
+      }));
+    }
+  }, [priceRange]);
 
   const handleAvailabilityChange = (type) => {
     const newAvailability = {
       ...filters.availability,
       [type]: !filters.availability[type],
     };
-    const newFilters = { ...filters, availability: newAvailability };
+
+    const newFilters = {
+      ...filters,
+      availability: newAvailability,
+    };
+
     setFilters(newFilters);
-    onFiltersChange && onFiltersChange(newFilters);
+
+    // Enviar en formato esperado por useProductFilters
+    onFiltersChange &&
+      onFiltersChange({
+        inStockOnly: newAvailability.in_stock,
+      });
   };
 
   const handlePriceChange = (field, value) => {
-    const newFilters = { ...filters, [field]: parseInt(value) };
+    const parsedValue = parseInt(value) || 0;
+    const newFilters = {
+      ...filters,
+      [field]: parsedValue,
+    };
+
     setFilters(newFilters);
-    onFiltersChange && onFiltersChange(newFilters);
+
+    // Enviar ambos valores de precio
+    onFiltersChange &&
+      onFiltersChange({
+        minPrice: field === "priceMin" ? parsedValue : filters.priceMin,
+        maxPrice: field === "priceMax" ? parsedValue : filters.priceMax,
+      });
   };
 
   const handleCheckboxChange = (category, value) => {
@@ -31,7 +96,11 @@ export const ProductFilters = ({ onFiltersChange, counts }) => {
       ? currentValues.filter((item) => item !== value)
       : [...currentValues, value];
 
-    const newFilters = { ...filters, [category]: newValues };
+    const newFilters = {
+      ...filters,
+      [category]: newValues,
+    };
+
     setFilters(newFilters);
     onFiltersChange && onFiltersChange(newFilters);
   };
@@ -40,8 +109,8 @@ export const ProductFilters = ({ onFiltersChange, counts }) => {
     in_stock: 0,
     out_of_stock: 0,
   };
+
   const grindTypeCounts = counts?.grindType || {};
-  // sin origen
 
   const UI_GRIND_TYPES = [
     "Granos",
@@ -50,13 +119,20 @@ export const ProductFilters = ({ onFiltersChange, counts }) => {
     "Molido Francesa",
     "Molido Italiana",
   ];
-  // UI_ORIGINS eliminado
 
   return (
     <div className="page-width-vertical-coll">
       <aside className="filter-disponibility" aria-labelledby="filter-title">
         <div className="wbblankinner">
-          <h2 id="filter-title">Filtrar</h2>
+          <div className="filter-header">
+            <h2 id="filter-title">Filtrar</h2>
+            {/* ✅ Contador de filtros activos */}
+            {activeFiltersCount > 0 && (
+              <span className="active-filters-badge" title="Filtros activos">
+                {activeFiltersCount}
+              </span>
+            )}
+          </div>
 
           <details className="filter-section" open>
             <summary className="filter-summary">Disponibilidad</summary>
@@ -100,7 +176,9 @@ export const ProductFilters = ({ onFiltersChange, counts }) => {
                   type="number"
                   id="price-min"
                   value={filters.priceMin}
-                  min="0"
+                  min={priceRange.min}
+                  max={filters.priceMax}
+                  placeholder={`Min: $${priceRange.min}`}
                   onChange={(e) =>
                     handlePriceChange("priceMin", e.target.value)
                   }
@@ -109,7 +187,9 @@ export const ProductFilters = ({ onFiltersChange, counts }) => {
                   type="number"
                   id="price-max"
                   value={filters.priceMax}
-                  min="0"
+                  min={filters.priceMin}
+                  max={priceRange.max}
+                  placeholder={`Max: $${priceRange.max}`}
                   onChange={(e) =>
                     handlePriceChange("priceMax", e.target.value)
                   }
@@ -119,8 +199,8 @@ export const ProductFilters = ({ onFiltersChange, counts }) => {
                 <input
                   type="range"
                   id="range-min"
-                  min="0"
-                  max="66155"
+                  min={priceRange.min}
+                  max={priceRange.max}
                   value={filters.priceMin}
                   onChange={(e) =>
                     handlePriceChange("priceMin", e.target.value)
@@ -129,8 +209,8 @@ export const ProductFilters = ({ onFiltersChange, counts }) => {
                 <input
                   type="range"
                   id="range-max"
-                  min="0"
-                  max="66155"
+                  min={priceRange.min}
+                  max={priceRange.max}
                   value={filters.priceMax}
                   onChange={(e) =>
                     handlePriceChange("priceMax", e.target.value)
@@ -157,8 +237,6 @@ export const ProductFilters = ({ onFiltersChange, counts }) => {
               ))}
             </div>
           </details>
-
-          {/* Se eliminó filtro de Origen */}
         </div>
       </aside>
     </div>
