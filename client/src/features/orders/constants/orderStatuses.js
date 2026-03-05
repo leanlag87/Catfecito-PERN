@@ -45,9 +45,7 @@ export const ORDER_STATUSES = {
   },
 };
 
-/**
- * Obtiene info de estado de orden
- */
+//Obtiene info de estado de orden
 export const getOrderStatusInfo = (status) => {
   return (
     ORDER_STATUSES[status] || {
@@ -61,21 +59,15 @@ export const getOrderStatusInfo = (status) => {
   );
 };
 
-/**
- * Lista de estados válidos
- */
+//Lista de estados válidos
 export const VALID_ORDER_STATUSES = Object.keys(ORDER_STATUSES);
 
-/**
- * Verifica si un estado es válido
- */
+//Verifica si un estado es válido
 export const isValidOrderStatus = (status) => {
   return VALID_ORDER_STATUSES.includes(status);
 };
 
-/**
- * Obtiene el siguiente estado en el proceso
- */
+//Obtiene el siguiente estado en el proceso
 export const getNextOrderStatus = (currentStatus) => {
   const current = ORDER_STATUSES[currentStatus];
   if (
@@ -96,9 +88,7 @@ export const getNextOrderStatus = (currentStatus) => {
   return nextStatus ? nextStatus[0] : null;
 };
 
-/**
- * Verifica si una orden puede avanzar al siguiente estado
- */
+//Verifica si una orden puede avanzar al siguiente estado
 export const canProgressToNextStatus = (currentStatus) => {
   return getNextOrderStatus(currentStatus) !== null;
 };
