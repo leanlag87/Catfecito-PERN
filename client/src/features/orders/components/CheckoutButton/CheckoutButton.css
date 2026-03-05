@@ -12,13 +12,17 @@
   display: none;
 }
 
-/* Loading spinner */
+/*LOADING STATE */
 .checkout-loading {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 20px;
+  justify-content: center;
+  padding: 30px 20px;
   text-align: center;
+  background: #f9f9f9;
+  border-radius: 8px;
+  border: 1px solid #e0e0e0;
 }
 
 .spinner {
@@ -28,64 +32,138 @@
   border-top: 4px solid #5b3b2b;
   border-radius: 50%;
   animation: spin 1s linear infinite;
-  margin-bottom: 10px;
+  margin-bottom: 12px;
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 .checkout-loading p {
   margin: 0;
   color: #666;
   font-size: 14px;
-  font-family: 'Poppins', sans-serif;
+  font-family: "Poppins", sans-serif;
+  font-weight: 500;
 }
 
-/* Error state */
+/*ERROR STATE */
 .checkout-error {
   text-align: center;
   padding: 20px;
-  background: #fee;
-  border: 1px solid #fcc;
+  background: #fff5f5;
+  border: 1px solid #e74c3c;
   border-radius: 8px;
   margin-top: 10px;
+  animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .checkout-error p {
-  margin: 0 0 10px 0;
-  color: #c33;
+  margin: 0 0 12px 0;
+  color: #c62828;
   font-size: 14px;
-  font-family: 'Poppins', sans-serif;
+  font-family: "Poppins", sans-serif;
+  font-weight: 500;
 }
 
 .retry-button {
   background: #5b3b2b;
   color: white;
   border: none;
-  padding: 8px 16px;
-  border-radius: 4px;
+  padding: 10px 20px;
+  border-radius: 6px;
   cursor: pointer;
-  font-family: 'Poppins', sans-serif;
-  font-size: 12px;
-  transition: background-color 0.3s ease;
+  font-family: "Poppins", sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  transition: all 0.3s ease;
 }
 
 .retry-button:hover {
   background: #4a2f1f;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 }
 
-/* Responsive scaffold: media-query templates for this component */
+.retry-button:active {
+  transform: translateY(0);
+}
+
+/* MERCADO PAGO CONTAINER */
+#mp-wallet-container {
+  width: 100%;
+  min-height: 50px;
+}
+
+/* Override de estilos de Mercado Pago si es necesario */
+#mp-wallet-container iframe {
+  border-radius: 6px;
+}
+
+/* RESPONSIVE*/
 @media (max-width: 576px) {
+  .checkout-button-container {
+    margin-top: 16px;
+  }
+
+  .checkout-loading {
+    padding: 24px 16px;
+  }
+
+  .checkout-error {
+    padding: 16px;
+  }
+
+  .spinner {
+    width: 36px;
+    height: 36px;
+    border-width: 3px;
+  }
+
+  .checkout-loading p,
+  .checkout-error p {
+    font-size: 13px;
+  }
+
+  .retry-button {
+    padding: 8px 16px;
+    font-size: 12px;
+  }
 }
+
 @media (min-width: 577px) and (max-width: 767px) {
+  .checkout-button-container {
+    margin-top: 18px;
+  }
 }
+
 @media (min-width: 768px) and (max-width: 991px) {
+  /* Estilos por defecto son apropiados */
 }
-@media (min-width: 992px) and (max-width: 1199px) {
-}
-@media (min-width: 1200px) and (max-width: 1399px) {
-}
-@media (min-width: 1400px) {
+
+@media (min-width: 992px) {
+  .checkout-loading {
+    padding: 32px 24px;
+  }
+
+  .retry-button:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+  }
 }
