@@ -88,7 +88,9 @@ export const getNextOrderStatus = (currentStatus) => {
 
   const nextStep = current.step + 1;
   const nextStatus = Object.entries(ORDER_STATUSES).find(
-    ([_, info]) => info.step === nextStep,
+    //Razón: Usar , (coma) en lugar de _ cuando no usas la variable.
+    //Es la convención correcta en destructuring.
+    ([, info]) => info.step === nextStep,
   );
 
   return nextStatus ? nextStatus[0] : null;
