@@ -3,15 +3,13 @@
  *
  * Responsabilidades:
  * - Normalizar datos de órdenes del backend
- * - Formatear estados de pago y envío
- * - Calcular totales e impuestos
+ * - Formatear fechas y direcciones
+ * - Calcular totales
  * - Validar datos de shipping
- * - Helpers para checkout
+ * - Preparar datos para checkout
  */
 
-/**
- * Normaliza una orden del backend
- */
+//Normaliza una orden del backend
 export const normalizeOrder = (order) => {
   if (!order) return null;
 
@@ -25,7 +23,6 @@ export const normalizeOrder = (order) => {
     paymentId: order.payment_id || null,
     preferenceId: order.preference_id || null,
 
-    // Información de envío
     shippingFirstName: order.shipping_first_name || "",
     shippingLastName: order.shipping_last_name || "",
     shippingCountry: order.shipping_country || "Argentina",
@@ -36,32 +33,23 @@ export const normalizeOrder = (order) => {
     shippingZip: order.shipping_zip || "",
     shippingPhone: order.shipping_phone || "",
 
-    // Items
     items: Array.isArray(order.items) ? order.items : [],
 
-    // Fechas
     createdAt: order.created_at || order.createdAt || new Date().toISOString(),
     updatedAt: order.updated_at || order.updatedAt || null,
     paidAt: order.paid_at || order.paidAt || null,
   };
 };
 
-/**
- * Normaliza array de órdenes
- */
 export const normalizeOrders = (orders) => {
   if (!Array.isArray(orders)) return [];
   return orders.map(normalizeOrder).filter(Boolean);
 };
 
-/**
- * Formatea fecha de orden
- */
 export const formatOrderDate = (date, format = "long") => {
   if (!date) return "-";
 
   const dateObj = new Date(date);
-
   if (isNaN(dateObj.getTime())) return "-";
 
   if (format === "short") {
@@ -80,7 +68,6 @@ export const formatOrderDate = (date, format = "long") => {
     });
   }
 
-  // long
   return dateObj.toLocaleDateString("es-AR", {
     day: "numeric",
     month: "long",
@@ -90,121 +77,6 @@ export const formatOrderDate = (date, format = "long") => {
   });
 };
 
-/**
- * Estados de pago con info visual
- */
-export const PAYMENT_STATUSES = {
-  pending: {
-    label: "Pendiente",
-    color: "#f39c12",
-    icon: "⏳",
-    description: "Esperando confirmación de pago",
-  },
-  approved: {
-    label: "Pagado",
-    color: "#4caf50",
-    icon: "✅",
-    description: "Pago confirmado",
-  },
-  authorized: {
-    label: "Autorizado",
-    color: "#2196f3",
-    icon: "🔐",
-    description: "Pago autorizado",
-  },
-  in_process: {
-    label: "Procesando",
-    color: "#ff9800",
-    icon: "🔄",
-    description: "Pago en proceso",
-  },
-  rejected: {
-    label: "Rechazado",
-    color: "#e74c3c",
-    icon: "❌",
-    description: "Pago rechazado",
-  },
-  cancelled: {
-    label: "Cancelado",
-    color: "#95a5a6",
-    icon: "🚫",
-    description: "Pago cancelado",
-  },
-  refunded: {
-    label: "Reembolsado",
-    color: "#9c27b0",
-    icon: "💸",
-    description: "Pago reembolsado",
-  },
-};
-
-/**
- * Obtiene info de estado de pago
- */
-export const getPaymentStatusInfo = (status) => {
-  return (
-    PAYMENT_STATUSES[status] || {
-      label: status || "Desconocido",
-      color: "#95a5a6",
-      icon: "❓",
-      description: "Estado desconocido",
-    }
-  );
-};
-
-/**
- * Estados de orden
- */
-export const ORDER_STATUSES = {
-  processing: {
-    label: "Procesando",
-    color: "#ff9800",
-    icon: "📦",
-    description: "Orden en proceso",
-  },
-  confirmed: {
-    label: "Confirmada",
-    color: "#2196f3",
-    icon: "✓",
-    description: "Orden confirmada",
-  },
-  shipped: {
-    label: "Enviada",
-    color: "#00bcd4",
-    icon: "🚚",
-    description: "Orden enviada",
-  },
-  delivered: {
-    label: "Entregada",
-    color: "#4caf50",
-    icon: "✅",
-    description: "Orden entregada",
-  },
-  cancelled: {
-    label: "Cancelada",
-    color: "#e74c3c",
-    icon: "🚫",
-    description: "Orden cancelada",
-  },
-};
-
-/**
- * Obtiene info de estado de orden
- */
-export const getOrderStatusInfo = (status) => {
-  return (
-    ORDER_STATUSES[status] || {
-      label: status || "Desconocido",
-      color: "#95a5a6",
-      icon: "❓",
-      description: "Estado desconocido",
-    }
-  );
-};
-
-/**
- * Calcula total de items en orden
- */
 export const calculateOrderItemsTotal = (items) => {
   if (!Array.isArray(items)) return 0;
 
@@ -215,9 +87,6 @@ export const calculateOrderItemsTotal = (items) => {
   }, 0);
 };
 
-/**
- * Calcula cantidad total de productos
- */
 export const calculateOrderItemsCount = (items) => {
   if (!Array.isArray(items)) return 0;
 
@@ -226,9 +95,6 @@ export const calculateOrderItemsCount = (items) => {
   }, 0);
 };
 
-/**
- * Formatea dirección de envío completa
- */
 export const formatShippingAddress = (order) => {
   if (!order) return "";
 
@@ -244,9 +110,6 @@ export const formatShippingAddress = (order) => {
   return parts.join(", ");
 };
 
-/**
- * Formatea nombre completo del destinatario
- */
 export const formatShippingName = (order) => {
   if (!order) return "";
 
@@ -256,9 +119,6 @@ export const formatShippingName = (order) => {
   return `${firstName} ${lastName}`.trim();
 };
 
-/**
- * Valida datos de dirección de envío
- */
 export const validateShippingAddress = (shippingData) => {
   const errors = {};
 
@@ -307,9 +167,6 @@ export const validateShippingAddress = (shippingData) => {
   };
 };
 
-/**
- * Prepara datos de orden para checkout
- */
 export const prepareCheckoutData = (shippingData) => {
   return {
     shipping_first_name: shippingData.firstName,
@@ -324,21 +181,16 @@ export const prepareCheckoutData = (shippingData) => {
   };
 };
 
-/**
- * Verifica si una orden se puede cancelar
- */
 export const canCancelOrder = (order) => {
   if (!order) return false;
 
   const status = order.orderStatus || order.order_status;
   const paymentStatus = order.paymentStatus || order.payment_status;
 
-  // No se puede cancelar si ya está cancelada, entregada o enviada
   if (["cancelled", "delivered", "shipped"].includes(status)) {
     return false;
   }
 
-  // No se puede cancelar si el pago ya fue aprobado y está en proceso de envío
   if (paymentStatus === "approved" && status === "confirmed") {
     return false;
   }
@@ -346,22 +198,15 @@ export const canCancelOrder = (order) => {
   return true;
 };
 
-/**
- * Verifica si una orden se puede pagar
- */
 export const canPayOrder = (order) => {
   if (!order) return false;
 
   const paymentStatus = order.paymentStatus || order.payment_status;
   const orderStatus = order.orderStatus || order.order_status;
 
-  // Solo se puede pagar si está pendiente y no cancelada
   return paymentStatus === "pending" && orderStatus !== "cancelled";
 };
 
-/**
- * Agrupa órdenes por estado de pago
- */
 export const groupOrdersByPaymentStatus = (orders) => {
   if (!Array.isArray(orders)) return {};
 
@@ -377,9 +222,6 @@ export const groupOrdersByPaymentStatus = (orders) => {
   }, {});
 };
 
-/**
- * Filtra órdenes por rango de fechas
- */
 export const filterOrdersByDateRange = (orders, startDate, endDate) => {
   if (!Array.isArray(orders)) return [];
 
@@ -392,9 +234,6 @@ export const filterOrdersByDateRange = (orders, startDate, endDate) => {
   });
 };
 
-/**
- * Obtiene órdenes recientes (últimos N días)
- */
 export const getRecentOrders = (orders, days = 30) => {
   if (!Array.isArray(orders)) return [];
 
@@ -407,9 +246,6 @@ export const getRecentOrders = (orders, days = 30) => {
   });
 };
 
-/**
- * Calcula estadísticas de órdenes
- */
 export const calculateOrdersStats = (orders) => {
   if (!Array.isArray(orders)) {
     return {
@@ -450,9 +286,6 @@ export const calculateOrdersStats = (orders) => {
   return stats;
 };
 
-/**
- * Formatea total de orden con moneda
- */
 export const formatOrderTotal = (order, locale = "es-AR") => {
   if (!order) return "$0";
 
