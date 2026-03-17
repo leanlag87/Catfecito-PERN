@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { useProfileOrders } from "../hooks";
-import { useOrdersStore } from "../../orders/stores/ordersStore";
 import {
   formatOrderDate,
   formatOrderTotal,
@@ -14,10 +13,15 @@ export default function ProfileOrders() {
   const paymentStatus = searchParams.get("payment");
   const orderId = searchParams.get("order_id");
 
-  const { orders, isLoading, error, refresh, getById, cancelById } =
-    useProfileOrders();
-
-  const { createPaymentPreference } = useOrdersStore();
+  const {
+    orders,
+    isLoading,
+    error,
+    refresh,
+    getById,
+    cancelById,
+    continuePaymentById,
+  } = useProfileOrders();
 
   const [expandedOrder, setExpandedOrder] = useState(null);
   const [orderDetails, setOrderDetails] = useState({});
@@ -80,7 +84,7 @@ export default function ProfileOrders() {
   };
 
   const continuePayment = async (id) => {
-    const result = await createPaymentPreference(id);
+    const result = await continuePaymentById(id);
     if (result?.success && result?.url) {
       window.location.href = result.url;
       return;
