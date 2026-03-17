@@ -1,94 +1,50 @@
-import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { useAuthStore } from "../../auth/stores/authStore";
-import { useProfileStore } from "../stores/profileStore";
+import { useState } from "react";
+import { useProfileForm } from "../hooks";
 import "./Profile/Profile.css";
 
 export default function ProfileAddress() {
-  const navigate = useNavigate();
-
-  const { isAuthenticated } = useAuthStore();
   const {
-    profile,
-    updateProfile,
-    isLoading: profileLoading,
-    error: profileError,
-  } = useProfileStore();
+    form,
+    formErrors,
+    isLoading,
+    error,
+    updateField,
+    submit,
+    clearError,
+  } = useProfileForm();
 
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
-
-  const [formData, setFormData] = useState({
-    default_country: "",
-    default_address: "",
-    default_address2: "",
-    default_city: "",
-    default_state: "",
-    default_zip: "",
-    default_phone: "",
-  });
-
-  useEffect(() => {
-    if (!isAuthenticated) {
-      navigate("/login");
-      return;
-    }
-  }, [isAuthenticated, navigate]);
-
-  useEffect(() => {
-    if (profile) {
-      setFormData({
-        default_country: profile.default_country || "",
-        default_address: profile.default_address || "",
-        default_address2: profile.default_address2 || "",
-        default_city: profile.default_city || "",
-        default_state: profile.default_state || "",
-        default_zip: profile.default_zip || "",
-        default_phone: profile.default_phone || "",
-      });
-    }
-  }, [profile]);
+  const [localError, setLocalError] = useState("");
 
   const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
+    const { name, value } = e.target;
+    updateField(name, value);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError("");
     setSuccess("");
-    setLoading(true);
+    setLocalError("");
+    clearError();
 
-    const result = await updateProfile(formData);
+    const result = await submit();
 
-    if (result.success) {
-      setSuccess("Dirección guardada exitosamente");
-    } else {
-      setError(result.error);
+    if (result?.success === false) {
+      setLocalError(result?.error || "No se pudo guardar la dirección");
+      return;
     }
 
-    setLoading(false);
+    setSuccess("Dirección guardada exitosamente");
   };
 
-  const displayError = error || profileError;
-
-  if (profileLoading && !profile) {
-    return (
-      <section className="profile-card">
-        <p>Cargando dirección...</p>
-      </section>
-    );
-  }
+  const displayError = localError || error;
 
   return (
     <section className="profile-card">
       <div className="section-header">
         <h2 className="section-title">Mi Dirección Predeterminada</h2>
       </div>
+
       <p style={{ marginBottom: "1rem", color: "#666", fontSize: "14px" }}>
         Esta dirección se utilizará para autocompletar el formulario de envío en
         futuras compras.
@@ -100,14 +56,14 @@ export default function ProfileAddress() {
       <form onSubmit={handleSubmit} className="address-form">
         <div className="address-form-row two-cols">
           <div>
-            <label htmlFor="default_country">País / Región *</label>
+            <label htmlFor="defaultCountry">País / Región *</label>
             <select
-              id="default_country"
-              name="default_country"
-              value={formData.default_country}
+              id="defaultCountry"
+              name="defaultCountry"
+              value={form.defaultCountry}
               onChange={handleChange}
               required
-              disabled={loading}
+              disabled={isLoading}
             >
               <option value="">Seleccionar país</option>
               <option value="Argentina">Argentina</option>
@@ -116,101 +72,122 @@ export default function ProfileAddress() {
               <option value="Perú">Perú</option>
               <option value="México">México</option>
             </select>
+            {formErrors.defaultCountry && (
+              <span className="field-error">{formErrors.defaultCountry}</span>
+            )}
           </div>
+
           <div>
-            <label htmlFor="default_phone">Teléfono *</label>
+            <label htmlFor="defaultPhone">Teléfono *</label>
             <input
-              id="default_phone"
+              id="defaultPhone"
               type="tel"
-              name="default_phone"
-              value={formData.default_phone}
+              name="defaultPhone"
+              value={form.defaultPhone}
               onChange={handleChange}
               placeholder="+57 300 123 4567"
               required
-              disabled={loading}
+              disabled={isLoading}
               autoComplete="tel"
             />
+            {formErrors.defaultPhone && (
+              <span className="field-error">{formErrors.defaultPhone}</span>
+            )}
           </div>
         </div>
 
         <div>
-          <label htmlFor="default_address">Dirección *</label>
+          <label htmlFor="defaultAddress">Dirección *</label>
           <input
-            id="default_address"
+            id="defaultAddress"
             type="text"
-            name="default_address"
-            value={formData.default_address}
+            name="defaultAddress"
+            value={form.defaultAddress}
             onChange={handleChange}
             placeholder="Calle 123 #45-67"
             required
-            disabled={loading}
+            disabled={isLoading}
             autoComplete="address-line1"
           />
+          {formErrors.defaultAddress && (
+            <span className="field-error">{formErrors.defaultAddress}</span>
+          )}
         </div>
 
         <div>
-          <label htmlFor="default_address2">
+          <label htmlFor="defaultAddress2">
             Apartamento, suite, etc. (opcional)
           </label>
           <input
-            id="default_address2"
+            id="defaultAddress2"
             type="text"
-            name="default_address2"
-            value={formData.default_address2}
+            name="defaultAddress2"
+            value={form.defaultAddress2}
             onChange={handleChange}
             placeholder="Apto 301"
-            disabled={loading}
+            disabled={isLoading}
             autoComplete="address-line2"
           />
         </div>
 
         <div className="address-form-row three-cols">
           <div>
-            <label htmlFor="default_zip">Código postal *</label>
+            <label htmlFor="defaultZip">Código postal *</label>
             <input
-              id="default_zip"
+              id="defaultZip"
               type="text"
-              name="default_zip"
-              value={formData.default_zip}
+              name="defaultZip"
+              value={form.defaultZip}
               onChange={handleChange}
               placeholder="110111"
               required
-              disabled={loading}
+              disabled={isLoading}
               autoComplete="postal-code"
             />
+            {formErrors.defaultZip && (
+              <span className="field-error">{formErrors.defaultZip}</span>
+            )}
           </div>
+
           <div>
-            <label htmlFor="default_city">Ciudad *</label>
+            <label htmlFor="defaultCity">Ciudad *</label>
             <input
-              id="default_city"
+              id="defaultCity"
               type="text"
-              name="default_city"
-              value={formData.default_city}
+              name="defaultCity"
+              value={form.defaultCity}
               onChange={handleChange}
               placeholder="Bogotá"
               required
-              disabled={loading}
+              disabled={isLoading}
               autoComplete="address-level2"
             />
+            {formErrors.defaultCity && (
+              <span className="field-error">{formErrors.defaultCity}</span>
+            )}
           </div>
+
           <div>
-            <label htmlFor="default_state">Provincia / Estado *</label>
+            <label htmlFor="defaultState">Provincia / Estado *</label>
             <input
-              id="default_state"
+              id="defaultState"
               type="text"
-              name="default_state"
-              value={formData.default_state}
+              name="defaultState"
+              value={form.defaultState}
               onChange={handleChange}
               placeholder="Cundinamarca"
               required
-              disabled={loading}
+              disabled={isLoading}
               autoComplete="address-level1"
             />
+            {formErrors.defaultState && (
+              <span className="field-error">{formErrors.defaultState}</span>
+            )}
           </div>
         </div>
 
-        <button type="submit" className="btn-primary" disabled={loading}>
-          {loading ? "Guardando..." : "Guardar Dirección"}
+        <button type="submit" className="btn-primary" disabled={isLoading}>
+          {isLoading ? "Guardando..." : "Guardar Dirección"}
         </button>
       </form>
     </section>
