@@ -14,6 +14,7 @@ export const useProfileOrders = () => {
     fetchOrders,
     fetchOrderById,
     cancelOrder,
+    createPaymentPreference,
     clearError,
   } = useOrdersStore();
 
@@ -61,6 +62,14 @@ export const useProfileOrders = () => {
     [cancelOrder],
   );
 
+  const continuePaymentById = useCallback(
+    async (orderId) => {
+      if (!orderId) return { success: false, error: "orderId requerido" };
+      return await createPaymentPreference(orderId);
+    },
+    [createPaymentPreference],
+  );
+
   return {
     // estado
     orders: filteredOrders,
@@ -78,6 +87,7 @@ export const useProfileOrders = () => {
     refresh,
     getById,
     cancelById,
+    continuePaymentById,
     clearError,
   };
 };
