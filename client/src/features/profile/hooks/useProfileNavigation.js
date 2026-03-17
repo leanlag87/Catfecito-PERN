@@ -1,36 +1,37 @@
 import { useMemo, useCallback } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 
-const VALID_SECTIONS = ["info", "address", "orders", "security"];
+const SECTIONS = [
+  { key: "info", label: "Mi Información", path: "/profile/info" },
+  { key: "orders", label: "Mis Pedidos", path: "/profile/orders" },
+  { key: "address", label: "Mi Dirección", path: "/profile/address" },
+];
 
 export const useProfileNavigation = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
   const activeSection = useMemo(() => {
-    const params = new URLSearchParams(location.search);
-    const section = params.get("section") || "info";
-    return VALID_SECTIONS.includes(section) ? section : "info";
-  }, [location.search]);
+    const found = SECTIONS.find((s) => location.pathname.startsWith(s.path));
+    return found?.key || "info";
+  }, [location.pathname]);
 
   const goToSection = useCallback(
-    (section) => {
-      const safeSection = VALID_SECTIONS.includes(section) ? section : "info";
-      navigate(`${location.pathname}?section=${safeSection}`, {
-        replace: false,
-      });
+    (sectionKey) => {
+      const section = SECTIONS.find((s) => s.key === sectionKey) || SECTIONS[0];
+      navigate(section.path);
     },
-    [navigate, location.pathname],
+    [navigate],
   );
 
   const isActive = useCallback(
-    (section) => activeSection === section,
+    (sectionKey) => activeSection === sectionKey,
     [activeSection],
   );
 
   return {
     activeSection,
-    sections: VALID_SECTIONS,
+    sections: SECTIONS,
     goToSection,
     isActive,
   };
