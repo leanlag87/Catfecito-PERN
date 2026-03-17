@@ -9,9 +9,8 @@
  * - Validación de contraseñas
  */
 
-/**
- * Normaliza perfil del backend
- */
+//Normaliza perfil del backend
+
 export const normalizeProfile = (profile) => {
   if (!profile) return null;
 
@@ -36,9 +35,7 @@ export const normalizeProfile = (profile) => {
   };
 };
 
-/**
- * Normaliza dirección del backend
- */
+//Normaliza dirección del backend
 export const normalizeAddress = (address) => {
   if (!address) return null;
 
@@ -58,17 +55,13 @@ export const normalizeAddress = (address) => {
   };
 };
 
-/**
- * Normaliza array de direcciones
- */
+//Normaliza array de direcciones
 export const normalizeAddresses = (addresses) => {
   if (!Array.isArray(addresses)) return [];
   return addresses.map(normalizeAddress).filter(Boolean);
 };
 
-/**
- * Formatea nombre completo (capitaliza)
- */
+//Formatea nombre completo (capitaliza)
 export const formatFullName = (name) => {
   if (!name || typeof name !== "string") return "";
 
@@ -79,9 +72,7 @@ export const formatFullName = (name) => {
     .join(" ");
 };
 
-/**
- * Obtiene iniciales del nombre
- */
+//Obtiene iniciales del nombre
 export const getNameInitials = (name) => {
   if (!name || typeof name !== "string") return "";
 
@@ -94,9 +85,7 @@ export const getNameInitials = (name) => {
   return (words[0].charAt(0) + words[words.length - 1].charAt(0)).toUpperCase();
 };
 
-/**
- * Formatea número de teléfono
- */
+//Formatea número de teléfono
 export const formatPhoneNumber = (phone) => {
   if (!phone || typeof phone !== "string") return "";
 
@@ -116,9 +105,7 @@ export const formatPhoneNumber = (phone) => {
   return cleaned;
 };
 
-/**
- * Formatea dirección completa
- */
+//Formatea dirección completa
 export const formatFullAddress = (address) => {
   if (!address) return "";
 
@@ -134,9 +121,7 @@ export const formatFullAddress = (address) => {
   return parts.join(", ");
 };
 
-/**
- * Valida datos de perfil
- */
+//Valida datos de perfil
 export const validateProfileData = (profileData) => {
   const errors = {};
 
@@ -157,9 +142,7 @@ export const validateProfileData = (profileData) => {
   };
 };
 
-/**
- * Valida datos de dirección
- */
+//Valida datos de dirección
 export const validateAddressData = (addressData) => {
   const errors = {};
 
@@ -204,9 +187,7 @@ export const validateAddressData = (addressData) => {
   };
 };
 
-/**
- * Valida contraseña
- */
+//Valida contraseña
 export const validatePassword = (password) => {
   const errors = [];
 
@@ -233,9 +214,7 @@ export const validatePassword = (password) => {
   };
 };
 
-/**
- * Calcula fortaleza de contraseña (0-100)
- */
+//Calcula fortaleza de contraseña (0-100)
 export const calculatePasswordStrength = (password) => {
   let strength = 0;
 
@@ -249,18 +228,14 @@ export const calculatePasswordStrength = (password) => {
   return Math.min(strength, 100);
 };
 
-/**
- * Obtiene etiqueta de fortaleza de contraseña
- */
+//Obtiene etiqueta de fortaleza de contraseña
 export const getPasswordStrengthLabel = (strength) => {
   if (strength < 40) return { label: "Débil", color: "#e74c3c" };
   if (strength < 70) return { label: "Media", color: "#f39c12" };
   return { label: "Fuerte", color: "#4caf50" };
 };
 
-/**
- * Valida cambio de contraseña
- */
+//Valida cambio de contraseña
 export const validatePasswordChange = (
   currentPassword,
   newPassword,
@@ -291,9 +266,7 @@ export const validatePasswordChange = (
   };
 };
 
-/**
- * Prepara datos de perfil para enviar al backend
- */
+//Prepara datos de perfil para enviar al backend
 export const prepareProfileData = (profileData) => {
   return {
     name: profileData.name?.trim(),
@@ -308,9 +281,7 @@ export const prepareProfileData = (profileData) => {
   };
 };
 
-/**
- * Prepara datos de dirección para enviar al backend
- */
+//Prepara datos de dirección para enviar al backend
 export const prepareAddressData = (addressData) => {
   return {
     country: addressData.country?.trim(),
@@ -324,9 +295,7 @@ export const prepareAddressData = (addressData) => {
   };
 };
 
-/**
- * Obtiene dirección predeterminada de una lista
- */
+//Obtiene dirección predeterminada de una lista
 export const getDefaultAddress = (addresses) => {
   if (!Array.isArray(addresses)) return null;
 
@@ -337,9 +306,7 @@ export const getDefaultAddress = (addresses) => {
   );
 };
 
-/**
- * Verifica si el perfil está completo
- */
+//Verifica si el perfil está completo
 export const isProfileComplete = (profile) => {
   if (!profile) return false;
 
@@ -357,9 +324,7 @@ export const isProfileComplete = (profile) => {
   );
 };
 
-/**
- * Obtiene porcentaje de completitud del perfil
- */
+//Obtiene porcentaje de completitud del perfil
 export const getProfileCompleteness = (profile) => {
   if (!profile) return 0;
 
@@ -381,9 +346,7 @@ export const getProfileCompleteness = (profile) => {
   return Math.round((completed / fields.length) * 100);
 };
 
-/**
- * Sanitiza datos de entrada
- */
+//Sanitiza datos de entrada
 export const sanitizeInput = (input) => {
   if (typeof input !== "string") return input;
 
@@ -393,9 +356,7 @@ export const sanitizeInput = (input) => {
     .slice(0, 500); // Limitar longitud
 };
 
-/**
- * Valida código postal según país
- */
+//Valida código postal según país
 export const validateZipCode = (zip, country) => {
   if (!zip) return false;
 
