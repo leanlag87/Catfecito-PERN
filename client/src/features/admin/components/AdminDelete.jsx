@@ -1,10 +1,10 @@
-import { useState, useEffect } from "react";
-import { useAdminStore } from "../stores/adminStore";
+import { useState } from "react";
+import { useAdminProducts } from "../hooks";
 import "./AdminProfile/AdminProfile.css";
 
 export default function AdminDelete() {
-  const { products, fetchAllProducts, deleteProduct, isLoading } =
-    useAdminStore();
+  const { products, isLoading, error, deleteProductById, clearError } =
+    useAdminProducts();
 
   const [id, setId] = useState("");
   const [product, setProduct] = useState(null);
@@ -12,23 +12,25 @@ export default function AdminDelete() {
   const [messageType, setMessageType] = useState("");
   const [loadingProduct, setLoadingProduct] = useState(false);
 
-  useEffect(() => {
-    fetchAllProducts();
-  }, [fetchAllProducts]);
-
   const loadProduct = async () => {
-    if (!id) return setMessage("Selecciona un producto");
+    if (!id) {
+      setMessage("Selecciona un producto");
+      setMessageType("error");
+      return;
+    }
+
     setMessage("");
+    setMessageType("");
     setLoadingProduct(true);
 
-    const selectedProduct = products.find((p) => p.id === parseInt(id));
+    const selectedProduct = products.find((p) => p.id === Number(id));
 
     if (selectedProduct) {
       setProduct(selectedProduct);
     } else {
+      setProduct(null);
       setMessage("No se pudo cargar el producto");
       setMessageType("error");
-      setProduct(null);
     }
 
     setLoadingProduct(false);
@@ -36,40 +38,52 @@ export default function AdminDelete() {
 
   const remove = async (e) => {
     e.preventDefault();
+    clearError?.();
     setMessage("");
 
     if (!id) {
       setMessage("Id requerido");
+      setMessageType("error");
       return;
     }
 
-    const result = await deleteProduct(id);
+    const confirmed = window.confirm(
+      "¿Seguro que deseas eliminar este producto?",
+    );
+    if (!confirmed) return;
 
-    if (result.success) {
+    const result = await deleteProductById(id);
+
+    if (result?.success) {
       setMessage("Producto eliminado");
       setMessageType("success");
       setProduct(null);
       setId("");
     } else {
-      setMessage(result.error);
+      setMessage(result?.error || "No se pudo eliminar el producto");
       setMessageType("error");
     }
   };
 
+  const imageSrc = product?.imageUrl
+    ? import.meta.env.VITE_BACKEND_URL
+      ? `${import.meta.env.VITE_BACKEND_URL.replace(/\/$/, "")}${product.imageUrl}`
+      : product.imageUrl
+    : "/placeholder-coffee.jpg";
+
   return (
     <section className="profile-card-admin">
       <h3>Eliminar producto</h3>
-      {message && (
+
+      {(message || error) && (
         <div
           className={
             messageType === "success"
               ? "profile-success-admin"
-              : messageType === "error"
-                ? "profile-error-admin"
-                : ""
+              : "profile-error-admin"
           }
         >
-          {message}
+          {message || error}
         </div>
       )}
 
@@ -85,6 +99,7 @@ export default function AdminDelete() {
                 </option>
               ))}
             </select>
+
             <button
               className="btn-secondary-admin"
               onClick={(e) => {
@@ -101,13 +116,7 @@ export default function AdminDelete() {
         {product && (
           <div>
             <img
-              src={
-                product.image_url
-                  ? import.meta.env.VITE_BACKEND_URL
-                    ? `${import.meta.env.VITE_BACKEND_URL.replace(/\/$/, "")}${product.image_url}`
-                    : product.image_url
-                  : "/placeholder-coffee.jpg"
-              }
+              src={imageSrc}
               alt={product.name}
               style={{
                 width: 120,
