@@ -1,63 +1,53 @@
-import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState } from "react";
 import { useAuthStore } from "../../auth/stores/authStore";
-import { useProfileStore } from "../stores/profileStore";
-import api from "../../../services/api";
+import { useProfile, useProfileSecurity } from "../hooks";
 import "./Profile/Profile.css";
 
 export default function ProfileInfo() {
-  const navigate = useNavigate();
+  const { logout } = useAuthStore();
+  const {
+    profile,
+    isLoading: isProfileLoading,
+    error: profileError,
+    fullName,
+  } = useProfile();
 
-  const { isAuthenticated, logout } = useAuthStore();
-  const { profile, isLoading, error: profileError } = useProfileStore();
+  const {
+    form,
+    formErrors,
+    isLoading: isSecurityLoading,
+    error: securityError,
+    updateField,
+    submitPasswordChange,
+    resetForm,
+    clearError,
+  } = useProfileSecurity();
 
-  const [error, setError] = useState("");
-  const [currentPassword, setCurrentPassword] = useState("");
-  const [newPassword, setNewPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-
-  useEffect(() => {
-    if (!isAuthenticated) {
-      navigate("/login");
-    }
-  }, [isAuthenticated, navigate]);
+  const [localError, setLocalError] = useState("");
+  const [successMsg, setSuccessMsg] = useState("");
 
   const handleChangePassword = async (e) => {
     e.preventDefault();
-    setError("");
+    setLocalError("");
+    setSuccessMsg("");
+    clearError();
 
-    if (newPassword.length < 8) {
-      setError("La nueva contraseña debe tener al menos 8 caracteres");
+    const result = await submitPasswordChange();
+
+    if (result?.success === false) {
+      setLocalError(result?.error || "Error al cambiar la contraseña");
       return;
     }
 
-    if (newPassword !== confirmPassword) {
-      setError("Las contraseñas nuevas no coinciden");
-      return;
-    }
-
-    try {
-      const { data } = await api.put("/users/change-password", {
-        currentPassword,
-        newPassword,
-      });
-
-      alert(data?.message || "Contraseña actualizada");
-      setCurrentPassword("");
-      setNewPassword("");
-      setConfirmPassword("");
-    } catch (e) {
-      setError(e?.response?.data?.message || "Error al cambiar la contraseña");
-    }
+    setSuccessMsg("Contraseña actualizada correctamente");
+    resetForm();
   };
 
-  const handleLogout = () => {
-    logout();
-  };
+  const handleLogout = () => logout();
 
-  const displayError = error || profileError;
+  const displayError = localError || securityError || profileError;
 
-  if (isLoading) {
+  if (isProfileLoading) {
     return (
       <section className="profile-card">
         <p>Cargando perfil...</p>
@@ -69,11 +59,13 @@ export default function ProfileInfo() {
     <>
       <section className="profile-card">
         {displayError && <div className="profile-error">{displayError}</div>}
+        {successMsg && <div className="profile-success">{successMsg}</div>}
+
         {profile ? (
           <div className="profile-fields">
             <div className="field">
               <div className="field-label">Nombre</div>
-              <div className="field-value">{profile.name}</div>
+              <div className="field-value">{fullName || profile.name}</div>
             </div>
             <div className="field">
               <div className="field-label">Correo electrónico</div>
@@ -89,40 +81,55 @@ export default function ProfileInfo() {
         <div className="section-header">
           <h2 className="section-title">Seguridad</h2>
         </div>
+
         <form className="password-form" onSubmit={handleChangePassword}>
           <label>Contraseña actual</label>
           <input
             type="password"
-            value={currentPassword}
-            onChange={(e) => setCurrentPassword(e.target.value)}
+            value={form.currentPassword}
+            onChange={(e) => updateField("currentPassword", e.target.value)}
             required
             autoComplete="current-password"
           />
+          {formErrors.currentPassword && (
+            <span className="field-error">{formErrors.currentPassword}</span>
+          )}
 
           <label>Nueva contraseña</label>
           <input
             type="password"
-            value={newPassword}
-            onChange={(e) => setNewPassword(e.target.value)}
+            value={form.newPassword}
+            onChange={(e) => updateField("newPassword", e.target.value)}
             required
             minLength={8}
             autoComplete="new-password"
           />
+          {formErrors.newPassword && (
+            <span className="field-error">{formErrors.newPassword}</span>
+          )}
 
           <label>Confirmar nueva contraseña</label>
           <input
             type="password"
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
+            value={form.confirmPassword}
+            onChange={(e) => updateField("confirmPassword", e.target.value)}
             required
             minLength={8}
             autoComplete="new-password"
           />
+          {formErrors.confirmPassword && (
+            <span className="field-error">{formErrors.confirmPassword}</span>
+          )}
 
-          <button type="submit" className="btn-primary">
-            Actualizar contraseña
+          <button
+            type="submit"
+            className="btn-primary"
+            disabled={isSecurityLoading}
+          >
+            {isSecurityLoading ? "Actualizando..." : "Actualizar contraseña"}
           </button>
         </form>
+
         <div className="cerrar-sesion-row">
           <button type="button" className="btn-danger" onClick={handleLogout}>
             Cerrar sesión

@@ -1,59 +1,42 @@
-import { useState, useEffect } from "react";
-import { useAdminStore } from "../stores/adminStore";
+import { useState } from "react";
+import { useAdminProducts } from "../hooks";
 import "./AdminProfile/AdminProfile.css";
 
 export default function AdminInsert() {
-  const { categories, fetchCategories, createProduct, isLoading } =
-    useAdminStore();
+  const {
+    categories,
+    form,
+    formErrors,
+    imageFile,
+    isLoading,
+    error,
+    setField,
+    setImageFile,
+    createProduct,
+    resetForm,
+    clearError,
+  } = useAdminProducts();
 
-  const [form, setForm] = useState({
-    name: "",
-    description: "",
-    price: "",
-    stock: "",
-    category_id: "",
-  });
-  const [imageFile, setImageFile] = useState(null);
-  const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
-  useEffect(() => {
-    fetchCategories();
-  }, [fetchCategories]);
+  const onChange = (e) => {
+    setField(e.target.name, e.target.value);
+  };
 
-  const onChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
-  const onFile = (e) => setImageFile(e.target.files?.[0] || null);
+  const onFile = (e) => {
+    setImageFile(e.target.files?.[0] || null);
+  };
 
   const submit = async (e) => {
     e.preventDefault();
-    setError("");
     setSuccess("");
+    clearError?.();
 
-    if (!form.name || !form.description || !form.price || !form.category_id) {
-      setError("Nombre, descripción, precio y categoría son requeridos");
-      return;
-    }
+    const result = await createProduct();
 
-    const fd = new FormData();
-    Object.entries(form).forEach(([k, v]) => {
-      if (v !== "") fd.append(k, v);
-    });
-    if (imageFile) fd.append("image", imageFile);
-
-    const result = await createProduct(fd);
-
-    if (result.success) {
-      setSuccess(result.data?.message || "Producto creado");
-      setForm({
-        name: "",
-        description: "",
-        price: "",
-        stock: "",
-        category_id: "",
-      });
-      setImageFile(null);
-    } else {
-      setError(result.error);
+    if (result?.success) {
+      setSuccess(result?.data?.message || "Producto creado");
+      resetForm();
     }
   };
 
@@ -66,6 +49,9 @@ export default function AdminInsert() {
       <form onSubmit={submit} className="iud-products-admin">
         <label>Nombre</label>
         <input name="name" value={form.name} onChange={onChange} required />
+        {formErrors.name && (
+          <span className="field-error">{formErrors.name}</span>
+        )}
 
         <label>Descripción</label>
         <textarea
@@ -75,6 +61,9 @@ export default function AdminInsert() {
           rows={4}
           required
         />
+        {formErrors.description && (
+          <span className="field-error">{formErrors.description}</span>
+        )}
 
         <label>Precio</label>
         <input
@@ -86,6 +75,9 @@ export default function AdminInsert() {
           onChange={onChange}
           required
         />
+        {formErrors.price && (
+          <span className="field-error">{formErrors.price}</span>
+        )}
 
         <label>Stock</label>
         <input
@@ -96,6 +88,9 @@ export default function AdminInsert() {
           value={form.stock}
           onChange={onChange}
         />
+        {formErrors.stock && (
+          <span className="field-error">{formErrors.stock}</span>
+        )}
 
         <label>Categoría</label>
         <select
@@ -111,6 +106,9 @@ export default function AdminInsert() {
             </option>
           ))}
         </select>
+        {formErrors.category_id && (
+          <span className="field-error">{formErrors.category_id}</span>
+        )}
 
         <label>Imagen</label>
         <div className="insert-product-image">
