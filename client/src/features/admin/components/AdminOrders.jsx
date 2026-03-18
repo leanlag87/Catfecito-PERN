@@ -21,6 +21,8 @@ export default function AdminOrders() {
 
   const [expandedOrder, setExpandedOrder] = useState(null);
   const [orderDetails, setOrderDetails] = useState({});
+  const [updatingOrderId, setUpdatingOrderId] = useState(null);
+  const [updatingPaymentId, setUpdatingPaymentId] = useState(null);
 
   const BACKEND_ORIGIN = import.meta.env.VITE_BACKEND_URL
     ? import.meta.env.VITE_BACKEND_URL.replace(/\/$/, "")
@@ -53,10 +55,37 @@ export default function AdminOrders() {
         }));
       } catch (err) {
         console.error("Error al obtener detalles:", err);
+        alert("No se pudieron cargar los detalles del pedido");
       }
     }
 
     setExpandedOrder(orderId);
+  };
+
+  const handleOrderStatusChange = async (orderId, nextStatus) => {
+    setUpdatingOrderId(orderId);
+    const res = await setOrderStatus(orderId, nextStatus);
+    setUpdatingOrderId(null);
+
+    if (!res?.success) {
+      alert(res?.error || "No se pudo actualizar el estado del pedido");
+      return;
+    }
+
+    alert("Estado del pedido actualizado");
+  };
+
+  const handlePaymentStatusChange = async (orderId, nextPaymentStatus) => {
+    setUpdatingPaymentId(orderId);
+    const res = await setPaymentStatus(orderId, nextPaymentStatus);
+    setUpdatingPaymentId(null);
+
+    if (!res?.success) {
+      alert(res?.error || "No se pudo actualizar el estado del pago");
+      return;
+    }
+
+    alert("Estado del pago actualizado");
   };
 
   return (
@@ -149,7 +178,10 @@ export default function AdminOrders() {
                   >
                     <select
                       value={o.status || "pending"}
-                      onChange={(e) => setOrderStatus(o.id, e.target.value)}
+                      disabled={updatingOrderId === o.id}
+                      onChange={(e) =>
+                        handleOrderStatusChange(o.id, e.target.value)
+                      }
                     >
                       <option value="pending">Pendiente</option>
                       <option value="processing">Procesando</option>
@@ -159,7 +191,10 @@ export default function AdminOrders() {
 
                     <select
                       value={o.paymentStatus || "pending"}
-                      onChange={(e) => setPaymentStatus(o.id, e.target.value)}
+                      disabled={updatingPaymentId === o.id}
+                      onChange={(e) =>
+                        handlePaymentStatusChange(o.id, e.target.value)
+                      }
                     >
                       <option value="pending">Pago pendiente</option>
                       <option value="approved">Pago aprobado</option>
