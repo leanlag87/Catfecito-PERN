@@ -15,6 +15,8 @@ export default function AdminOrders() {
     setStatusFilter,
     setPaymentFilter,
     setSearch,
+    setOrderStatus,
+    setPaymentStatus,
   } = useAdminOrders();
 
   const [expandedOrder, setExpandedOrder] = useState(null);
@@ -135,6 +137,35 @@ export default function AdminOrders() {
                   </div>
                   <div>
                     Total: ${Number(o.total || 0).toLocaleString("es-AR")}
+                  </div>
+
+                  <div
+                    style={{
+                      display: "flex",
+                      gap: 8,
+                      flexWrap: "wrap",
+                      marginTop: 8,
+                    }}
+                  >
+                    <select
+                      value={o.status || "pending"}
+                      onChange={(e) => setOrderStatus(o.id, e.target.value)}
+                    >
+                      <option value="pending">Pendiente</option>
+                      <option value="processing">Procesando</option>
+                      <option value="delivered">Entregado</option>
+                      <option value="cancelled">Cancelado</option>
+                    </select>
+
+                    <select
+                      value={o.paymentStatus || "pending"}
+                      onChange={(e) => setPaymentStatus(o.id, e.target.value)}
+                    >
+                      <option value="pending">Pago pendiente</option>
+                      <option value="approved">Pago aprobado</option>
+                      <option value="rejected">Pago rechazado</option>
+                      <option value="cancelled">Pago cancelado</option>
+                    </select>
                   </div>
 
                   <div
