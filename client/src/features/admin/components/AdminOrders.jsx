@@ -4,7 +4,18 @@ import api from "../../../services/api";
 import "../../profile/components/ProfileOrders/ProfileOrders.css";
 
 export default function AdminOrders() {
-  const { allOrders, isLoading, error } = useAdminOrders();
+  const {
+    orders,
+    isLoading,
+    error,
+    stats,
+    statusFilter,
+    paymentFilter,
+    search,
+    setStatusFilter,
+    setPaymentFilter,
+    setSearch,
+  } = useAdminOrders();
 
   const [expandedOrder, setExpandedOrder] = useState(null);
   const [orderDetails, setOrderDetails] = useState({});
@@ -52,16 +63,58 @@ export default function AdminOrders() {
         <h2>Pedidos de usuarios</h2>
       </div>
 
+      <div
+        style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 12 }}
+      >
+        <input
+          type="text"
+          placeholder="Buscar por ID, nombre o email"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          style={{ minWidth: 260 }}
+        />
+
+        <select
+          value={statusFilter}
+          onChange={(e) => setStatusFilter(e.target.value)}
+        >
+          <option value="all">Todos los estados</option>
+          <option value="pending">Pendiente</option>
+          <option value="processing">Procesando</option>
+          <option value="delivered">Entregado</option>
+          <option value="cancelled">Cancelado</option>
+        </select>
+
+        <select
+          value={paymentFilter}
+          onChange={(e) => setPaymentFilter(e.target.value)}
+        >
+          <option value="all">Todos los pagos</option>
+          <option value="pending">Pendiente</option>
+          <option value="approved">Aprobado</option>
+          <option value="rejected">Rechazado</option>
+          <option value="cancelled">Cancelado</option>
+        </select>
+      </div>
+
+      <div style={{ marginBottom: 12, fontSize: 14 }}>
+        Total: <strong>{stats?.total ?? 0}</strong> | Pendientes:{" "}
+        <strong>{stats?.pending ?? 0}</strong> | Procesando:{" "}
+        <strong>{stats?.processing ?? 0}</strong> | Entregados:{" "}
+        <strong>{stats?.delivered ?? 0}</strong> | Cancelados:{" "}
+        <strong>{stats?.cancelled ?? 0}</strong>
+      </div>
+
       {isLoading && <p>Cargando pedidos…</p>}
       {error && <div className="orders-error">{error}</div>}
 
       {!isLoading &&
         !error &&
-        (allOrders.length === 0 ? (
+        (orders.length === 0 ? (
           <p>No hay pedidos todavía.</p>
         ) : (
           <ul className="orders-list">
-            {allOrders.map((o) => (
+            {orders.map((o) => (
               <li key={o.id} className="disponsal-item">
                 <div className="disponsal-summary">
                   <div>
