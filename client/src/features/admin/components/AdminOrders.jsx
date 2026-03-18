@@ -1,10 +1,10 @@
-import { useEffect, useState } from "react";
-import { useAdminStore } from "../stores/adminStore";
+import { useState } from "react";
+import { useAdminOrders } from "../hooks";
 import api from "../../../services/api";
 import "../../profile/components/ProfileOrders/ProfileOrders.css";
 
 export default function AdminOrders() {
-  const { allOrders, fetchAllOrders, isLoading, error } = useAdminStore();
+  const { allOrders, isLoading, error } = useAdminOrders();
 
   const [expandedOrder, setExpandedOrder] = useState(null);
   const [orderDetails, setOrderDetails] = useState({});
@@ -16,9 +16,7 @@ export default function AdminOrders() {
   const getItemImageSrc = (it) => {
     if (!it) return "";
     let v = it.image ?? it.image_url ?? "";
-    if (v && typeof v === "object" && typeof v.url === "string") {
-      v = v.url;
-    }
+    if (v && typeof v === "object" && typeof v.url === "string") v = v.url;
     if (typeof v !== "string") return "";
     const src = v.trim();
     if (!src) return "";
@@ -26,10 +24,6 @@ export default function AdminOrders() {
     if (!BACKEND_ORIGIN) return src;
     return `${BACKEND_ORIGIN}${src.startsWith("/") ? "" : "/"}${src}`;
   };
-
-  useEffect(() => {
-    fetchAllOrders();
-  }, [fetchAllOrders]);
 
   const toggleOrderDetails = async (orderId) => {
     if (expandedOrder === orderId) {
@@ -42,7 +36,7 @@ export default function AdminOrders() {
         const { data } = await api.orders.getById(orderId);
         setOrderDetails((prev) => ({
           ...prev,
-          [orderId]: data.order,
+          [orderId]: data?.order || null,
         }));
       } catch (err) {
         console.error("Error al obtener detalles:", err);
@@ -74,26 +68,27 @@ export default function AdminOrders() {
                     <strong>Pedido #{o.id}</strong>
                   </div>
                   <div>
-                    <strong>Usuario:</strong> {o.user_name} ({o.user_email})
+                    <strong>Usuario:</strong> {o.userName} ({o.userEmail})
                   </div>
                   <div>
                     Fecha:{" "}
-                    {o.created_at
-                      ? new Date(o.created_at).toLocaleString("es-AR")
+                    {o.createdAt
+                      ? new Date(o.createdAt).toLocaleString("es-AR")
                       : "-"}
                   </div>
                   <div>
                     Estado: {o.status}{" "}
-                    {o.payment_status ? `(pago: ${o.payment_status})` : ""}
+                    {o.paymentStatus ? `(pago: ${o.paymentStatus})` : ""}
                   </div>
                   <div>
                     Total: ${Number(o.total || 0).toLocaleString("es-AR")}
                   </div>
+
                   <div
                     className="order-items-toggle"
                     onClick={() => toggleOrderDetails(o.id)}
                   >
-                    Items: {o.items_count}
+                    Items: {o.itemsCount || 0}
                     <span
                       className={`arrow ${expandedOrder === o.id ? "open" : ""}`}
                     >
@@ -109,7 +104,7 @@ export default function AdminOrders() {
                         <div className="shipping-info">
                           <h4>Datos del envío</h4>
                           <p>{orderDetails[o.id].shipping_country}</p>
-                          <p>{orderDetails[o.id].shipping_address}/</p>
+                          <p>{orderDetails[o.id].shipping_address}</p>
                           <p>{orderDetails[o.id].shipping_city}</p>
                           <p>{orderDetails[o.id].shipping_state}</p>
                           <p>{orderDetails[o.id].shipping_zip}</p>
@@ -119,7 +114,7 @@ export default function AdminOrders() {
                         <div className="purchase-info">
                           <h4>Datos de la compra</h4>
                           <ul className="purchase-list">
-                            {orderDetails[o.id].items.map((item) => (
+                            {(orderDetails[o.id].items || []).map((item) => (
                               <li key={item.id} className="purchase-item">
                                 <div className="purchase-text">
                                   <p>
