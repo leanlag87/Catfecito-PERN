@@ -1,50 +1,49 @@
-import { useState, useEffect } from "react";
-import { useAdminStore } from "../stores/adminStore";
+import { useState } from "react";
+import { useAdminProducts } from "../hooks";
 import "./AdminProfile/AdminProfile.css";
 
 export default function AdminUpdate() {
-  const { products, fetchAllProducts, updateProduct, isLoading } =
-    useAdminStore();
+  const {
+    products,
+    categories,
+    form,
+    formErrors,
+    imageFile,
+    isLoading,
+    error,
+    setField,
+    setImageFile,
+    setFormFromProduct,
+    updateProductById,
+    clearError,
+  } = useAdminProducts();
 
   const [id, setId] = useState("");
   const [product, setProduct] = useState(null);
-  const [payload, setPayload] = useState({
-    name: "",
-    price: "",
-    stock: "",
-    description: "",
-  });
-  const [imageFile, setImageFile] = useState(null);
   const [message, setMessage] = useState("");
   const [messageType, setMessageType] = useState("");
   const [loadingProduct, setLoadingProduct] = useState(false);
 
-  useEffect(() => {
-    fetchAllProducts();
-  }, [fetchAllProducts]);
-
   const loadProduct = async () => {
-    if (!id) return setMessage("Selecciona un producto");
+    if (!id) {
+      setMessage("Selecciona un producto");
+      setMessageType("error");
+      return;
+    }
+
     setMessage("");
     setLoadingProduct(true);
 
-    const selectedProduct = products.find((p) => p.id === parseInt(id));
+    const selectedProduct = products.find((p) => p.id === Number(id));
 
     if (selectedProduct) {
       setProduct(selectedProduct);
-      setImageFile(null);
-      setPayload({
-        name: selectedProduct.name || "",
-        price:
-          selectedProduct.price != null ? String(selectedProduct.price) : "",
-        stock:
-          selectedProduct.stock != null ? String(selectedProduct.stock) : "",
-        description: selectedProduct.description || "",
-      });
+      setFormFromProduct(selectedProduct);
+      setMessageType("");
     } else {
+      setProduct(null);
       setMessage("No se pudo cargar el producto");
       setMessageType("error");
-      setProduct(null);
     }
 
     setLoadingProduct(false);
@@ -52,56 +51,50 @@ export default function AdminUpdate() {
 
   const update = async (e) => {
     e.preventDefault();
+    clearError?.();
     setMessage("");
+    setMessageType("");
 
     if (!id) {
       setMessage("Id requerido");
+      setMessageType("error");
       return;
     }
 
-    let body;
+    const result = await updateProductById(id);
 
-    if (imageFile) {
-      body = new FormData();
-      Object.keys(payload).forEach((k) => {
-        if (payload[k] !== "") body.append(k, payload[k]);
-      });
-      body.append("image", imageFile);
-    } else {
-      body = {};
-      Object.keys(payload).forEach((k) => {
-        if (payload[k] !== "") body[k] = payload[k];
-      });
-    }
-
-    const result = await updateProduct(id, body);
-
-    if (result.success) {
-      setMessage(result.data?.message || "Producto actualizado");
+    if (result?.success) {
+      setMessage(result?.data?.message || "Producto actualizado");
       setMessageType("success");
       setImageFile(null);
+    } else if (result?.validation) {
+      setMessage("Revisa los campos del formulario");
+      setMessageType("error");
     } else {
-      setMessage(result.error);
+      setMessage(result?.error || "No se pudo actualizar");
       setMessageType("error");
     }
   };
 
-  const onFile = (e) => setImageFile(e.target.files?.[0] || null);
+  const imageSrc = product?.imageUrl
+    ? import.meta.env.VITE_BACKEND_URL
+      ? `${import.meta.env.VITE_BACKEND_URL.replace(/\/$/, "")}${product.imageUrl}`
+      : product.imageUrl
+    : "/placeholder-coffee.jpg";
 
   return (
     <section className="profile-card-admin">
       <h3>Actualizar producto</h3>
-      {message && (
+
+      {(message || error) && (
         <div
           className={
             messageType === "success"
               ? "profile-success-admin"
-              : messageType === "error"
-                ? "profile-error-admin"
-                : ""
+              : "profile-error-admin"
           }
         >
-          {message}
+          {message || error}
         </div>
       )}
 
@@ -118,6 +111,7 @@ export default function AdminUpdate() {
                   </option>
                 ))}
               </select>
+
               <button
                 className="btn-secondary-admin"
                 onClick={(e) => {
@@ -135,13 +129,7 @@ export default function AdminUpdate() {
         {product && (
           <div>
             <img
-              src={
-                product.image_url
-                  ? import.meta.env.VITE_BACKEND_URL
-                    ? `${import.meta.env.VITE_BACKEND_URL.replace(/\/$/, "")}${product.image_url}`
-                    : product.image_url
-                  : "/placeholder-coffee.jpg"
-              }
+              src={imageSrc}
               alt={product.name}
               style={{
                 width: 120,
@@ -160,41 +148,78 @@ export default function AdminUpdate() {
 
         <label>Nombre</label>
         <input
-          value={payload.name}
-          onChange={(e) => setPayload({ ...payload, name: e.target.value })}
+          name="name"
+          value={form.name}
+          onChange={(e) => setField("name", e.target.value)}
           required
         />
+        {formErrors.name && (
+          <span className="field-error">{formErrors.name}</span>
+        )}
 
         <label>Descripción</label>
         <textarea
-          value={payload.description}
-          onChange={(e) =>
-            setPayload({ ...payload, description: e.target.value })
-          }
+          name="description"
+          value={form.description}
+          onChange={(e) => setField("description", e.target.value)}
+          rows={4}
         />
+        {formErrors.description && (
+          <span className="field-error">{formErrors.description}</span>
+        )}
 
         <label>Precio</label>
         <input
           type="number"
           min="0"
           step="0.01"
-          value={payload.price}
-          onChange={(e) => setPayload({ ...payload, price: e.target.value })}
+          name="price"
+          value={form.price}
+          onChange={(e) => setField("price", e.target.value)}
           required
         />
+        {formErrors.price && (
+          <span className="field-error">{formErrors.price}</span>
+        )}
 
         <label>Stock</label>
         <input
           type="number"
           min="0"
           step="1"
-          value={payload.stock}
-          onChange={(e) => setPayload({ ...payload, stock: e.target.value })}
+          name="stock"
+          value={form.stock}
+          onChange={(e) => setField("stock", e.target.value)}
         />
+        {formErrors.stock && (
+          <span className="field-error">{formErrors.stock}</span>
+        )}
+
+        <label>Categoría</label>
+        <select
+          name="category_id"
+          value={form.category_id}
+          onChange={(e) => setField("category_id", e.target.value)}
+          required
+        >
+          <option value="">Selecciona</option>
+          {categories.map((c) => (
+            <option key={c.id} value={c.id}>
+              {c.name}
+            </option>
+          ))}
+        </select>
+        {formErrors.category_id && (
+          <span className="field-error">{formErrors.category_id}</span>
+        )}
 
         <label>Imagen</label>
         <div className="insert-product-image">
-          <input type="file" accept="image/*" onChange={onFile} />
+          <input
+            type="file"
+            accept="image/*"
+            onChange={(e) => setImageFile(e.target.files?.[0] || null)}
+          />
           {imageFile && <div>✓ {imageFile.name}</div>}
         </div>
 
