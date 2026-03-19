@@ -139,6 +139,13 @@ export const useAuthStore = create(
         localStorage.removeItem(STORAGE_KEYS.REFRESH_TOKEN);
         localStorage.removeItem(STORAGE_KEYS.USER);
 
+        // legacy cleanup
+        localStorage.removeItem("token");
+        localStorage.removeItem("refreshToken");
+        localStorage.removeItem("user");
+        sessionStorage.removeItem("authToken");
+        sessionStorage.removeItem("authUser");
+
         // Disparar evento
         window.dispatchEvent(new Event("authChanged"));
 
