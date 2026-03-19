@@ -70,6 +70,13 @@ export const useAuthStore = create(
           localStorage.removeItem(STORAGE_KEYS.REFRESH_TOKEN);
           localStorage.removeItem(STORAGE_KEYS.USER);
 
+          // legacy cleanup
+          localStorage.removeItem("token");
+          localStorage.removeItem("refreshToken");
+          localStorage.removeItem("user");
+          sessionStorage.removeItem("authToken");
+          sessionStorage.removeItem("authUser");
+
           return { success: false, error: errorMessage };
         }
       },
@@ -119,6 +126,13 @@ export const useAuthStore = create(
           localStorage.removeItem(STORAGE_KEYS.AUTH_TOKEN);
           localStorage.removeItem(STORAGE_KEYS.REFRESH_TOKEN);
           localStorage.removeItem(STORAGE_KEYS.USER);
+
+          // legacy cleanup
+          localStorage.removeItem("token");
+          localStorage.removeItem("refreshToken");
+          localStorage.removeItem("user");
+          sessionStorage.removeItem("authToken");
+          sessionStorage.removeItem("authUser");
 
           return { success: false, error: errorMessage };
         }
