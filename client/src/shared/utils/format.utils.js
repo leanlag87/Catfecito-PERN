@@ -50,3 +50,16 @@ export const normalizeText = (text = "") =>
     .replace(/[\u0300-\u036f]/g, "")
     .toLowerCase()
     .trim();
+
+/**
+ * Estas funciones de formato sirven para estandarizar la presentación de datos en la interfaz de usuario.
+ * - toNumber: Convierte un valor a número, con un fallback seguro.
+ * - formatCurrency: Formatea un número como moneda según la configuración regional.
+ * - formatDate: Formatea una fecha a una cadena legible según la configuración regional.
+ * - formatDateTime: Formatea una fecha y hora a una cadena legible según la configuración regional.
+ * - formatPhone: Formatea un número de teléfono para su visualización.
+ * - capitalize: Convierte la primera letra de un texto a mayúscula.
+ * - truncate: Trunca un texto a una longitud máxima, agregando puntos suspensivos si es necesario.
+ * - normalizeText: Normaliza un texto eliminando acentos y convirtiéndolo a minúsculas.
+ * Estas funciones ayudan a mantener la consistencia en la presentación de datos y facilitan el mantenimiento del código.
+ */
