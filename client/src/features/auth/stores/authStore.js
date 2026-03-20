@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import api from "../../../services/api";
+import { STORAGE_KEYS } from "../../../shared/constants";
 
 /**
  * Auth Store - Manejo centralizado de autenticación
@@ -42,6 +43,14 @@ export const useAuthStore = create(
             error: null,
           });
 
+          localStorage.setItem(STORAGE_KEYS.AUTH_TOKEN, data.token);
+          if (data?.refreshToken) {
+            localStorage.setItem(STORAGE_KEYS.REFRESH_TOKEN, data.refreshToken);
+          }
+          if (data?.user) {
+            localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(data.user));
+          }
+
           // Disparar evento para componentes que escuchan authChanged
           window.dispatchEvent(new Event("authChanged"));
 
@@ -56,6 +65,17 @@ export const useAuthStore = create(
             isLoading: false,
             error: errorMessage,
           });
+
+          localStorage.removeItem(STORAGE_KEYS.AUTH_TOKEN);
+          localStorage.removeItem(STORAGE_KEYS.REFRESH_TOKEN);
+          localStorage.removeItem(STORAGE_KEYS.USER);
+
+          // legacy cleanup
+          localStorage.removeItem("token");
+          localStorage.removeItem("refreshToken");
+          localStorage.removeItem("user");
+          sessionStorage.removeItem("authToken");
+          sessionStorage.removeItem("authUser");
 
           return { success: false, error: errorMessage };
         }
@@ -80,6 +100,14 @@ export const useAuthStore = create(
             error: null,
           });
 
+          localStorage.setItem(STORAGE_KEYS.AUTH_TOKEN, data.token);
+          if (data?.refreshToken) {
+            localStorage.setItem(STORAGE_KEYS.REFRESH_TOKEN, data.refreshToken);
+          }
+          if (data?.user) {
+            localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(data.user));
+          }
+
           // Disparar evento
           window.dispatchEvent(new Event("authChanged"));
 
@@ -94,6 +122,17 @@ export const useAuthStore = create(
             isLoading: false,
             error: errorMessage,
           });
+
+          localStorage.removeItem(STORAGE_KEYS.AUTH_TOKEN);
+          localStorage.removeItem(STORAGE_KEYS.REFRESH_TOKEN);
+          localStorage.removeItem(STORAGE_KEYS.USER);
+
+          // legacy cleanup
+          localStorage.removeItem("token");
+          localStorage.removeItem("refreshToken");
+          localStorage.removeItem("user");
+          sessionStorage.removeItem("authToken");
+          sessionStorage.removeItem("authUser");
 
           return { success: false, error: errorMessage };
         }
@@ -110,6 +149,14 @@ export const useAuthStore = create(
         });
 
         // Limpiar sessionStorage/localStorage legacy (migración)
+        localStorage.removeItem(STORAGE_KEYS.AUTH_TOKEN);
+        localStorage.removeItem(STORAGE_KEYS.REFRESH_TOKEN);
+        localStorage.removeItem(STORAGE_KEYS.USER);
+
+        // legacy cleanup
+        localStorage.removeItem("token");
+        localStorage.removeItem("refreshToken");
+        localStorage.removeItem("user");
         sessionStorage.removeItem("authToken");
         sessionStorage.removeItem("authUser");
 

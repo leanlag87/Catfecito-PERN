@@ -1,4 +1,5 @@
 import { sanitizeInput } from "../validations/auth.validation";
+import { STORAGE_KEYS } from "../../../shared/constants";
 
 /**
  * Auth Service - Funciones helper para autenticación
@@ -204,15 +205,12 @@ export const getAuthHeaders = (token) => {
 };
 
 //Guarda datos de auth en localStorage de forma segura
-export const saveAuthData = (token, user) => {
+export const saveAuthData = (token, user, refreshToken = null) => {
   try {
-    if (token) {
-      localStorage.setItem("token", token);
-    }
-
-    if (user) {
-      localStorage.setItem("user", JSON.stringify(user));
-    }
+    if (token) localStorage.setItem(STORAGE_KEYS.AUTH_TOKEN, token);
+    if (refreshToken)
+      localStorage.setItem(STORAGE_KEYS.REFRESH_TOKEN, refreshToken);
+    if (user) localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(user));
 
     return true;
   } catch (error) {
@@ -224,35 +222,59 @@ export const saveAuthData = (token, user) => {
 //Recupera datos de auth de localStorage
 export const loadAuthData = () => {
   try {
-    const token = localStorage.getItem("token");
-    const userStr = localStorage.getItem("user");
+    const token =
+      localStorage.getItem(STORAGE_KEYS.AUTH_TOKEN) ||
+      localStorage.getItem("token");
+    const refreshToken =
+      localStorage.getItem(STORAGE_KEYS.REFRESH_TOKEN) ||
+      localStorage.getItem("refreshToken");
+    const userStr =
+      localStorage.getItem(STORAGE_KEYS.USER) || localStorage.getItem("user");
 
-    if (!token || !userStr) {
-      return { token: null, user: null };
-    }
+    if (!token || !userStr)
+      return { token: null, refreshToken: null, user: null };
 
-    // Verificar si el token está expirado
     if (isTokenExpired(token)) {
-      console.warn("Token expirado en localStorage");
       clearAuthData();
-      return { token: null, user: null };
+      return { token: null, refreshToken: null, user: null };
     }
 
-    const user = JSON.parse(userStr);
+    // migración automática
+    if (!localStorage.getItem(STORAGE_KEYS.AUTH_TOKEN)) {
+      localStorage.setItem(STORAGE_KEYS.AUTH_TOKEN, token);
+      localStorage.removeItem("token");
+    }
+    if (refreshToken && !localStorage.getItem(STORAGE_KEYS.REFRESH_TOKEN)) {
+      localStorage.setItem(STORAGE_KEYS.REFRESH_TOKEN, refreshToken);
+      localStorage.removeItem("refreshToken");
+    }
+    if (!localStorage.getItem(STORAGE_KEYS.USER)) {
+      localStorage.setItem(STORAGE_KEYS.USER, userStr);
+      localStorage.removeItem("user");
+    }
 
-    return { token, user };
+    return { token, refreshToken, user: JSON.parse(userStr) };
   } catch (error) {
     console.error("Error al cargar datos de auth:", error);
     clearAuthData();
-    return { token: null, user: null };
+    return { token: null, refreshToken: null, user: null };
   }
 };
 
 //Limpia datos de auth de localStorage
 export const clearAuthData = () => {
   try {
+    localStorage.removeItem(STORAGE_KEYS.AUTH_TOKEN);
+    localStorage.removeItem(STORAGE_KEYS.REFRESH_TOKEN);
+    localStorage.removeItem(STORAGE_KEYS.USER);
+
+    // legacy cleanup
     localStorage.removeItem("token");
+    localStorage.removeItem("refreshToken");
     localStorage.removeItem("user");
+    sessionStorage.removeItem("authToken");
+    sessionStorage.removeItem("authUser");
+
     return true;
   } catch (error) {
     console.error("Error al limpiar datos de auth:", error);
