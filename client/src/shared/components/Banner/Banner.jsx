@@ -1,106 +1,123 @@
-import { useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { ROUTES } from "../../constants";
 import "./Banner.css";
 import bannerBackground from "../../../assets/img/gato-portada.png";
 import catImg from "../../../assets/img/cat.png";
 import logoSvg from "../../../assets/img/Group.svg";
 
+const AUTOPLAY_MS = 5000;
+const ENABLE_AUTOPLAY = false;
+
+const SLIDES = [
+  {
+    src: bannerBackground,
+    alt: "Banner principal con café y arte de gato",
+    content: {
+      logo: logoSvg,
+      text: "Descubre el sabor único de nuestro café artesanal, preparado con los granos más selectos para tu paladar.",
+      buttonText: "COMPRAR",
+    },
+  },
+  {
+    src: catImg,
+    alt: "Banner secundario",
+  },
+];
+
 export const Banner = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const navigate = useNavigate();
 
-  // Array de objetos para definir cada slide
-  const slides = [
-    {
-      src: bannerBackground,
-      alt: "Banner principal con café y arte de gato",
-      // Contenido que se superpondrá a la imagen
-      content: {
-        logo: logoSvg,
-        text: "Descubre el sabor único de nuestro café artesanal, preparado con los granos más selectos para tu paladar.",
-        buttonText: "COMPRAR",
-      },
+  const totalSlides = SLIDES.length;
+  const shopRoute = ROUTES.SHOP || "/products";
+
+  const normalizeIndex = useCallback(
+    (index) => ((index % totalSlides) + totalSlides) % totalSlides,
+    [totalSlides],
+  );
+
+  const goToSlide = useCallback(
+    (index) => setCurrentSlide(normalizeIndex(index)),
+    [normalizeIndex],
+  );
+
+  const nextSlide = useCallback(
+    (e) => {
+      e?.stopPropagation?.();
+      setCurrentSlide((prev) => normalizeIndex(prev + 1));
     },
-    {
-      src: catImg,
-      alt: "Banner secundario",
+    [normalizeIndex],
+  );
+
+  const prevSlide = useCallback(
+    (e) => {
+      e?.stopPropagation?.();
+      setCurrentSlide((prev) => normalizeIndex(prev - 1));
     },
-  ];
+    [normalizeIndex],
+  );
 
-  const totalSlides = slides.length;
-
-  const showSlide = (index) => {
-    const normalizedIndex = ((index % totalSlides) + totalSlides) % totalSlides;
-    setCurrentSlide(normalizedIndex);
-  };
-
-  const nextSlide = (e) => {
-    e?.stopPropagation();
-    showSlide(currentSlide + 1);
-  };
-
-  const prevSlide = (e) => {
-    e?.stopPropagation();
-    showSlide(currentSlide - 1);
-  };
-
-  const goToSlide = (index) => {
-    showSlide(index);
-  };
-
-  // Descomenta este bloque para que el slider cambie automáticamente
-  /*
   useEffect(() => {
-    const interval = setInterval(nextSlide, 5000);
-    return () => clearInterval(interval);
-  }, [currentSlide]);
-  */
+    if (!ENABLE_AUTOPLAY || totalSlides <= 1) return;
+    const interval = window.setInterval(() => {
+      setCurrentSlide((prev) => normalizeIndex(prev + 1));
+    }, AUTOPLAY_MS);
+
+    return () => window.clearInterval(interval);
+  }, [normalizeIndex, totalSlides]);
+
+  const activeSlide = useMemo(() => SLIDES[currentSlide], [currentSlide]);
 
   return (
     <div className="hero-slider">
       <div className="slider-images">
-        {/* Mapeo de las imágenes de fondo del slider */}
-        {slides.map((slide, index) => (
+        {SLIDES.map((slide, index) => (
           <img
-            key={index}
+            key={slide.alt}
             src={slide.src}
             alt={slide.alt}
             className={index === currentSlide ? "active" : ""}
           />
         ))}
 
-        {/* Renderiza el contenido superpuesto solo si el slide activo lo tiene */}
-        {slides[currentSlide].content && (
+        {activeSlide?.content && (
           <div className="slide-content">
             <img
-              src={slides[currentSlide].content.logo}
+              src={activeSlide.content.logo}
               alt="Logo Catfecito"
               className="logo"
             />
-            <p className="text">{slides[currentSlide].content.text}</p>
-            <button
-              className="buy-button"
-              onClick={() => navigate("/products")}
-            >
-              {slides[currentSlide].content.buttonText}
+            <p className="text">{activeSlide.content.text}</p>
+            <button className="buy-button" onClick={() => navigate(shopRoute)}>
+              {activeSlide.content.buttonText}
             </button>
           </div>
         )}
 
-        {/* Controles del Slider */}
-        <button className="prev" onClick={prevSlide}>
+        <button
+          className="prev"
+          onClick={prevSlide}
+          aria-label="Slide anterior"
+        >
           &#10094;
         </button>
-        <button className="next" onClick={nextSlide}>
+        <button
+          className="next"
+          onClick={nextSlide}
+          aria-label="Siguiente slide"
+        >
           &#10095;
         </button>
 
         <div className="slider-dots">
-          {slides.map((_, index) => (
-            <span
-              key={index}
+          {SLIDES.map((slide, index) => (
+            <button
+              key={`${slide.alt}-dot`}
+              type="button"
               className={`dot ${index === currentSlide ? "active" : ""}`}
               onClick={() => goToSlide(index)}
+              aria-label={`Ir al slide ${index + 1}`}
             />
           ))}
         </div>

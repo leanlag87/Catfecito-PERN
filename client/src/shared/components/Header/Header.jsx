@@ -1,15 +1,24 @@
-import { useState, useEffect, useCallback, useRef, useMemo } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { debounce } from "lodash";
 import { useAuthStore } from "../../../features/auth/stores/authStore";
 import api from "../../../services/api";
 import { Cart } from "../../../features/cart/components/Cart";
+import { useDebouncedValue, useClickOutside, useEscapeKey } from "../../hooks";
+import { ROUTES, UI_DURATIONS_MS } from "../../constants";
+import {
+  normalizeText,
+  resolveImageUrl,
+  formatCurrency,
+  getErrorMessage,
+} from "../../utils";
 import "./Header.css";
 import group from "../../../assets/img/Group.svg";
 import searchIcon from "../../../assets/img/lupa.png";
 import user from "../../../assets/img/user.svg";
 import cart from "../../../assets/img/cart.svg";
 import logoutIcon from "../../../assets/img/logout.svg";
+
+const PRODUCTS_ROUTE = "/products";
 
 export const Header = ({
   cartItems = [],
@@ -23,102 +32,98 @@ export const Header = ({
 }) => {
   const navigate = useNavigate();
   const inputRef = useRef(null);
+  const searchContainerRef = useRef(null);
 
-  // Usa el store de Zustand
   const { user: currentUser, isAuthenticated, logout } = useAuthStore();
+
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState([]);
   const [isSearching, setIsSearching] = useState(false);
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
 
-  const BACKEND_ORIGIN = import.meta.env.VITE_BACKEND_URL
-    ? import.meta.env.VITE_BACKEND_URL.replace(/\/$/, "")
-    : "";
+  const debouncedQuery = useDebouncedValue(
+    searchQuery,
+    UI_DURATIONS_MS.DEBOUNCE_SEARCH,
+  );
 
-  const getItemImageSrc = (it) => {
-    if (!it) return "";
-    let v = it.image ?? it.image_url ?? "";
-    if (v && typeof v === "object" && typeof v.url === "string") {
-      v = v.url;
-    }
-    if (typeof v !== "string") return "";
-    const src = v.trim();
-    if (!src) return "";
-    if (src.startsWith("http") || src.startsWith("data:")) return src;
-    if (!BACKEND_ORIGIN) return src;
-    return `${BACKEND_ORIGIN}${src.startsWith("/") ? "" : "/"}${src}`;
-  };
-
-  const handleNavigateToHome = () => {
-    navigate("/");
-  };
-
-  const handleLogout = () => {
-    logout();
-  };
+  const handleNavigateToHome = () => navigate(ROUTES.HOME);
+  const handleLogout = () => logout();
 
   const handleProfileClick = () => {
     if (!isAuthenticated) {
       if (typeof onOpenAuthModal === "function") {
-        return onOpenAuthModal("login");
+        onOpenAuthModal("login");
+        return;
       }
-      return navigate("/login", {
+      navigate(ROUTES.LOGIN, {
         state: {
           from: window.location.pathname,
           background: { pathname: window.location.pathname },
         },
       });
+      return;
     }
 
-    const role = currentUser?.role;
-    navigate(role === "admin" ? "/admin" : "/profile");
+    navigate(currentUser?.role === "admin" ? ROUTES.ADMIN : ROUTES.PROFILE);
   };
 
-  // useCallback para performSearch
+  const goToSearchPage = (value) => {
+    const q = String(value || "").trim();
+    if (!q) return;
+    navigate(`${PRODUCTS_ROUTE}?search=${encodeURIComponent(q)}`);
+    setSearchResults([]);
+    setMobileSearchOpen(false);
+  };
+
   const performSearch = useCallback(async (query) => {
     if (!query) {
       setSearchResults([]);
       setIsSearching(false);
       return;
     }
+
     setIsSearching(true);
     try {
       const { data } = await api.products.getAll();
-      const products = data.products || [];
-      const normalize = (str) =>
-        (str || "")
-          .toString()
-          .normalize("NFD")
-          .replace(/[\u0300-\u036f]/g, "")
-          .toLowerCase()
-          .trim();
-      const q = normalize(query);
-      const filtered = products.filter(
-        (p) =>
-          normalize(p.name).includes(q) ||
-          normalize(p.category_name).includes(q),
-      );
+      const products = data?.products || [];
+      const q = normalizeText(query);
+
+      const filtered = products.filter((p) => {
+        const name = normalizeText(p?.name);
+        const category = normalizeText(p?.category_name);
+        return name.includes(q) || category.includes(q);
+      });
+
       setSearchResults(filtered);
     } catch (error) {
-      console.error("Error al buscar productos:", error);
+      console.error("Error al buscar productos:", getErrorMessage(error));
       setSearchResults([]);
     } finally {
       setIsSearching(false);
     }
   }, []);
 
-  // useMemo para crear debounce
-  const debouncedSearch = useMemo(
-    () => debounce(performSearch, 300),
-    [performSearch],
+  useEffect(() => {
+    performSearch(String(debouncedQuery || "").trim());
+  }, [debouncedQuery, performSearch]);
+
+  useClickOutside(
+    searchContainerRef,
+    () => {
+      setSearchResults([]);
+      if (!searchQuery) setMobileSearchOpen(false);
+    },
+    true,
   );
 
-  useEffect(() => {
-    debouncedSearch(searchQuery);
-    return () => {
-      debouncedSearch.cancel();
-    };
-  }, [searchQuery, debouncedSearch]);
+  useEscapeKey(
+    () => {
+      setSearchResults([]);
+      setMobileSearchOpen(false);
+      inputRef.current?.blur();
+    },
+    mobileSearchOpen || searchResults.length > 0,
+  );
 
   return (
     <div className="header">
@@ -126,7 +131,10 @@ export const Header = ({
         <img src={group} alt="Catfecito logo" />
       </div>
 
-      <div className={`searcher ${mobileSearchOpen ? "visible" : ""}`}>
+      <div
+        ref={searchContainerRef}
+        className={`searcher ${mobileSearchOpen ? "visible" : ""}`}
+      >
         <input
           ref={inputRef}
           className="search-rec"
@@ -141,15 +149,16 @@ export const Header = ({
           role="button"
           tabIndex={0}
           onClick={() => inputRef.current?.focus()}
-          onKeyDown={(e) => {
-            if (e.key === "Enter") inputRef.current?.focus();
-          }}
+          onKeyDown={(e) => e.key === "Enter" && inputRef.current?.focus()}
         />
 
         <button
           type="button"
           className="clear-search"
-          onClick={() => setSearchQuery("")}
+          onClick={() => {
+            setSearchQuery("");
+            setSearchResults([]);
+          }}
           aria-label="Limpiar búsqueda"
           style={{ display: searchQuery ? "flex" : "none" }}
         >
@@ -157,19 +166,19 @@ export const Header = ({
         </button>
 
         <button
+          type="button"
           className="search-icon"
-          onClick={() => {
-            const q = searchQuery.trim();
-            if (!q) return;
-            navigate(`/products?search=${encodeURIComponent(q)}`);
-            setSearchResults([]);
-          }}
+          onClick={() => goToSearchPage(searchQuery)}
         >
           <img src={searchIcon} alt="Buscar" />
         </button>
 
         <div
-          className={`search-results ${isSearching || searchResults.length > 0 || searchQuery ? "visible" : ""}`}
+          className={`search-results ${
+            isSearching || searchResults.length > 0 || searchQuery
+              ? "visible"
+              : ""
+          }`}
         >
           {isSearching ? (
             <div className="no-results">Buscando...</div>
@@ -180,20 +189,18 @@ export const Header = ({
                 className="search-result-item"
                 type="button"
                 onClick={() => {
-                  const q = p.name.trim();
-                  if (q) {
-                    setSearchQuery("");
-                    setSearchResults([]);
-                    navigate(`/products?search=${encodeURIComponent(q)}`);
-                  }
+                  setSearchQuery("");
+                  setSearchResults([]);
+                  goToSearchPage(p.name);
                 }}
               >
-                <img src={getItemImageSrc(p)} alt={p.name} />
+                <img
+                  src={resolveImageUrl(p, "/placeholder-product.jpg")}
+                  alt={p.name}
+                />
                 <div className="sr-info">
                   <div className="sr-name">{p.name}</div>
-                  <div className="sr-price">
-                    ${Number(p.price || 0).toFixed(2)}
-                  </div>
+                  <div className="sr-price">{formatCurrency(p.price)}</div>
                 </div>
               </button>
             ))
@@ -215,8 +222,12 @@ export const Header = ({
           onClick={() => {
             const next = !mobileSearchOpen;
             setMobileSearchOpen(next);
-            if (next && inputRef.current)
-              setTimeout(() => inputRef.current.focus(), 50);
+            if (next) {
+              window.setTimeout(
+                () => inputRef.current?.focus(),
+                UI_DURATIONS_MS.FAST,
+              );
+            }
           }}
         >
           <img src={searchIcon} alt="Buscar" />
