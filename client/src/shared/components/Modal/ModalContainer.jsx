@@ -1,9 +1,11 @@
-import { useEffect, useState } from "react";
+import { useRef, useState } from "react";
 import "./ModalContainer.css";
 import { Login } from "../../../features/auth/components/Login";
 import { Register } from "../../../features/auth/components/Register";
 import { LogoutPopUpComponent } from "../../../features/auth/components/LogoutPopUp/LogoutPopUpComponent";
-import { ConstructionComponent } from "../../components/Construction/ConstructionComponent";
+import { ConstructionComponent } from "../Construction/ConstructionComponent";
+import { useBodyScrollLock, useClickOutside, useEscapeKey } from "../../hooks";
+import { MODAL_CLOSE_REASONS } from "../../constants";
 
 export const ModalContainer = ({
   type,
@@ -13,16 +15,28 @@ export const ModalContainer = ({
   onSuccess,
 }) => {
   const [isProcessing, setIsProcessing] = useState(false);
+  const modalRef = useRef(null);
 
-  useEffect(() => {
-    const handleEsc = (e) => {
-      if (e.key === "Escape" && visible && !isProcessing) onClose();
-    };
-    document.addEventListener("keydown", handleEsc);
-    return () => document.removeEventListener("keydown", handleEsc);
-  }, [visible, onClose, isProcessing]);
+  useBodyScrollLock(visible);
+
+  const requestClose = (reason) => {
+    if (isProcessing || !visible) return;
+    onClose?.(reason);
+  };
+
+  useEscapeKey(
+    () => requestClose(MODAL_CLOSE_REASONS.ESCAPE),
+    visible && !isProcessing,
+  );
+
+  useClickOutside(
+    modalRef,
+    () => requestClose(MODAL_CLOSE_REASONS.BACKDROP),
+    visible && !isProcessing,
+  );
 
   const handleSuccess = async (data) => {
+    if (typeof onSuccess !== "function") return;
     setIsProcessing(true);
     try {
       await onSuccess(data);
@@ -49,39 +63,43 @@ export const ModalContainer = ({
               margin: "1rem auto",
               animation: "spin 1s linear infinite",
             }}
-          ></div>
+          />
         </div>
       );
     }
-    if (type === "login")
+
+    if (type === "login") {
       return <Login onSwitch={onSwitch} onSuccess={handleSuccess} />;
-    if (type === "register")
+    }
+
+    if (type === "register") {
       return <Register onSwitch={onSwitch} onSuccess={handleSuccess} />;
-    if (type === "construction") return <ConstructionComponent />;
-    if (type === "logout") return <LogoutPopUpComponent />;
+    }
+
+    if (type === "construction") {
+      return <ConstructionComponent />;
+    }
+
+    if (type === "logout") {
+      return <LogoutPopUpComponent />;
+    }
+
     return null;
   };
 
   return (
-    <div
-      className="cf-modal-overlay"
-      onMouseDown={!isProcessing ? onClose : undefined}
-    >
-      <div
-        className="cf-modal"
-        onMouseDown={(e) => e.stopPropagation()}
-        role="dialog"
-        aria-modal="true"
-      >
+    <div className="cf-modal-overlay">
+      <div ref={modalRef} className="cf-modal" role="dialog" aria-modal="true">
         {!isProcessing && (
           <button
             className="cf-modal-close"
-            onClick={onClose}
+            onClick={() => requestClose(MODAL_CLOSE_REASONS.CLOSE_BUTTON)}
             aria-label="Cerrar"
           >
             ×
           </button>
         )}
+
         <div className="cf-modal-content">{renderContent()}</div>
       </div>
     </div>
