@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useAdminProducts } from "../hooks";
 import "./AdminProfile/AdminProfile.css";
 
-export default function AdminInsert() {
+export const AdminInsert = () => {
   const {
     categories,
     form,
@@ -122,4 +122,4 @@ export default function AdminInsert() {
       </form>
     </section>
   );
-}
+};
