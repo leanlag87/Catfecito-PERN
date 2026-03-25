@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useProfileForm } from "../hooks";
 import "./Profile/Profile.css";
 
-export default function ProfileAddress() {
+export const ProfileAddress = () => {
   const {
     form,
     formErrors,
@@ -192,4 +192,4 @@ export default function ProfileAddress() {
       </form>
     </section>
   );
-}
+};
