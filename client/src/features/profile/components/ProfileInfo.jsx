@@ -3,7 +3,7 @@ import { useAuthStore } from "../../auth/stores/authStore";
 import { useProfile, useProfileSecurity } from "../hooks";
 import "./Profile/Profile.css";
 
-export default function ProfileInfo() {
+export const ProfileInfo = () => {
   const { logout } = useAuthStore();
   const {
     profile,
@@ -138,4 +138,4 @@ export default function ProfileInfo() {
       </section>
     </>
   );
-}
+};
