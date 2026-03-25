@@ -3,7 +3,7 @@ import { useAdminOrders } from "../hooks";
 import api from "../../../services/api";
 import "../../profile/components/ProfileOrders/ProfileOrders.css";
 
-export default function AdminOrders() {
+export const AdminOrders = () => {
   const {
     orders,
     isLoading,
@@ -265,4 +265,4 @@ export default function AdminOrders() {
         ))}
     </section>
   );
-}
+};
