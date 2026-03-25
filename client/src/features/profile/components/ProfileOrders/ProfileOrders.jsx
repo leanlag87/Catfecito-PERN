@@ -8,7 +8,7 @@ import {
 } from "../../orders/services/orders.service";
 import "./ProfileOrders.css";
 
-export default function ProfileOrders() {
+export const ProfileOrders = () => {
   const [searchParams] = useSearchParams();
   const paymentStatus = searchParams.get("payment");
   const orderId = searchParams.get("order_id");
@@ -221,4 +221,4 @@ export default function ProfileOrders() {
         ))}
     </section>
   );
-}
+};
