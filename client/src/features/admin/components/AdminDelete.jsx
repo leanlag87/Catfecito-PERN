@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useAdminProducts } from "../hooks";
 import "./AdminProfile/AdminProfile.css";
 
-export default function AdminDelete() {
+export const AdminDelete = () => {
   const { products, isLoading, error, deleteProductById, clearError } =
     useAdminProducts();
 
@@ -142,4 +142,4 @@ export default function AdminDelete() {
       </form>
     </section>
   );
-}
+};

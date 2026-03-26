@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useAdminProducts } from "../hooks";
 import "./AdminProfile/AdminProfile.css";
 
-export default function AdminUpdate() {
+export const AdminUpdate = () => {
   const {
     products,
     categories,
@@ -229,4 +229,4 @@ export default function AdminUpdate() {
       </form>
     </section>
   );
-}
+};
