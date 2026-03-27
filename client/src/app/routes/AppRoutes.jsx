@@ -2,53 +2,125 @@ import { Navigate, Route, Routes } from "react-router-dom";
 import { RequireAuth, RequireAdmin } from "./routeGuards";
 import { ROUTES } from "../../shared/constants";
 import { NotFoundComponent } from "../../shared/components/NotFound/NotFoundComponent";
+import {
+  HomeRouteElement,
+  ContactRouteElement,
+  ProductsRouteElement,
+  LoginRouteElement,
+  RegisterRouteElement,
+  CheckoutRouteElement,
+  ProfileRouteElement,
+  ProfileInfoRouteElement,
+  ProfileAddressRouteElement,
+  ProfileOrdersRouteElement,
+  AdminProfileRouteElement,
+  AdminInsertRouteElement,
+  AdminUpdateRouteElement,
+  AdminDeleteRouteElement,
+  AdminOrdersRouteElement,
+} from "./routeElements";
 
-import { HomePage } from "../../pages/home/HomePage";
-import { ContactPage } from "../../pages/contact/ContactPage";
-import { Products } from "../../features/products/components/Products";
-import { Login } from "../../features/auth/components/Login";
-import { Register } from "../../features/auth/components/Register";
-import { Profile } from "../../features/profile/components/Profile/Profile";
-import { ProfileInfo } from "../../features/profile/components/ProfileInfo";
-import { ProfileAddress } from "../../features/profile/components/ProfileAddress";
-import { ProfileOrders } from "../../features/profile/components/ProfileOrders/ProfileOrders";
-import { CheckoutPage } from "../../features/orders/components/CheckoutPage/CheckoutPage";
-import { AdminInsert } from "../../features/admin/components/AdminInsert";
-import { AdminUpdate } from "../../features/admin/components/AdminUpdate";
-import { AdminDelete } from "../../features/admin/components/AdminDelete";
-import { AdminOrders } from "../../features/admin/components/AdminOrders";
-import { AdminProfile } from "../../features/admin/components/AdminProfile/AdminProfile";
-
-export const AppRoutes = () => {
+export const AppRoutes = ({
+  cartItems,
+  itemCount,
+  isCartOpen,
+  subtotal,
+  onAddToCart,
+  onRemoveItem,
+  onUpdateQuantity,
+  onClearCart,
+  onOpenCart,
+  onCloseCart,
+  onToggleCart,
+  onOpenAuthModal,
+}) => {
   return (
     <Routes>
       {/* Públicas */}
-      <Route path={ROUTES.HOME} element={<HomePage />} />
-      <Route path={ROUTES.CONTACT} element={<ContactPage />} />
-      <Route path={ROUTES.PRODUCTS} element={<Products />} />
-      <Route path={ROUTES.LOGIN} element={<Login />} />
-      <Route path={ROUTES.REGISTER} element={<Register />} />
-      <Route path={ROUTES.CHECKOUT} element={<CheckoutPage />} />
+      <Route
+        path={ROUTES.HOME}
+        element={
+          <HomeRouteElement
+            cartItems={cartItems}
+            itemCount={itemCount}
+            isCartOpen={isCartOpen}
+            onOpenCart={onOpenCart}
+            onCloseCart={onCloseCart}
+            onUpdateQuantity={onUpdateQuantity}
+            onRemoveItem={onRemoveItem}
+            onOpenAuthModal={onOpenAuthModal}
+          />
+        }
+      />
+      <Route path={ROUTES.CONTACT} element={<ContactRouteElement />} />
+      <Route
+        path={ROUTES.PRODUCTS}
+        element={
+          <ProductsRouteElement
+            onAddToCart={onAddToCart}
+            onOpenAuthModal={onOpenAuthModal}
+          />
+        }
+      />
+      <Route path={ROUTES.LOGIN} element={<LoginRouteElement />} />
+      <Route path={ROUTES.REGISTER} element={<RegisterRouteElement />} />
+      <Route
+        path={ROUTES.CHECKOUT}
+        element={
+          <CheckoutRouteElement
+            cartItems={cartItems}
+            subtotal={subtotal}
+            onUpdateQuantity={onUpdateQuantity}
+            onRemoveItem={onRemoveItem}
+            onClearCart={onClearCart}
+            onToggleCart={onToggleCart}
+          />
+        }
+      />
 
       {/* Privadas (usuario autenticado) */}
       <Route element={<RequireAuth />}>
-        <Route path={ROUTES.PROFILE} element={<Profile />} />
-        <Route path={ROUTES.PROFILE_INFO} element={<ProfileInfo />} />
-        <Route path={ROUTES.PROFILE_ADDRESS} element={<ProfileAddress />} />
-        <Route path={ROUTES.PROFILE_ORDERS} element={<ProfileOrders />} />
+        <Route path={ROUTES.PROFILE} element={<ProfileRouteElement />} />
+        <Route
+          path={ROUTES.PROFILE_INFO}
+          element={<ProfileInfoRouteElement />}
+        />
+        <Route
+          path={ROUTES.PROFILE_ADDRESS}
+          element={<ProfileAddressRouteElement />}
+        />
+        <Route
+          path={ROUTES.PROFILE_ORDERS}
+          element={<ProfileOrdersRouteElement />}
+        />
       </Route>
 
       {/* Privadas (admin) */}
       <Route element={<RequireAdmin />}>
-        <Route path={ROUTES.ADMIN} element={<AdminProfile />} />
-        <Route path={ROUTES.ADMIN_INSERT} element={<AdminInsert />} />
-        <Route path={ROUTES.ADMIN_UPDATE} element={<AdminUpdate />} />
-        <Route path={ROUTES.ADMIN_DELETE} element={<AdminDelete />} />
-        <Route path={ROUTES.ADMIN_ORDERS} element={<AdminOrders />} />
+        <Route path={ROUTES.ADMIN} element={<AdminProfileRouteElement />} />
+        <Route
+          path={ROUTES.ADMIN_INSERT}
+          element={<AdminInsertRouteElement />}
+        />
+        <Route
+          path={ROUTES.ADMIN_UPDATE}
+          element={<AdminUpdateRouteElement />}
+        />
+        <Route
+          path={ROUTES.ADMIN_DELETE}
+          element={<AdminDeleteRouteElement />}
+        />
+        <Route
+          path={ROUTES.ADMIN_ORDERS}
+          element={<AdminOrdersRouteElement />}
+        />
       </Route>
 
-      {/* Redirección opcional */}
-      <Route path="/home" element={<Navigate to={ROUTES.HOME} replace />} />
+      {/* Redirección */}
+      <Route
+        path={ROUTES.HOME_ALIAS || "/home"}
+        element={<Navigate to={ROUTES.HOME} replace />}
+      />
 
       {/* 404 */}
       <Route path={ROUTES.NOT_FOUND} element={<NotFoundComponent />} />
