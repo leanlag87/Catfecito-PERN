@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
-import { useProfileOrders } from "../hooks";
+import { useProfileOrders } from "../../hooks/useProfileOrders";
 import {
   formatOrderDate,
   formatOrderTotal,
