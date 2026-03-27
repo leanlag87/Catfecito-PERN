@@ -4,6 +4,7 @@ import { ROUTES } from "../../shared/constants";
 import { NotFoundComponent } from "../../shared/components/NotFound/NotFoundComponent";
 
 import { HomePage } from "../../pages/home/HomePage";
+import { ContactPage } from "../../pages/contact/ContactPage";
 import { Products } from "../../features/products/components/Products";
 import { Login } from "../../features/auth/components/Login";
 import { Register } from "../../features/auth/components/Register";
@@ -23,9 +24,11 @@ export const AppRoutes = () => {
     <Routes>
       {/* Públicas */}
       <Route path={ROUTES.HOME} element={<HomePage />} />
-      <Route path={ROUTES.SHOP} element={<Products />} />
+      <Route path={ROUTES.CONTACT} element={<ContactPage />} />
+      <Route path={ROUTES.PRODUCTS} element={<Products />} />
       <Route path={ROUTES.LOGIN} element={<Login />} />
       <Route path={ROUTES.REGISTER} element={<Register />} />
+      <Route path={ROUTES.CHECKOUT} element={<CheckoutPage />} />
 
       {/* Privadas (usuario autenticado) */}
       <Route element={<RequireAuth />}>
@@ -33,7 +36,6 @@ export const AppRoutes = () => {
         <Route path={ROUTES.PROFILE_INFO} element={<ProfileInfo />} />
         <Route path={ROUTES.PROFILE_ADDRESS} element={<ProfileAddress />} />
         <Route path={ROUTES.PROFILE_ORDERS} element={<ProfileOrders />} />
-        <Route path={ROUTES.PROFILE_SECURITY} element={<CheckoutPage />} />
       </Route>
 
       {/* Privadas (admin) */}
