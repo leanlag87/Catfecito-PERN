@@ -1,9 +1,11 @@
 export const ROUTES = Object.freeze({
   HOME: "/",
-  SHOP: "/shop",
+  PRODUCTS: "/products",
   CART: "/cart",
   LOGIN: "/login",
   REGISTER: "/register",
+  CONTACT: "/contact",
+  CHECKOUT: "/checkout",
 
   PROFILE: "/profile",
   PROFILE_INFO: "/profile/info",
