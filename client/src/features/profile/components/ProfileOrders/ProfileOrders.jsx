@@ -5,7 +5,7 @@ import {
   formatOrderDate,
   formatOrderTotal,
   formatShippingAddress,
-} from "../../orders/services/orders.service";
+} from "../../../orders/services/orders.service";
 import "./ProfileOrders.css";
 
 export const ProfileOrders = () => {
