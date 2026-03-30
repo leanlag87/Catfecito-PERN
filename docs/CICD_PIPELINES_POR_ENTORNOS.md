@@ -263,3 +263,124 @@ Semana 4:
 
 - Implementar production con approvals y rollback
 - Medir KPIs de pipeline (duracion, tasa de fallos, lead time)
+
+## 14. Ejecutable inmediato para este repo
+
+Si lo aplicas ya, crea estos archivos en .github/workflows con contenido minimo inicial.
+
+### 14.1 Archivos a crear
+
+```text
+.github/workflows/ci.yml
+.github/workflows/cd-dev.yml
+.github/workflows/cd-staging.yml
+.github/workflows/cd-prod.yml
+```
+
+### 14.2 Contenido minimo inicial
+
+Archivo: .github/workflows/ci.yml
+
+```yaml
+name: CI
+
+on:
+  pull_request:
+    branches: [develop, main]
+  push:
+    branches: [develop, main]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install root dependencies
+        run: npm ci
+
+      - name: Build client
+        run: npm --prefix client ci && npm --prefix client run build
+
+      - name: Validate backend syntax
+        run: node -c server/index.js
+```
+
+Archivo: .github/workflows/cd-dev.yml
+
+```yaml
+name: CD Development
+
+on:
+  push:
+    branches: [develop]
+
+jobs:
+  deploy-dev:
+    runs-on: ubuntu-latest
+    environment: development
+    steps:
+      - uses: actions/checkout@v4
+      - run: echo "Deploy a Development"
+```
+
+Archivo: .github/workflows/cd-staging.yml
+
+```yaml
+name: CD Staging
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - release/**
+
+jobs:
+  deploy-staging:
+    runs-on: ubuntu-latest
+    environment: staging
+    steps:
+      - uses: actions/checkout@v4
+      - run: echo "Deploy a Staging"
+```
+
+Archivo: .github/workflows/cd-prod.yml
+
+```yaml
+name: CD Production
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy-prod:
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+      - run: echo "Deploy a Production"
+```
+
+### 14.3 Configuracion requerida en GitHub
+
+Crear en Settings > Environments:
+
+- development
+- staging
+- production
+
+Para production configurar minimo:
+
+- Required reviewers
+- Branch restriction a main
+- Secrets del entorno productivo
+
+### 14.4 Integracion con tu pipeline actual
+
+- Mantener tu workflow actual como base de calidad.
+- Usar estos 4 workflows para separar CI y CD por entorno.
+- Reemplazar los pasos echo por comandos reales de deploy cuando definas destino (AWS, Vercel, Render, etc.).

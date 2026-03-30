@@ -189,3 +189,124 @@ Para Catfecito conviene una adopcion progresiva:
 - Health checks implementados
 - Imagenes escaneadas en CI
 - Guia de uso para equipo publicada
+
+## 15. Ejecutable inmediato para este repo
+
+Si lo aplicas ya, crea estos archivos exactamente con este contenido inicial.
+
+### 15.1 Archivos a crear
+
+```text
+docker/client/Dockerfile
+docker/client/nginx.conf
+docker/server/Dockerfile
+docker-compose.dev.yml
+.dockerignore
+```
+
+### 15.2 Contenido minimo inicial
+
+Archivo: docker/client/Dockerfile
+
+```dockerfile
+FROM node:20-alpine AS build
+WORKDIR /app
+COPY client/package*.json ./
+RUN npm ci
+COPY client/ ./
+ARG VITE_BACKEND_URL
+ARG VITE_MP_PUBLIC_KEY
+ARG VITE_APP_NAME
+ENV VITE_BACKEND_URL=$VITE_BACKEND_URL
+ENV VITE_MP_PUBLIC_KEY=$VITE_MP_PUBLIC_KEY
+ENV VITE_APP_NAME=$VITE_APP_NAME
+RUN npm run build
+
+FROM nginx:1.27-alpine
+COPY docker/client/nginx.conf /etc/nginx/conf.d/default.conf
+COPY --from=build /app/dist /usr/share/nginx/html
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]
+```
+
+Archivo: docker/client/nginx.conf
+
+```nginx
+server {
+  listen 80;
+  server_name _;
+  root /usr/share/nginx/html;
+  index index.html;
+
+  location / {
+    try_files $uri /index.html;
+  }
+}
+```
+
+Archivo: docker/server/Dockerfile
+
+```dockerfile
+FROM node:20-alpine
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci --omit=dev
+COPY server ./server
+EXPOSE 5000
+CMD ["node", "server/index.js"]
+```
+
+Archivo: docker-compose.dev.yml
+
+```yaml
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: docker/server/Dockerfile
+    env_file:
+      - .env
+    ports:
+      - "5000:5000"
+
+  frontend:
+    build:
+      context: .
+      dockerfile: docker/client/Dockerfile
+      args:
+        VITE_BACKEND_URL: ${VITE_BACKEND_URL}
+        VITE_MP_PUBLIC_KEY: ${VITE_MP_PUBLIC_KEY}
+        VITE_APP_NAME: ${VITE_APP_NAME}
+    depends_on:
+      - backend
+    ports:
+      - "5173:80"
+```
+
+Archivo: .dockerignore
+
+```text
+node_modules
+**/node_modules
+dist
+**/dist
+.git
+.github
+.vscode
+.idea
+*.log
+npm-debug.log*
+```
+
+### 15.3 Comandos para levantar
+
+```bash
+docker compose -f docker-compose.dev.yml up --build
+docker compose -f docker-compose.dev.yml down
+```
+
+### 15.4 Verificacion rapida
+
+- Frontend: http://localhost:5173
+- Backend: http://localhost:5000
+- Confirmar que el frontend apunte a la URL correcta de API en VITE_BACKEND_URL.
