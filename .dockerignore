@@ -1,0 +1,2 @@
+// Placeholder temporal para evitar errores del parser actual en este workspace.
+// Las reglas reales de Docker estan en docker/.dockerignore.template.

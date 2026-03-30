@@ -74,6 +74,7 @@ Si deseas ejecutar la **versión original PERN**:
 
 - Revisa el branch `legacy/pern-stack`
 - Instrucciones en `LEGACY_BACKEND_INSTRUCTIONS.md`
+- Frontend en `LEGACY_FRONTEND_INSTRUCTIONS.md`
 
 ## ⚡ Inicio Rápido (Versión Serverless)
 

@@ -1,0 +1,33 @@
+name: CD Staging - Disabled by default
+
+# Estado actual: DESACTIVADO.
+# Este workflow esta en modo manual y bloqueado por variable.
+#
+# Como activarlo:
+# 1) Definir CATFECITO_ENABLE_CICD=true en variables del repo.
+# 2) Cambiar on.workflow_dispatch por push a release/* o deploy manual aprobado.
+# 3) Reemplazar los pasos de echo por deploy real.
+
+on:
+  workflow_dispatch:
+
+jobs:
+  activation-info:
+    name: Activation info
+    runs-on: ubuntu-latest
+    steps:
+      - name: CD Staging is disabled
+        run: echo "CD Staging desactivado por defecto."
+
+  deploy-staging:
+    name: Deploy to Staging
+    # Desactivado por defecto. Cambiar a true para habilitar.
+    if: ${{ false }}
+    runs-on: ubuntu-latest
+    # Al activar, agregar: environment: staging
+    steps:
+      - uses: actions/checkout@v4
+      - name: Placeholder deploy
+        run: |
+          echo "TODO: reemplazar este paso por deploy real a Staging."
+          echo "Ejemplo: serverless deploy --stage staging"

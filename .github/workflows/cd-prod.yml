@@ -1,0 +1,34 @@
+name: CD Production - Disabled by default
+
+# Estado actual: DESACTIVADO.
+# Este workflow esta en modo manual y bloqueado por variable.
+#
+# Como activarlo:
+# 1) Definir CATFECITO_ENABLE_CICD=true en variables del repo.
+# 2) Cambiar on.workflow_dispatch por push a main.
+# 3) Configurar approvals en environment production.
+# 4) Reemplazar los pasos de echo por deploy real.
+
+on:
+  workflow_dispatch:
+
+jobs:
+  activation-info:
+    name: Activation info
+    runs-on: ubuntu-latest
+    steps:
+      - name: CD Production is disabled
+        run: echo "CD Production desactivado por defecto."
+
+  deploy-production:
+    name: Deploy to Production
+    # Desactivado por defecto. Cambiar a true para habilitar.
+    if: ${{ false }}
+    runs-on: ubuntu-latest
+    # Al activar, agregar: environment: production
+    steps:
+      - uses: actions/checkout@v4
+      - name: Placeholder deploy
+        run: |
+          echo "TODO: reemplazar este paso por deploy real a Production."
+          echo "Ejemplo: serverless deploy --stage prod"

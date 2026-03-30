@@ -1,0 +1,8 @@
+name: catfecito-prod
+
+services:
+  # Plantilla no operativa para produccion.
+  # Se activara cuando se defina estrategia final de release y monitoreo.
+  placeholder:
+    image: alpine:3.20
+    command: ["sh", "-c", "echo 'Production docker aun no habilitado'; sleep infinity"]
