@@ -1,0 +1,31 @@
+name: catfecito-dev
+
+services:
+  backend:
+    profiles: ["manual-enable"]
+    build:
+      context: .
+      dockerfile: docker/server/Dockerfile
+    env_file:
+      - .env
+    ports:
+      - "5000:5000"
+    # MODO DESACTIVADO (intencional):
+    # para activar luego, usa un comando real de backend.
+    command: ["sh", "-c", "echo 'Servicio backend desactivado por ahora.' && sleep infinity"]
+
+  frontend:
+    profiles: ["manual-enable"]
+    build:
+      context: .
+      dockerfile: docker/client/Dockerfile
+      args:
+        VITE_BACKEND_URL: ${VITE_BACKEND_URL:-http://localhost:5000}
+        VITE_MP_PUBLIC_KEY: ${VITE_MP_PUBLIC_KEY:-}
+        VITE_APP_NAME: ${VITE_APP_NAME:-CatFecito}
+    depends_on:
+      - backend
+    ports:
+      - "5173:80"
+    # MODO DESACTIVADO (intencional):
+    command: ["sh", "-c", "echo 'Servicio frontend desactivado por ahora.' && sleep infinity"]
