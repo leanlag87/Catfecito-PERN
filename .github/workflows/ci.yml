@@ -1,0 +1,51 @@
+name: CI - Disabled by default
+
+# Estado actual: DESACTIVADO.
+# Este workflow NO corre automaticamente porque solo usa workflow_dispatch
+# y ademas los jobs principales requieren CATFECITO_ENABLE_CICD=true.
+#
+# Como activarlo:
+# 1) Ir a GitHub > Settings > Secrets and variables > Actions > Variables.
+# 2) Crear variable de repositorio: CATFECITO_ENABLE_CICD = true
+# 3) Cambiar "on" segun estrategia:
+#    - push / pull_request en develop y main
+#    - o mantener workflow_dispatch manual.
+
+on:
+  workflow_dispatch:
+
+jobs:
+  activation-info:
+    name: Activation info
+    runs-on: ubuntu-latest
+    steps:
+      - name: CI is disabled
+        run: |
+          echo "CI/CD actualmente desactivado por configuracion."
+          echo "Para activar: crear CATFECITO_ENABLE_CICD=true y ajustar triggers en este archivo."
+
+  validate-quality:
+    name: Validate quality
+    # Desactivado por defecto. Cambiar a true para habilitar.
+    if: ${{ false }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install backend dependencies
+        run: npm ci
+
+      - name: Validate backend syntax
+        run: node -c server/test-dynamodb.js
+
+      - name: Install frontend dependencies
+        run: npm --prefix client ci
+
+      - name: Frontend lint
+        run: npm --prefix client run lint
+
+      - name: Frontend build
+        run: npm --prefix client run build
